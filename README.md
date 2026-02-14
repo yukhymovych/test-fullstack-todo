@@ -81,11 +81,18 @@ npm run dev
 
 ## API Ендпоінти
 
-- `GET /health` - Перевірка стану сервера
-- `GET /todos` - Отримати всі todo
+### Auth (no token required)
+- `POST /auth/register` - Register: body `{ username, password }` → returns `{ token }`
+- `POST /auth/login` - Login: body `{ username, password }` → returns `{ token }`
+- `GET /auth/me` - Get current user (requires Bearer token)
+
+### Todos (requires Bearer token in Authorization header)
+- `GET /todos` - Отримати всі todo (user-scoped)
 - `POST /todos` - Створити нове todo
 - `PATCH /todos/:id` - Оновити todo
 - `DELETE /todos/:id` - Видалити todo
+
+- `GET /health` - Перевірка стану сервера
 
 ## Особливості архітектури
 
@@ -163,7 +170,10 @@ VITE_API_URL=http://localhost:3001
 ```
 DATABASE_URL=postgresql://todo_user:password@localhost:5432/todo_db
 PORT=3001
+JWT_SECRET=your-secret-key-change-in-production
 ```
+
+**Important:** `JWT_SECRET` is required. The server will fail to start if it is not set. Use a long random string in production.
 
 ## Ліцензія
 

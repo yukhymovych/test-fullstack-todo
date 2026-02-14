@@ -7,12 +7,13 @@ import {
 } from './todos.schemas.js';
 
 export async function getTodos(
-  _req: Request,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {
   try {
-    const todos = await todosService.getAllTodos();
+    const userId = req.user!.id;
+    const todos = await todosService.getAllTodos(userId);
     res.json(todos);
   } catch (error) {
     next(error);
@@ -25,8 +26,9 @@ export async function createTodo(
   next: NextFunction
 ): Promise<void> {
   try {
+    const userId = req.user!.id;
     const input = createTodoSchema.parse(req.body);
-    const todo = await todosService.createTodo(input);
+    const todo = await todosService.createTodo(userId, input);
     res.status(201).json(todo);
   } catch (error) {
     next(error);
@@ -39,9 +41,10 @@ export async function updateTodo(
   next: NextFunction
 ): Promise<void> {
   try {
+    const userId = req.user!.id;
     const id = todoIdSchema.parse(req.params.id);
     const input = updateTodoSchema.parse(req.body);
-    const todo = await todosService.updateTodo(id, input);
+    const todo = await todosService.updateTodo(id, userId, input);
 
     if (!todo) {
       res.status(404).json({ error: 'Todo not found' });
@@ -60,8 +63,9 @@ export async function deleteTodo(
   next: NextFunction
 ): Promise<void> {
   try {
+    const userId = req.user!.id;
     const id = todoIdSchema.parse(req.params.id);
-    const deleted = await todosService.deleteTodo(id);
+    const deleted = await todosService.deleteTodo(id, userId);
 
     if (!deleted) {
       res.status(404).json({ error: 'Todo not found' });

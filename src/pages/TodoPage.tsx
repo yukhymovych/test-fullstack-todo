@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useTodosQuery, useCreateTodo, useUpdateTodo, useDeleteTodo } from '../features/todos/model/useTodos';
+import { useAuth } from '../app/contexts/AuthContext';
 import type { Todo } from '../features/todos/model/types';
 
 export function TodoPage() {
+  const { logout } = useAuth();
   const [newTitle, setNewTitle] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
@@ -58,7 +60,15 @@ export function TodoPage() {
 
   return (
     <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
-      <h1>Todo App</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <h1 style={{ margin: 0 }}>Todo App</h1>
+        <button
+          onClick={logout}
+          style={{ padding: '8px 16px', backgroundColor: '#666', color: 'white', border: 'none', cursor: 'pointer', borderRadius: '4px' }}
+        >
+          Logout
+        </button>
+      </div>
 
       {/* Add Todo Form */}
       <div style={{ marginBottom: '20px' }}>

@@ -1,5 +1,7 @@
 # Database Setup Instructions
 
+**Note:** The auth migration creates a `users` table and adds `user_id` to `todos`. If you get permission errors ("нет доступа к таблице users" / "must be owner of table users"), ensure `todo_user` has full access to the schema and tables. Run the commands below as the postgres superuser.
+
 If you're getting "нет доступа к схеме public" (no access to public schema) error, run these commands as the postgres superuser:
 
 ```sql

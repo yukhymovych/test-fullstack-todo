@@ -1,20 +1,46 @@
 import { API_URL } from '../config/env';
+import { getToken, clearToken } from '../lib/auth';
+
+type LogoutCallback = () => void;
+
+let logoutCallback: LogoutCallback | null = null;
+
+export function setLogoutCallback(cb: LogoutCallback | null): void {
+  logoutCallback = cb;
+}
 
 interface FetchOptions {
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE';
   body?: unknown;
+  skipAuth?: boolean;
 }
 
 async function fetchJson<T>(endpoint: string, options: FetchOptions): Promise<T> {
-  const { method, body } = options;
+  const { method, body, skipAuth } = options;
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  if (!skipAuth) {
+    const token = getToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+  }
 
   const response = await fetch(`${API_URL}${endpoint}`, {
     method,
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers,
     body: body ? JSON.stringify(body) : undefined,
   });
+
+  if (response.status === 401) {
+    clearToken();
+    logoutCallback?.();
+    const errorText = await response.text();
+    throw new Error(errorText || 'Unauthorized');
+  }
 
   if (!response.ok) {
     const errorText = await response.text();
@@ -30,8 +56,12 @@ async function fetchJson<T>(endpoint: string, options: FetchOptions): Promise<T>
 }
 
 export const http = {
-  get: <T>(endpoint: string) => fetchJson<T>(endpoint, { method: 'GET' }),
-  post: <T>(endpoint: string, body?: unknown) => fetchJson<T>(endpoint, { method: 'POST', body }),
-  patch: <T>(endpoint: string, body?: unknown) => fetchJson<T>(endpoint, { method: 'PATCH', body }),
-  delete: <T>(endpoint: string) => fetchJson<T>(endpoint, { method: 'DELETE' }),
+  get: <T>(endpoint: string, skipAuth?: boolean) =>
+    fetchJson<T>(endpoint, { method: 'GET', skipAuth }),
+  post: <T>(endpoint: string, body?: unknown, skipAuth?: boolean) =>
+    fetchJson<T>(endpoint, { method: 'POST', body, skipAuth }),
+  patch: <T>(endpoint: string, body?: unknown) =>
+    fetchJson<T>(endpoint, { method: 'PATCH', body }),
+  delete: <T>(endpoint: string) =>
+    fetchJson<T>(endpoint, { method: 'DELETE' }),
 };

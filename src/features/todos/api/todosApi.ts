@@ -1,5 +1,5 @@
 import { http } from '../../../shared/api/http';
-import { Todo } from '../model/types';
+import type { Todo } from '../model/types';
 
 export async function getTodos(): Promise<Todo[]> {
   return http.get<Todo[]>('/todos');
