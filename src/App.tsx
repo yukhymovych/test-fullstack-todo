@@ -1,13 +1,15 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { LoginPage } from './pages/LoginPage';
 import { TodoPage } from './pages/TodoPage';
+import { NotesListPage } from './pages/NotesListPage';
+import { NoteEditorPage } from './pages/NoteEditorPage';
 import { ProtectedRoute } from './app/components/ProtectedRoute';
 import { useAuth } from './app/contexts/AuthContext';
 import './App.css';
 
 function RootRedirect() {
   const { isAuthed } = useAuth();
-  return <Navigate to={isAuthed ? '/todos' : '/login'} replace />;
+  return <Navigate to={isAuthed ? '/notes' : '/login'} replace />;
 }
 
 function App() {
@@ -15,6 +17,22 @@ function App() {
     <Routes>
       <Route path="/" element={<RootRedirect />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/notes"
+        element={
+          <ProtectedRoute>
+            <NotesListPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/notes/:id"
+        element={
+          <ProtectedRoute>
+            <NoteEditorPage />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/todos"
         element={

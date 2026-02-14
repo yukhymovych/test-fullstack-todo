@@ -10,7 +10,7 @@ export function setLogoutCallback(cb: LogoutCallback | null): void {
 }
 
 interface FetchOptions {
-  method: 'GET' | 'POST' | 'PATCH' | 'DELETE';
+  method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
   body?: unknown;
   skipAuth?: boolean;
 }
@@ -62,6 +62,8 @@ export const http = {
     fetchJson<T>(endpoint, { method: 'POST', body, skipAuth }),
   patch: <T>(endpoint: string, body?: unknown) =>
     fetchJson<T>(endpoint, { method: 'PATCH', body }),
+  put: <T>(endpoint: string, body?: unknown) =>
+    fetchJson<T>(endpoint, { method: 'PUT', body }),
   delete: <T>(endpoint: string) =>
     fetchJson<T>(endpoint, { method: 'DELETE' }),
 };

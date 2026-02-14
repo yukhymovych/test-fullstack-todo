@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
+import { MantineProvider } from '@mantine/core';
 import type { ReactNode } from 'react';
 import { AuthProvider } from '../contexts/AuthContext';
 
@@ -20,9 +21,11 @@ export function AppProviders({ children }: AppProvidersProps) {
   return (
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <MantineProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </MantineProvider>
       </QueryClientProvider>
     </BrowserRouter>
   );

@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import { authRouter } from './modules/auth/auth.routes.js';
+import { notesRouter } from './modules/notes/notes.routes.js';
 import { todosRouter } from './modules/todos/todos.routes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 
@@ -21,6 +22,7 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/auth', authRouter);
+app.use('/notes', notesRouter);
 app.use('/todos', todosRouter);
 
 app.use(errorHandler);

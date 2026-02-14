@@ -1,0 +1,121 @@
+import { Request, Response, NextFunction } from 'express';
+import * as notesService from './notes.service.js';
+import {
+  createNoteSchema,
+  updateNoteSchema,
+  noteIdSchema,
+} from './notes.schemas.js';
+
+const DEFAULT_RICH_CONTENT = [{ type: 'paragraph', content: [] }];
+
+export async function getNotes(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const notes = await notesService.getAllNotes(userId);
+    res.json(notes);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getNote(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const id = noteIdSchema.parse(req.params.id);
+    const note = await notesService.getNoteById(id, userId);
+
+    if (!note) {
+      res.status(404).json({ error: 'Note not found' });
+      return;
+    }
+
+    res.json(note);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function createNote(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const input = createNoteSchema.parse(req.body);
+    const richContent = Array.isArray(input.rich_content)
+      ? input.rich_content
+      : DEFAULT_RICH_CONTENT;
+    const title = (input.title && input.title.trim()) || 'Untitled';
+    const note = await notesService.createNote(userId, {
+      title,
+      rich_content: richContent,
+    });
+    res.status(201).json(note);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function updateNote(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const id = noteIdSchema.parse(req.params.id);
+    const input = updateNoteSchema.parse(req.body);
+    const richContent = Array.isArray(input.rich_content)
+      ? input.rich_content
+      : undefined;
+
+    if (richContent === undefined) {
+      res.status(400).json({ error: 'rich_content is required' });
+      return;
+    }
+
+    const note = await notesService.updateNote(id, userId, {
+      title: input.title,
+      rich_content: richContent,
+    });
+
+    if (!note) {
+      res.status(404).json({ error: 'Note not found' });
+      return;
+    }
+
+    res.json(note);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function deleteNote(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const id = noteIdSchema.parse(req.params.id);
+    const deleted = await notesService.deleteNote(id, userId);
+
+    if (!deleted) {
+      res.status(404).json({ error: 'Note not found' });
+      return;
+    }
+
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+}

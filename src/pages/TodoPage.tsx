@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTodosQuery, useCreateTodo, useUpdateTodo, useDeleteTodo } from '../features/todos/model/useTodos';
 import { useAuth } from '../app/contexts/AuthContext';
 import type { Todo } from '../features/todos/model/types';
 
 export function TodoPage() {
   const { logout } = useAuth();
+  const navigate = useNavigate();
   const [newTitle, setNewTitle] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
@@ -62,12 +64,20 @@ export function TodoPage() {
     <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <h1 style={{ margin: 0 }}>Todo App</h1>
-        <button
-          onClick={logout}
-          style={{ padding: '8px 16px', backgroundColor: '#666', color: 'white', border: 'none', cursor: 'pointer', borderRadius: '4px' }}
-        >
-          Logout
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button
+            onClick={() => navigate('/notes')}
+            style={{ padding: '8px 16px', backgroundColor: '#666', color: 'white', border: 'none', cursor: 'pointer', borderRadius: '4px' }}
+          >
+            Notes
+          </button>
+          <button
+            onClick={logout}
+            style={{ padding: '8px 16px', backgroundColor: '#666', color: 'white', border: 'none', cursor: 'pointer', borderRadius: '4px' }}
+          >
+            Logout
+          </button>
+        </div>
       </div>
 
       {/* Add Todo Form */}
