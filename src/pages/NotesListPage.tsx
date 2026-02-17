@@ -30,19 +30,48 @@ export function NotesListPage() {
   };
 
   if (isLoading) {
-    return <div style={{ padding: '20px' }}>Loading notes...</div>;
+    return (
+      <div
+        style={{
+          padding: '20px',
+          maxWidth: 800,
+          width: '100%',
+          margin: '0 auto',
+          boxSizing: 'border-box',
+        }}
+      >
+        Loading notes...
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div style={{ padding: '20px', color: 'red' }}>
+      <div
+        style={{
+          padding: '20px',
+          color: 'red',
+          maxWidth: 800,
+          width: '100%',
+          margin: '0 auto',
+          boxSizing: 'border-box',
+        }}
+      >
         Error loading notes: {error.message}
       </div>
     );
   }
 
   return (
-    <div style={{ padding: '20px', maxWidth: '90vw', margin: '0 auto' }}>
+    <div
+      style={{
+        padding: '20px',
+        maxWidth: 800,
+        width: '100%',
+        margin: '0 auto',
+        boxSizing: 'border-box',
+      }}
+    >
       <h1 style={{ margin: '50px 0', textAlign: 'center' }}>Notes</h1>
       <div
         style={{
@@ -51,7 +80,8 @@ export function NotesListPage() {
           alignItems: 'center',
           marginBottom: '20px',
           width: '100%',
-          minWidth: '600px',
+          flexWrap: 'wrap',
+          gap: '10px',
         }}
       >
         <div style={{ display: 'flex', gap: '10px' }}>
@@ -103,8 +133,6 @@ export function NotesListPage() {
                 style={{
                   padding: '12px 16px',
                   marginBottom: '8px',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '6px',
                   cursor: 'pointer',
                 }}
               >

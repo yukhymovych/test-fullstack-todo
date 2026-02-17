@@ -5,6 +5,7 @@ export interface NoteListItem {
   id: string;
   title: string;
   updated_at: string;
+  parent_id?: string | null;
 }
 
 export interface Note {

@@ -18,7 +18,7 @@ const DEFAULT_BLOCKS = [{ type: 'paragraph', content: [] }];
 
 function ensureBlocksArray(value: unknown): unknown[] {
   let v = value;
-  
+
   // Handle legacy stringified JSON from DB
   if (typeof v === 'string') {
     try {
@@ -28,12 +28,12 @@ function ensureBlocksArray(value: unknown): unknown[] {
       return DEFAULT_BLOCKS;
     }
   }
-  
+
   // Ensure we have a valid array
   if (Array.isArray(v) && v.length > 0) {
     return v;
   }
-  
+
   console.warn('[ensureBlocksArray] Invalid or empty blocks, using default blocks');
   return DEFAULT_BLOCKS;
 }
@@ -141,7 +141,7 @@ export function NoteEditorPage() {
                 props: { noteId: newNote.id },
               });
             })
-            .catch(() => {});
+            .catch(() => { });
         },
         icon: <RiFileTextLine size={18} />,
         key: 'embeddedPage' as const,
@@ -160,11 +160,11 @@ export function NoteEditorPage() {
       console.log('[performSave] blocks type:', typeof blocks);
       console.log('[performSave] blocks is array:', Array.isArray(blocks));
       console.log('[performSave] blocks sample:', JSON.stringify(blocks).slice(0, 200));
-      
+
       const richContent = JSON.parse(JSON.stringify(blocks));
       console.log('[performSave] richContent type:', typeof richContent);
       console.log('[performSave] richContent is array:', Array.isArray(richContent));
-      
+
       await updateMutation.mutateAsync({
         id,
         payload: {
@@ -208,20 +208,28 @@ export function NoteEditorPage() {
     navigate('/notes');
   };
 
+  const contentStyles = {
+    padding: '20px',
+    maxWidth: 800,
+    width: '100%',
+    margin: '0 auto',
+    boxSizing: 'border-box' as const,
+  };
+
   if (isLoading || !id) {
-    return <div style={{ padding: '20px' }}>Loading note...</div>;
+    return <div style={contentStyles}>Loading note...</div>;
   }
 
   if (error || !note) {
     return (
-      <div style={{ padding: '20px', color: 'red' }}>
+      <div style={{ ...contentStyles, color: 'red' }}>
         Error: {error?.message ?? 'Note not found'}
       </div>
     );
   }
 
   return (
-    <div style={{ padding: '20px', maxWidth: '90vw', margin: '0 auto', width: "900px" }}>
+    <div style={contentStyles}>
       <div
         style={{
           display: 'flex',
@@ -229,6 +237,7 @@ export function NoteEditorPage() {
           alignItems: 'center',
           marginBottom: '16px',
           gap: '12px',
+          flexWrap: 'wrap',
         }}
       >
         <button
@@ -300,11 +309,10 @@ export function NoteEditorPage() {
         placeholder="Note title"
         style={{
           width: '100%',
+          boxSizing: 'border-box',
           padding: '12px 16px',
           fontSize: '24px',
           fontWeight: 600,
-          border: '1px solid #e5e7eb',
-          borderRadius: '6px',
           marginBottom: '16px',
         }}
       />
@@ -312,8 +320,6 @@ export function NoteEditorPage() {
       <NoteTitlesContext.Provider value={noteTitlesMap}>
         <div
           style={{
-            border: '1px solid #e5e7eb',
-            borderRadius: '6px',
             minHeight: '300px',
             padding: '16px',
           }}

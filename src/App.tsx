@@ -3,6 +3,7 @@ import { LoginPage } from './pages/LoginPage';
 import { NotesListPage } from './pages/NotesListPage';
 import { NoteEditorPage } from './pages/NoteEditorPage';
 import { ProtectedRoute } from './app/components/ProtectedRoute';
+import { NotesLayout } from './app/layout/NotesLayout';
 import { useAuth } from './app/contexts/AuthContext';
 import './App.css';
 
@@ -20,18 +21,13 @@ function App() {
         path="/notes"
         element={
           <ProtectedRoute>
-            <NotesListPage />
+            <NotesLayout />
           </ProtectedRoute>
         }
-      />
-      <Route
-        path="/notes/:id"
-        element={
-          <ProtectedRoute>
-            <NoteEditorPage />
-          </ProtectedRoute>
-        }
-      />
+      >
+        <Route index element={<NotesListPage />} />
+        <Route path=":id" element={<NoteEditorPage />} />
+      </Route>
     </Routes>
   );
 }

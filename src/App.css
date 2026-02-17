@@ -3,3 +3,8 @@
   margin: 0 auto;
   padding: 2rem;
 }
+
+/* Notes sidebar tree row hover */
+.notes-tree-row:hover {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
