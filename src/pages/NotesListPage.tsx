@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useNotesQuery, useCreateNote } from '../features/notes/model/useNotes';
 import { useAuth } from '../app/contexts/AuthContext';
 import type { NoteListItem } from '../features/notes/model/types';
+import { Button } from '@/shared/ui';
 
 function formatDate(iso: string): string {
   const d = new Date(iso);
@@ -85,33 +86,16 @@ export function NotesListPage() {
         }}
       >
         <div style={{ display: 'flex', gap: '10px' }}>
-          <button
+          <Button
+            variant="primary"
             onClick={handleNewNote}
             disabled={createMutation.isPending}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#2563eb',
-              color: 'white',
-              border: 'none',
-              cursor: 'pointer',
-              borderRadius: '4px',
-            }}
           >
             {createMutation.isPending ? 'Creating...' : 'New note'}
-          </button>
-          <button
-            onClick={logout}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#666',
-              color: 'white',
-              border: 'none',
-              cursor: 'pointer',
-              borderRadius: '4px',
-            }}
-          >
+          </Button>
+          <Button variant="secondary" onClick={logout}>
             Logout
-          </button>
+          </Button>
         </div>
       </div>
 

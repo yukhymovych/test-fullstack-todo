@@ -12,6 +12,7 @@ import '@blocknote/mantine/style.css';
 import { useNoteQuery, useUpdateNote, useDeleteNote, useCreateNote, useNotesQuery, useNoteEmbeds } from '../features/notes/model/useNotes';
 import { NoteTitlesContext, EmbeddedPageBlock } from '../features/notes/blocks/EmbeddedPageBlock';
 import { useAuth } from '../app/contexts/AuthContext';
+import { Button } from '@/shared/ui';
 import { insertOrUpdateBlockForSlashMenu } from '@blocknote/core/extensions';
 
 const DEFAULT_BLOCKS = [{ type: 'paragraph', content: [] }];
@@ -240,19 +241,9 @@ export function NoteEditorPage() {
           flexWrap: 'wrap',
         }}
       >
-        <button
-          onClick={handleBack}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#666',
-            color: 'white',
-            border: 'none',
-            cursor: 'pointer',
-            borderRadius: '4px',
-          }}
-        >
+        <Button variant="secondary" onClick={handleBack}>
           Back to list
-        </button>
+        </Button>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <span
             style={{
@@ -272,33 +263,16 @@ export function NoteEditorPage() {
             {saveStatus === 'error' && 'Error saving'}
             {saveStatus === 'idle' && '\u00A0'}
           </span>
-          <button
+          <Button
+            variant="danger"
             onClick={handleDelete}
             disabled={deleteMutation.isPending}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#dc2626',
-              color: 'white',
-              border: 'none',
-              cursor: 'pointer',
-              borderRadius: '4px',
-            }}
           >
             {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
-          </button>
-          <button
-            onClick={logout}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#666',
-              color: 'white',
-              border: 'none',
-              cursor: 'pointer',
-              borderRadius: '4px',
-            }}
-          >
+          </Button>
+          <Button variant="secondary" onClick={logout}>
             Logout
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -341,22 +315,12 @@ export function NoteEditorPage() {
           <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
             {embeds.map((embed) => (
               <li key={embed.id} style={{ marginBottom: '6px' }}>
-                <button
-                  type="button"
+                <Button
+                  variant="link"
                   onClick={() => navigate(`/notes/${embed.id}`)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    padding: 0,
-                    cursor: 'pointer',
-                    color: '#2563eb',
-                    fontSize: '14px',
-                    textDecoration: 'underline',
-                    textAlign: 'left',
-                  }}
                 >
                   {embed.title || 'Untitled'}
-                </button>
+                </Button>
               </li>
             ))}
           </ul>

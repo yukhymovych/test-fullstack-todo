@@ -5,6 +5,7 @@ import { useNotesQuery, useCreateNote, useUpdateNote } from '../../model/useNote
 import * as notesApi from '../../api/notesApi';
 import { buildMaps, getAncestors } from './treeUtils';
 import { TreeNode } from './TreeNode';
+import { Button } from '@/shared/ui';
 
 const NOTE_KEY = (id: string) => ['notes', id];
 const EXPANDED_STORAGE_KEY = 'notes-sidebar-expanded';
@@ -184,27 +185,14 @@ export function SidebarNotesTree() {
 
   return (
     <div style={{ padding: '8px 0' }}>
-      <button
-        type="button"
+      <Button
+        variant="ghost-muted"
+        fullWidth
         onClick={handleCreateRoot}
         disabled={createNote.isPending}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          width: '100%',
-          padding: '8px 12px',
-          marginBottom: '8px',
-          background: 'rgba(255,255,255,0.06)',
-          border: 'none',
-          borderRadius: '6px',
-          color: '#d1d5db',
-          fontSize: '14px',
-          cursor: createNote.isPending ? 'not-allowed' : 'pointer',
-        }}
       >
         {createNote.isPending ? 'Creating...' : 'New page'}
-      </button>
+      </Button>
       <div>
         {rootIds.map((nodeId) => (
           <TreeNode

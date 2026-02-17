@@ -1,4 +1,5 @@
 import type { NoteItem } from './treeUtils';
+import { Button } from '@/shared/ui';
 
 interface TreeNodeProps {
   nodeId: string;
@@ -51,27 +52,19 @@ export function TreeNode({
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            icon
             onClick={() => hasChildren && toggleExpand(nodeId)}
             style={{
-              width: '20px',
-              height: '20px',
-              flexShrink: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'none',
-              border: 'none',
               cursor: hasChildren ? 'pointer' : 'default',
-              color: '#9ca3af',
-              fontSize: '12px',
+              flex: 0,
             }}
           >
             {hasChildren ? (isExpanded ? '▼' : '▶') : ' '}
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="ghost"
             onClick={() => navigate(nodeId)}
             style={{
               flex: 1,
@@ -79,38 +72,22 @@ export function TreeNode({
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
               color: isActive ? '#fff' : '#d1d5db',
               fontSize: '14px',
-              padding: '2px 4px',
               marginLeft: '2px',
             }}
           >
             {node.title || 'Untitled'}
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="ghost"
+            icon
             onClick={() => onCreateChild(nodeId)}
             title="Add child page"
-            style={{
-              width: '20px',
-              height: '20px',
-              flexShrink: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              color: '#9ca3af',
-              fontSize: '14px',
-              opacity: 0.7,
-            }}
+            style={{ opacity: 0.7 }}
           >
             +
-          </button>
+          </Button>
         </div>
       </div>
       {hasChildren && isExpanded && (

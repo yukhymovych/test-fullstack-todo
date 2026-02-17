@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../app/contexts/AuthContext';
 import * as authApi from '../features/auth/api/authApi';
+import { Button } from '@/shared/ui';
 
 export function LoginPage() {
   const { isAuthed } = useAuth();
@@ -83,23 +84,24 @@ export function LoginPage() {
         {error && (
           <div style={{ color: 'red', marginBottom: '15px' }}>{error}</div>
         )}
-        <button
+        <Button
           type="submit"
+          variant="primary"
           disabled={isLoading}
-          style={{ padding: '10px 20px', marginRight: '10px' }}
+          style={{ marginRight: '10px' }}
         >
           {isLoading ? 'Please wait...' : isRegister ? 'Register' : 'Login'}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="secondary"
           onClick={() => {
             setIsRegister(!isRegister);
             setError(null);
           }}
-          style={{ padding: '10px 20px' }}
         >
           {isRegister ? 'Already have an account? Login' : 'Need an account? Register'}
-        </button>
+        </Button>
       </form>
     </div>
   );
