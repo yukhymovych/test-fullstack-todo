@@ -42,16 +42,18 @@ export function NotesListPage() {
   }
 
   return (
-    <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
+    <div style={{ padding: '20px', maxWidth: '90vw', margin: '0 auto' }}>
+      <h1 style={{ margin: '50px 0', textAlign: 'center' }}>Notes</h1>
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           marginBottom: '20px',
+          width: '100%',
+          minWidth: '600px',
         }}
       >
-        <h1 style={{ margin: 0 }}>Notes</h1>
         <div style={{ display: 'flex', gap: '10px' }}>
           <button
             onClick={handleNewNote}
@@ -67,7 +69,7 @@ export function NotesListPage() {
           >
             {createMutation.isPending ? 'Creating...' : 'New note'}
           </button>
-          <button
+          {/* <button
             onClick={() => navigate('/todos')}
             style={{
               padding: '8px 16px',
@@ -79,7 +81,7 @@ export function NotesListPage() {
             }}
           >
             Todos
-          </button>
+          </button> */}
           <button
             onClick={logout}
             style={{
@@ -117,10 +119,9 @@ export function NotesListPage() {
                   border: '1px solid #e5e7eb',
                   borderRadius: '6px',
                   cursor: 'pointer',
-                  backgroundColor: 'white',
                 }}
               >
-                <div style={{ fontWeight: 500 }}>
+                <div style={{ fontWeight: 500, color: 'white' }}>
                   {note.title || 'Untitled'}
                 </div>
                 <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>

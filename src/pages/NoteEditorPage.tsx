@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCreateBlockNote, useEditorChange } from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/mantine';
+import { BlockNoteSchema, createCodeBlockSpec } from '@blocknote/core';
+import { codeBlockOptions } from '@blocknote/code-block';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/mantine/style.css';
 import { useNoteQuery, useUpdateNote, useDeleteNote } from '../features/notes/model/useNotes';
@@ -58,6 +60,11 @@ export function NoteEditorPage() {
     : DEFAULT_BLOCKS;
 
   const editor = useCreateBlockNote({
+    schema: BlockNoteSchema.create().extend({
+      blockSpecs: {
+        codeBlock: createCodeBlockSpec(codeBlockOptions),
+      },
+    }),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     initialContent: initialContent as any,
   }, [note?.id]);
@@ -123,7 +130,7 @@ export function NoteEditorPage() {
   }
 
   return (
-    <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
+    <div style={{ padding: '20px', maxWidth: '90vw', margin: '0 auto', width: "900px" }}>
       <div
         style={{
           display: 'flex',

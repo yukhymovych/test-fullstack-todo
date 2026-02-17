@@ -4,7 +4,7 @@ import * as authSQL from './auth.sql.js';
 import type { RegisterInput, LoginInput } from './auth.schemas.js';
 
 const SALT_ROUNDS = 10;
-const JWT_EXPIRES_IN = '10m';
+const JWT_EXPIRES_IN = '5d';
 
 function getJwtSecret(): string {
   const secret = process.env.JWT_SECRET;

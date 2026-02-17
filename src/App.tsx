@@ -33,14 +33,14 @@ function App() {
           </ProtectedRoute>
         }
       />
-      <Route
+      {/* <Route
         path="/todos"
         element={
           <ProtectedRoute>
             <TodoPage />
           </ProtectedRoute>
         }
-      />
+      /> */}
     </Routes>
   );
 }

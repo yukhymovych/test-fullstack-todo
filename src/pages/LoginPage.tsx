@@ -9,7 +9,7 @@ export function LoginPage() {
 
   useEffect(() => {
     if (isAuthed) {
-      navigate('/todos', { replace: true });
+      navigate('/notes', { replace: true });
     }
   }, [isAuthed, navigate]);
   const [isRegister, setIsRegister] = useState(false);
@@ -40,7 +40,7 @@ export function LoginPage() {
         ? await authApi.register(username.trim().toLowerCase(), password)
         : await authApi.login(username.trim().toLowerCase(), password);
       login(token);
-      navigate('/todos');
+      navigate('/notes');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
