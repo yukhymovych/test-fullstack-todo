@@ -278,19 +278,6 @@ export function NoteEditorPage() {
             {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
           </button>
           <button
-            onClick={() => navigate('/todos')}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#666',
-              color: 'white',
-              border: 'none',
-              cursor: 'pointer',
-              borderRadius: '4px',
-            }}
-          >
-            Todos
-          </button>
-          <button
             onClick={logout}
             style={{
               padding: '8px 16px',

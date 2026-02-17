@@ -1,6 +1,6 @@
-# Fullstack Todo Application
+# Fullstack Notes Application
 
-Мінімальний fullstack Todo додаток з React TypeScript фронтендом і Node.js Express бекендом.
+Мінімальний fullstack Notes додаток з React TypeScript фронтендом і Node.js Express бекендом.
 
 ## Структура проєкту
 
@@ -20,7 +20,7 @@ test-fullstack-todo/
     │   ├── server.ts     # Точка входу
     │   ├── app.ts        # Express додаток
     │   ├── db/           # Database connection
-    │   ├── modules/      # Модулі (todos)
+    │   ├── modules/      # Модулі (notes, auth)
     │   └── middlewares/  # Middlewares
     └── migrations/       # Database міграції
 ```
@@ -86,11 +86,11 @@ npm run dev
 - `POST /auth/login` - Login: body `{ username, password }` → returns `{ token }`
 - `GET /auth/me` - Get current user (requires Bearer token)
 
-### Todos (requires Bearer token in Authorization header)
-- `GET /todos` - Отримати всі todo (user-scoped)
-- `POST /todos` - Створити нове todo
-- `PATCH /todos/:id` - Оновити todo
-- `DELETE /todos/:id` - Видалити todo
+### Notes (requires Bearer token in Authorization header)
+- `GET /notes` - Отримати всі notes (user-scoped)
+- `POST /notes` - Створити нову note
+- `PATCH /notes/:id` - Оновити note
+- `DELETE /notes/:id` - Видалити note
 
 - `GET /health` - Перевірка стану сервера
 
@@ -121,28 +121,12 @@ npm run dev
 - `src/shared/config` - Конфігурація додатку
 
 **Backend:**
-- `src/modules/todos` - Модуль todos з повним CRUD
-  - `todos.routes.ts` - Визначення маршрутів
-  - `todos.controller.ts` - HTTP handlers (request/response)
-  - `todos.service.ts` - Бізнес логіка
-  - `todos.sql.ts` - SQL запити
-  - `todos.schemas.ts` - Zod схеми валідації
+- `src/modules/notes` - Модуль notes з повним CRUD
+- `src/modules/auth` - Модуль автентифікації
 - `src/db` - Database connection pool
 - `src/middlewares` - Express middlewares
 
 ## База даних
-
-### Таблиця todos
-
-```sql
-CREATE TABLE todos (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  title TEXT NOT NULL,
-  completed BOOLEAN NOT NULL DEFAULT false,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-```
 
 ### Міграції
 

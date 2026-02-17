@@ -1,6 +1,6 @@
-# Todo API
+# Notes API
 
-Простий REST API для Todo додатку на Node.js + Express + TypeScript + PostgreSQL.
+Простий REST API для Notes додатку на Node.js + Express + TypeScript + PostgreSQL.
 
 ## Налаштування
 
@@ -68,10 +68,8 @@ npm start
 ## API Ендпоінти
 
 - `GET /health` - Перевірка стану сервера
-- `GET /todos` - Отримати всі todo
-- `POST /todos` - Створити нове todo (body: `{ title: string }`)
-- `PATCH /todos/:id` - Оновити todo (body: `{ title?: string, completed?: boolean }`)
-- `DELETE /todos/:id` - Видалити todo
+- Auth: `POST /auth/register`, `POST /auth/login`, `GET /auth/me`
+- Notes: `GET /notes`, `POST /notes`, `PATCH /notes/:id`, `DELETE /notes/:id`
 
 ## Структура проєкту
 
@@ -83,12 +81,8 @@ api/
 │   ├── db/
 │   │   └── pool.ts           # PostgreSQL connection pool
 │   ├── modules/
-│   │   └── todos/
-│   │       ├── todos.routes.ts      # Маршрути
-│   │       ├── todos.controller.ts  # Request/Response handlers
-│   │       ├── todos.service.ts     # Бізнес-логіка
-│   │       ├── todos.sql.ts         # SQL запити
-│   │       └── todos.schemas.ts     # Zod схеми валідації
+│   │   ├── auth/                    # Автентифікація
+│   │   └── notes/                   # Notes CRUD
 │   └── middlewares/
 │       └── errorHandler.ts   # Обробка помилок
 ├── migrations/               # Database міграції

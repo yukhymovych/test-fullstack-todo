@@ -1,6 +1,18 @@
-exports.up = async function(pgm) {
-  pgm.sql('CREATE EXTENSION IF NOT EXISTS pgcrypto;');
+/**
+ * @param pgm {import('node-pg-migrate').MigrationBuilder}
+ * @param run {() => void | undefined}
+ * @returns {Promise<void> | void}
+ */
+exports.up = async (pgm) => {
+  pgm.dropTable('todos', { ifExists: true });
+};
 
+/**
+ * @param pgm {import('node-pg-migrate').MigrationBuilder}
+ * @param run {() => void | undefined}
+ * @returns {Promise<void> | void}
+ */
+exports.down = async (pgm) => {
   pgm.createTable('todos', {
     id: {
       type: 'uuid',
@@ -27,11 +39,5 @@ exports.up = async function(pgm) {
       default: pgm.func('NOW()'),
     },
   });
-
   pgm.createIndex('todos', 'created_at');
-};
-
-exports.down = async function(pgm) {
-  pgm.dropTable('todos');
-  pgm.sql('DROP EXTENSION IF EXISTS pgcrypto;');
 };

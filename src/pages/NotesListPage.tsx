@@ -69,19 +69,6 @@ export function NotesListPage() {
           >
             {createMutation.isPending ? 'Creating...' : 'New note'}
           </button>
-          {/* <button
-            onClick={() => navigate('/todos')}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#666',
-              color: 'white',
-              border: 'none',
-              cursor: 'pointer',
-              borderRadius: '4px',
-            }}
-          >
-            Todos
-          </button> */}
           <button
             onClick={logout}
             style={{

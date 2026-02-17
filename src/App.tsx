@@ -1,6 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { LoginPage } from './pages/LoginPage';
-import { TodoPage } from './pages/TodoPage';
 import { NotesListPage } from './pages/NotesListPage';
 import { NoteEditorPage } from './pages/NoteEditorPage';
 import { ProtectedRoute } from './app/components/ProtectedRoute';
@@ -30,14 +29,6 @@ function App() {
         element={
           <ProtectedRoute>
             <NoteEditorPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/todos"
-        element={
-          <ProtectedRoute>
-            <TodoPage />
           </ProtectedRoute>
         }
       />
