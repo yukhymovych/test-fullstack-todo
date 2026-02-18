@@ -34,16 +34,13 @@ function EmbeddedPageBlockRender({ block }: { block: { props: { noteId: string }
         display: 'flex',
         alignItems: 'center',
         gap: '8px',
-        padding: '8px 12px',
-        borderRadius: '6px',
-        backgroundColor: '#f3f4f6',
+        padding: '8px 0',
         cursor: 'pointer',
-        border: '1px solid #e5e7eb',
         maxWidth: '400px',
       }}
     >
-      <RiFileTextLine size={20} style={{ flexShrink: 0, color: '#6b7280' }} />
-      <span style={{ fontSize: '14px', fontWeight: 500, color: '#374151' }}>
+      <RiFileTextLine size={20} style={{ flexShrink: 0, color: 'white' }} />
+      <span style={{ fontSize: '14px', fontWeight: 500, color: 'white' }}>
         {title}
       </span>
     </div>

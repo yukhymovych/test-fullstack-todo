@@ -6,6 +6,7 @@ import * as notesApi from '../../api/notesApi';
 import { buildMaps, getAncestors } from './treeUtils';
 import { TreeNode } from './TreeNode';
 import { Button } from '@/shared/ui';
+import { UserInfo } from '@/app/components/UserInfo';
 
 const NOTE_KEY = (id: string) => ['notes', id];
 const EXPANDED_STORAGE_KEY = 'notes-sidebar-expanded';
@@ -185,6 +186,9 @@ export function SidebarNotesTree() {
 
   return (
     <div style={{ padding: '8px 0' }}>
+      <div className="px-2 pb-2">
+        <UserInfo />
+      </div>
       <Button
         variant="ghost-muted"
         fullWidth

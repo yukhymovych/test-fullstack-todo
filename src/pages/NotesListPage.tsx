@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { useNotesQuery, useCreateNote } from '../features/notes/model/useNotes';
-import { useAuth } from '../app/contexts/AuthContext';
 import type { NoteListItem } from '../features/notes/model/types';
 import { Button } from '@/shared/ui';
 
@@ -16,7 +15,6 @@ function formatDate(iso: string): string {
 }
 
 export function NotesListPage() {
-  const { logout } = useAuth();
   const navigate = useNavigate();
   const { data: notes, isLoading, error } = useNotesQuery();
   const createMutation = useCreateNote();
@@ -73,7 +71,7 @@ export function NotesListPage() {
         boxSizing: 'border-box',
       }}
     >
-      <h1 style={{ margin: '50px 0', textAlign: 'center' }}>Notes</h1>
+      <h1 style={{ margin: '50px 0', textAlign: 'center', fontSize: '40px', fontWeight: 600 }}>Notes</h1>
       <div
         style={{
           display: 'flex',
@@ -92,9 +90,6 @@ export function NotesListPage() {
             disabled={createMutation.isPending}
           >
             {createMutation.isPending ? 'Creating...' : 'New note'}
-          </Button>
-          <Button variant="secondary" onClick={logout}>
-            Logout
           </Button>
         </div>
       </div>

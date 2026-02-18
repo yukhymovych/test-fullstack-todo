@@ -68,11 +68,6 @@ body {
   min-height: 100vh;
 }
 
-h1 {
-  font-size: 32px;
-  line-height: 1.1;
-}
-
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);

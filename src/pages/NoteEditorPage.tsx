@@ -11,7 +11,6 @@ import '@blocknote/core/fonts/inter.css';
 import '@blocknote/mantine/style.css';
 import { useNoteQuery, useUpdateNote, useDeleteNote, useCreateNote, useNotesQuery, useNoteEmbeds } from '../features/notes/model/useNotes';
 import { NoteTitlesContext, EmbeddedPageBlock } from '../features/notes/blocks/EmbeddedPageBlock';
-import { useAuth } from '../app/contexts/AuthContext';
 import { Button } from '@/shared/ui';
 import { insertOrUpdateBlockForSlashMenu } from '@blocknote/core/extensions';
 
@@ -70,7 +69,6 @@ function useDebouncedSave(saveFn: () => void, delay: number) {
 export function NoteEditorPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { logout } = useAuth();
   const { data: note, isLoading, error } = useNoteQuery(id, true);
   const { data: notes } = useNotesQuery();
   const { data: embeds } = useNoteEmbeds(id, !!id);
@@ -270,9 +268,6 @@ export function NoteEditorPage() {
           >
             {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
           </Button>
-          <Button variant="secondary" onClick={logout}>
-            Logout
-          </Button>
         </div>
       </div>
 
@@ -285,8 +280,8 @@ export function NoteEditorPage() {
           width: '100%',
           boxSizing: 'border-box',
           padding: '12px 16px',
-          fontSize: '24px',
-          fontWeight: 600,
+          fontSize: '40px',
+          fontWeight: 'bold',
           marginBottom: '16px',
         }}
       />
