@@ -1,3 +1,12 @@
+export {
+  Breadcrumb,
+  BreadcrumbEllipsis,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from './breadcrumb';
 export { Button } from './Button';
 export type { ButtonProps, ButtonVariant } from './Button';
 export { Avatar, AvatarImage, AvatarFallback } from './avatar';

@@ -66,6 +66,7 @@ export function TreeNode({
           <Button
             variant="ghost"
             onClick={() => navigate(nodeId)}
+            className="justify-start"
             style={{
               flex: 1,
               textAlign: 'left',

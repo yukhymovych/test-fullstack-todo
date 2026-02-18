@@ -34,21 +34,3 @@ export function buildMaps(notes: NoteItem[]): TreeMaps {
   return { byId, childrenByParent };
 }
 
-/** Walk parent_id upwards until null. Protects against cycles. */
-export function getAncestors(noteId: string, byId: Map<string, NoteItem>): string[] {
-  const seen = new Set<string>();
-  const ancestors: string[] = [];
-  let current: NoteItem | undefined = byId.get(noteId);
-  while (current) {
-    if (seen.has(current.id)) break;
-    seen.add(current.id);
-    const pid = current.parent_id ?? null;
-    if (pid) {
-      ancestors.unshift(pid);
-      current = byId.get(pid);
-    } else {
-      break;
-    }
-  }
-  return ancestors;
-}

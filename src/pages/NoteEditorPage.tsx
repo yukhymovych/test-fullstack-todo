@@ -11,6 +11,7 @@ import '@blocknote/core/fonts/inter.css';
 import '@blocknote/mantine/style.css';
 import { useNoteQuery, useUpdateNote, useDeleteNote, useCreateNote, useNotesQuery, useNoteEmbeds } from '../features/notes/model/useNotes';
 import { NoteTitlesContext, EmbeddedPageBlock } from '../features/notes/blocks/EmbeddedPageBlock';
+import { NoteBreadcrumbs } from '../features/notes/ui/NoteBreadcrumbs';
 import { Button } from '@/shared/ui';
 import { insertOrUpdateBlockForSlashMenu } from '@blocknote/core/extensions';
 
@@ -203,10 +204,6 @@ export function NoteEditorPage() {
     navigate('/notes');
   };
 
-  const handleBack = () => {
-    navigate('/notes');
-  };
-
   const contentStyles = {
     padding: '20px',
     maxWidth: 800,
@@ -239,9 +236,13 @@ export function NoteEditorPage() {
           flexWrap: 'wrap',
         }}
       >
-        <Button variant="secondary" onClick={handleBack}>
-          Back to list
-        </Button>
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <NoteBreadcrumbs
+            activeId={id}
+            notes={notes}
+            currentTitle={title.trim() || note.title || 'Untitled'}
+          />
+        </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <span
             style={{

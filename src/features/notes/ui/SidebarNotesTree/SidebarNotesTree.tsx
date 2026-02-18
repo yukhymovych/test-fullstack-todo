@@ -3,7 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNotesQuery, useCreateNote, useUpdateNote } from '../../model/useNotes';
 import * as notesApi from '../../api/notesApi';
-import { buildMaps, getAncestors } from './treeUtils';
+import { getAncestorChain } from '../../model/noteHierarchy';
+import { buildMaps } from './treeUtils';
 import { TreeNode } from './TreeNode';
 import { Button } from '@/shared/ui';
 import { UserInfo } from '@/app/components/UserInfo';
@@ -96,7 +97,7 @@ export function SidebarNotesTree() {
 
   useEffect(() => {
     if (!activeId || !byId.has(activeId)) return;
-    const ancestors = getAncestors(activeId, byId);
+    const ancestors = getAncestorChain(activeId, byId);
     if (ancestors.length === 0) return;
     setExpanded((prev) => {
       let changed = false;
