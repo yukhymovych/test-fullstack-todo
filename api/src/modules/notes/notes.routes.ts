@@ -11,4 +11,5 @@ notesRouter.get('/:id/embeds', notesController.getNoteEmbeds);
 notesRouter.get('/:id', notesController.getNote);
 notesRouter.post('/', notesController.createNote);
 notesRouter.put('/:id', notesController.updateNote);
+notesRouter.patch('/:id/move', notesController.moveNote);
 notesRouter.delete('/:id', notesController.deleteNote);

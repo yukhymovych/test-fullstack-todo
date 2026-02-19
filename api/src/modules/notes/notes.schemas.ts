@@ -19,5 +19,11 @@ export const updateNoteSchema = z.object({
 
 export const noteIdSchema = z.string().uuid('Invalid note ID format');
 
+export const moveNoteSchema = z.object({
+  new_parent_id: z.string().uuid().nullable(),
+  position: z.number().int().min(0).optional().default(0),
+});
+
 export type CreateNoteInput = z.infer<typeof createNoteSchema>;
 export type UpdateNoteInput = z.infer<typeof updateNoteSchema>;
+export type MoveNoteInput = z.infer<typeof moveNoteSchema>;

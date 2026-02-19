@@ -1,13 +1,8 @@
+import { useDraggable } from '@dnd-kit/core';
+import { CSS } from '@dnd-kit/utilities';
 import type { TreeNodeProps } from './TreeNode.types';
-import { DEFAULT_NOTE_TITLE } from '../../../model/types';
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/shared/ui';
-import { MoreVertical } from 'lucide-react';
+import { TreeNodeRow } from './TreeNodeRow';
+import { DropZone } from '../DropZone';
 
 export function TreeNode({
   nodeId,
@@ -18,6 +13,7 @@ export function TreeNode({
   toggleExpand,
   onCreateChild,
   onDeletePage,
+  onMoveNote,
   isDeleting,
   navigate,
   activeId,
@@ -30,81 +26,53 @@ export function TreeNode({
   const isExpanded = expandedSet.has(nodeId);
   const isActive = activeId === nodeId;
 
-  const paddingLeft = 12 + depth * 14;
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    isDragging,
+  } = useDraggable({
+    id: nodeId,
+    disabled: !onMoveNote,
+  });
+
+  const style = transform
+    ? {
+        transform: CSS.Translate.toString(transform),
+        opacity: isDragging ? 0.5 : 1,
+      }
+    : undefined;
+
+  const rowContent = (
+    <TreeNodeRow
+      node={node}
+      nodeId={nodeId}
+      depth={depth}
+      hasChildren={hasChildren}
+      isExpanded={isExpanded}
+      isActive={isActive}
+      toggleExpand={toggleExpand}
+      onCreateChild={onCreateChild}
+      onDeletePage={onDeletePage}
+      isDeleting={isDeleting}
+      navigate={navigate}
+      dragHandleProps={onMoveNote ? { ...attributes, ...listeners } : undefined}
+      rowRef={onMoveNote ? setNodeRef : undefined}
+      rowStyle={style}
+    />
+  );
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <div
-        className="notes-tree-row"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          paddingLeft,
-          paddingRight: '8px',
-          paddingTop: '4px',
-          paddingBottom: '4px',
-          minHeight: '28px',
-          backgroundColor: isActive ? 'rgba(255,255,255,0.08)' : 'transparent',
-          borderRadius: '4px',
-          cursor: 'default',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
-          <Button
-            variant="ghost"
-            icon
-            onClick={() => hasChildren && toggleExpand(nodeId)}
-            style={{
-              cursor: hasChildren ? 'pointer' : 'default',
-              flex: 0,
-            }}
-          >
-            {hasChildren ? (isExpanded ? '▼' : '▶') : ' '}
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={() => navigate(nodeId)}
-            className="justify-start"
-            style={{
-              flex: 1,
-              textAlign: 'left',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              color: isActive ? '#fff' : '#d1d5db',
-              fontSize: '14px',
-              marginLeft: '2px',
-            }}
-          >
-            {node.title || DEFAULT_NOTE_TITLE}
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                icon
-                onClick={(e) => e.stopPropagation()}
-                title="Page options"
-                style={{ opacity: 0.7 }}
-              >
-                <MoreVertical className="size-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onCreateChild(nodeId)}>
-                Add new page
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                variant="destructive"
-                onClick={() => onDeletePage(nodeId)}
-                disabled={isDeleting}
-              >
-                Delete page
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
+      {onMoveNote && (
+        <DropZone id={`before-${nodeId}`} variant="between" />
+      )}
+      {onMoveNote ? (
+        <DropZone id={`onto-${nodeId}`}>{rowContent}</DropZone>
+      ) : (
+        rowContent
+      )}
       {hasChildren && isExpanded && (
         <div>
           {children.map((cid) => (
@@ -118,6 +86,7 @@ export function TreeNode({
               toggleExpand={toggleExpand}
               onCreateChild={onCreateChild}
               onDeletePage={onDeletePage}
+              onMoveNote={onMoveNote}
               isDeleting={isDeleting}
               navigate={navigate}
               activeId={activeId}

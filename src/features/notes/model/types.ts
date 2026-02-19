@@ -8,6 +8,7 @@ export interface NoteListItem {
   title: string;
   updated_at: string;
   parent_id?: string | null;
+  sort_order?: number;
 }
 
 export interface Note {

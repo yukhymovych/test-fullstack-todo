@@ -1,0 +1,27 @@
+.sidebar-container {
+  padding: 8px 0;
+}
+
+.sidebar-user-info {
+  padding: 0 8px 8px;
+}
+
+.sidebar-tree {
+  /* container for tree nodes */
+}
+
+.sidebar-loading {
+  padding: 12px;
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+.sidebar-error {
+  padding: 12px;
+  color: #ef4444;
+  font-size: 13px;
+}
+
+.sidebar-root-end {
+  min-height: 24px;
+}

@@ -35,3 +35,15 @@ export async function deleteNote(id: string): Promise<void> {
 export async function getNoteEmbeds(noteId: string): Promise<NoteListItem[]> {
   return http.get<NoteListItem[]>(`/notes/${noteId}/embeds`);
 }
+
+export interface MoveNotePayload {
+  new_parent_id: string | null;
+  position?: number;
+}
+
+export async function moveNote(
+  id: string,
+  payload: MoveNotePayload
+): Promise<Note> {
+  return http.patch<Note>(`/notes/${id}/move`, payload);
+}

@@ -3,6 +3,7 @@ import * as notesService from './notes.service.js';
 import {
   createNoteSchema,
   updateNoteSchema,
+  moveNoteSchema,
   noteIdSchema,
 } from './notes.schemas.js';
 
@@ -74,12 +75,6 @@ export async function updateNote(
   try {
     const userId = req.user!.id;
     const id = noteIdSchema.parse(req.params.id);
-    
-    // Debug: Log raw request body
-    console.log('[updateNote] Raw body type:', typeof req.body);
-    console.log('[updateNote] Rich content type:', typeof req.body.rich_content);
-    console.log('[updateNote] Rich content sample:', JSON.stringify(req.body.rich_content).slice(0, 200));
-    
     const input = updateNoteSchema.parse(req.body);
     const richContent = Array.isArray(input.rich_content)
       ? input.rich_content
@@ -101,6 +96,26 @@ export async function updateNote(
       return;
     }
 
+    res.json(note);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function moveNote(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const id = noteIdSchema.parse(req.params.id);
+    const input = moveNoteSchema.parse(req.body);
+    const note = await notesService.moveNote(id, userId, input);
+    if (!note) {
+      res.status(404).json({ error: 'Note not found' });
+      return;
+    }
     res.json(note);
   } catch (error) {
     next(error);

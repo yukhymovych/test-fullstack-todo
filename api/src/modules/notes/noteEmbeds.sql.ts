@@ -56,6 +56,31 @@ export async function replaceNoteEmbeds(
   }
 }
 
+/** Replace embeds using an existing DB client (for transactions). */
+export async function replaceNoteEmbedsWithClient(
+  client: { query: (q: string, p?: unknown[]) => Promise<{ rows: unknown[] }> },
+  userId: string,
+  hostNoteId: string,
+  embeddedIds: string[]
+): Promise<void> {
+  await client.query(
+    'DELETE FROM note_embeds WHERE user_id = $1 AND host_note_id = $2',
+    [userId, hostNoteId]
+  );
+  const uniqueIds = [...new Set(embeddedIds)];
+  if (uniqueIds.length > 0) {
+    const values = uniqueIds
+      .map((_, i) => `($1, $2, $${i + 3}, NOW())`)
+      .join(', ');
+    const params = [userId, hostNoteId, ...uniqueIds];
+    await client.query(
+      `INSERT INTO note_embeds (user_id, host_note_id, embedded_note_id, created_at)
+       VALUES ${values}`,
+      params
+    );
+  }
+}
+
 export async function getNoteEmbeds(
   userId: string,
   hostNoteId: string

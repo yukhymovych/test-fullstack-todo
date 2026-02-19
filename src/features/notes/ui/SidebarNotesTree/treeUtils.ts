@@ -22,12 +22,17 @@ export function buildMaps(notes: NoteItem[]): TreeMaps {
     childrenByParent.set(pid, arr);
   }
 
-  // Sort children by updated_at DESC
+  // Sort children by sort_order ASC, then updated_at DESC
   for (const [, ids] of childrenByParent) {
     ids.sort((a, b) => {
       const na = byId.get(a)!;
       const nb = byId.get(b)!;
-      return new Date(nb.updated_at).getTime() - new Date(na.updated_at).getTime();
+      const sortA = na.sort_order ?? 0;
+      const sortB = nb.sort_order ?? 0;
+      if (sortA !== sortB) return sortA - sortB;
+      return (
+        new Date(nb.updated_at).getTime() - new Date(na.updated_at).getTime()
+      );
     });
   }
 
