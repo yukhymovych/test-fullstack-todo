@@ -1,8 +1,7 @@
 import { http } from '../../../shared/api/http';
+import type { LoginResponse } from './authApi.types';
 
-export interface LoginResponse {
-  token: string;
-}
+export type { LoginResponse } from './authApi.types';
 
 export async function register(
   username: string,
