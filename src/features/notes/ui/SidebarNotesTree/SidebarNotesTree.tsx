@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { useNotesQuery, useCreateNote, useUpdateNote } from '../../model/useNotes';
+import {
+  useNotesQuery,
+  useCreateNote,
+  useUpdateNote,
+  useDeleteNote,
+} from '../../model/useNotes';
 import { DEFAULT_NOTE_TITLE } from '../../model/types';
 import { notesRoutes } from '../../lib/routes';
 import * as notesApi from '../../api/notesApi';
@@ -73,6 +78,7 @@ export function SidebarNotesTree() {
   const { data: notes, isLoading, error } = useNotesQuery();
   const createNote = useCreateNote();
   const updateNote = useUpdateNote();
+  const deleteNote = useDeleteNote();
 
   const [expanded, setExpanded] = useState<Set<string>>(() => loadExpandedFromStorage());
 
@@ -171,6 +177,17 @@ export function SidebarNotesTree() {
     [navigate]
   );
 
+  const handleDeletePage = useCallback(
+    async (pageId: string) => {
+      if (!window.confirm('Delete this page?')) return;
+      await deleteNote.mutateAsync(pageId);
+      if (activeId === pageId) {
+        navigate(notesRoutes.list());
+      }
+    },
+    [deleteNote, activeId, navigate]
+  );
+
   if (isLoading) {
     return (
       <div style={{ padding: '12px', color: '#9ca3af', fontSize: '13px' }}>
@@ -211,6 +228,8 @@ export function SidebarNotesTree() {
             expandedSet={expanded}
             toggleExpand={toggleExpand}
             onCreateChild={handleCreateChild}
+            onDeletePage={handleDeletePage}
+            isDeleting={deleteNote.isPending}
             navigate={handleNavigate}
             activeId={activeId}
           />

@@ -1,6 +1,13 @@
 import type { NoteItem } from './treeUtils';
 import { DEFAULT_NOTE_TITLE } from '../../model/types';
-import { Button } from '@/shared/ui';
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/shared/ui';
+import { MoreVertical } from 'lucide-react';
 
 interface TreeNodeProps {
   nodeId: string;
@@ -10,6 +17,8 @@ interface TreeNodeProps {
   expandedSet: Set<string>;
   toggleExpand: (id: string) => void;
   onCreateChild: (parentId: string) => void;
+  onDeletePage: (pageId: string) => void;
+  isDeleting: boolean;
   navigate: (id: string) => void;
   activeId: string | undefined;
 }
@@ -22,6 +31,8 @@ export function TreeNode({
   expandedSet,
   toggleExpand,
   onCreateChild,
+  onDeletePage,
+  isDeleting,
   navigate,
   activeId,
 }: TreeNodeProps) {
@@ -81,15 +92,31 @@ export function TreeNode({
           >
             {node.title || DEFAULT_NOTE_TITLE}
           </Button>
-          <Button
-            variant="ghost"
-            icon
-            onClick={() => onCreateChild(nodeId)}
-            title="Add child page"
-            style={{ opacity: 0.7 }}
-          >
-            +
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                icon
+                onClick={(e) => e.stopPropagation()}
+                title="Page options"
+                style={{ opacity: 0.7 }}
+              >
+                <MoreVertical className="size-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => onCreateChild(nodeId)}>
+                Add new page
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() => onDeletePage(nodeId)}
+                disabled={isDeleting}
+              >
+                Delete page
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       {hasChildren && isExpanded && (
@@ -104,6 +131,8 @@ export function TreeNode({
               expandedSet={expandedSet}
               toggleExpand={toggleExpand}
               onCreateChild={onCreateChild}
+              onDeletePage={onDeletePage}
+              isDeleting={isDeleting}
               navigate={navigate}
               activeId={activeId}
             />
