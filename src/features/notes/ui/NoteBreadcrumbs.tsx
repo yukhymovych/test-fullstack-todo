@@ -1,6 +1,13 @@
-import * as React from 'react';
+import { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getAncestorChain } from '../model/noteHierarchy';
+import {
+  buildNoteLookupMaps,
+  getAncestorChain,
+  splitBreadcrumbAncestors,
+} from '../model/noteHierarchy';
+import { DEFAULT_NOTE_TITLE } from '../model/types';
+import { notesRoutes } from '../lib/routes';
+import type { NoteListItem } from '../model/types';
 import {
   Breadcrumb,
   BreadcrumbEllipsis,
@@ -17,42 +24,106 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui';
 
-interface NoteBreadcrumbsProps {
-  activeId: string;
-  notes: Array<{ id: string; title?: string; parent_id?: string | null }> | undefined;
-  currentTitle: string;
-}
-
 const TRUNCATE_CLASS = 'max-w-[220px] truncate inline-block';
 const MAX_VISIBLE_LINKS = 3;
+
+interface BreadcrumbEllipsisDropdownProps {
+  ancestorIds: string[];
+  titleById: Map<string, string>;
+  onNavigate: (id: string) => void;
+}
+
+function BreadcrumbEllipsisDropdown({
+  ancestorIds,
+  titleById,
+  onNavigate,
+}: BreadcrumbEllipsisDropdownProps) {
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
+            >
+              <BreadcrumbEllipsis />
+              <span className="sr-only">Toggle menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuGroup>
+              {ancestorIds.map((aid) => (
+                <DropdownMenuItem
+                  key={aid}
+                  onClick={() => onNavigate(aid)}
+                  className="cursor-pointer"
+                >
+                  <span className={TRUNCATE_CLASS}>
+                    {titleById.get(aid) ?? DEFAULT_NOTE_TITLE}
+                  </span>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </BreadcrumbItem>
+    </>
+  );
+}
+
+interface BreadcrumbAncestorLinkProps {
+  id: string;
+  title: string;
+}
+
+function BreadcrumbAncestorLink({ id, title }: BreadcrumbAncestorLinkProps) {
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbLink asChild>
+          <Link
+            to={notesRoutes.editor(id)}
+            className={`${TRUNCATE_CLASS} text-muted-foreground hover:text-foreground hover:underline`}
+          >
+            {title}
+          </Link>
+        </BreadcrumbLink>
+      </BreadcrumbItem>
+    </>
+  );
+}
+
+interface NoteBreadcrumbsProps {
+  activeId: string;
+  notes: NoteListItem[] | undefined;
+  currentTitle: string;
+}
 
 export function NoteBreadcrumbs({ activeId, notes, currentTitle }: NoteBreadcrumbsProps) {
   const navigate = useNavigate();
 
-  const byId = new Map<string, { id: string; parent_id: string | null }>();
-  if (notes) {
-    for (const n of notes) {
-      byId.set(n.id, { id: n.id, parent_id: n.parent_id ?? null });
-    }
-  }
+  const { byId, titleById } = useMemo(
+    () => buildNoteLookupMaps(notes ?? []),
+    [notes]
+  );
 
-  const ancestorIds = getAncestorChain(activeId, byId);
-  const titleById = new Map<string, string>();
-  if (notes) {
-    for (const n of notes) {
-      titleById.set(n.id, n.title ?? 'Untitled');
-    }
-  }
+  const ancestorIds = useMemo(
+    () => getAncestorChain(activeId, byId),
+    [activeId, byId]
+  );
 
-  const displayTitle = currentTitle.trim() || 'Untitled';
+  const { hidden, visible } = useMemo(
+    () => splitBreadcrumbAncestors(ancestorIds, MAX_VISIBLE_LINKS),
+    [ancestorIds]
+  );
 
-  // Total segments: Notes + ancestors + current
-  const totalSegments = 1 + ancestorIds.length + 1;
-  const shouldCollapse = totalSegments > MAX_VISIBLE_LINKS;
+  const displayTitle = currentTitle.trim() || DEFAULT_NOTE_TITLE;
 
-  // When collapsed: Notes / [dropdown] / lastAncestor / Current
-  const hiddenInDropdown = shouldCollapse ? ancestorIds.slice(0, -1) : [];
-  const visibleAncestors = shouldCollapse ? ancestorIds.slice(-1) : ancestorIds;
+  const handleNavigate = (id: string) => navigate(notesRoutes.editor(id));
 
   return (
     <Breadcrumb className="min-w-0">
@@ -60,7 +131,7 @@ export function NoteBreadcrumbs({ activeId, notes, currentTitle }: NoteBreadcrum
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
             <Link
-              to="/notes"
+              to={notesRoutes.list()}
               className={`${TRUNCATE_CLASS} text-muted-foreground hover:text-foreground hover:underline`}
             >
               Notes
@@ -68,55 +139,20 @@ export function NoteBreadcrumbs({ activeId, notes, currentTitle }: NoteBreadcrum
           </BreadcrumbLink>
         </BreadcrumbItem>
 
-        {shouldCollapse && hiddenInDropdown.length > 0 && (
-          <>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    className="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
-                  >
-                    <BreadcrumbEllipsis />
-                    <span className="sr-only">Toggle menu</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                  <DropdownMenuGroup>
-                    {hiddenInDropdown.map((aid) => (
-                      <DropdownMenuItem
-                        key={aid}
-                        onClick={() => navigate(`/notes/${aid}`)}
-                        className="cursor-pointer"
-                      >
-                        <span className={TRUNCATE_CLASS}>
-                          {titleById.get(aid) ?? 'Untitled'}
-                        </span>
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </BreadcrumbItem>
-          </>
+        {hidden.length > 0 && (
+          <BreadcrumbEllipsisDropdown
+            ancestorIds={hidden}
+            titleById={titleById}
+            onNavigate={handleNavigate}
+          />
         )}
 
-        {visibleAncestors.map((aid) => (
-          <React.Fragment key={aid}>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link
-                  to={`/notes/${aid}`}
-                  className={`${TRUNCATE_CLASS} text-muted-foreground hover:text-foreground hover:underline`}
-                >
-                  {titleById.get(aid) ?? 'Untitled'}
-                </Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-          </React.Fragment>
+        {visible.map((aid) => (
+          <BreadcrumbAncestorLink
+            key={aid}
+            id={aid}
+            title={titleById.get(aid) ?? DEFAULT_NOTE_TITLE}
+          />
         ))}
 
         <BreadcrumbSeparator />

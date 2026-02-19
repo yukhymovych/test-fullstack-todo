@@ -1,4 +1,5 @@
 import type { NoteItem } from './treeUtils';
+import { DEFAULT_NOTE_TITLE } from '../../model/types';
 import { Button } from '@/shared/ui';
 
 interface TreeNodeProps {
@@ -78,7 +79,7 @@ export function TreeNode({
               marginLeft: '2px',
             }}
           >
-            {node.title || 'Untitled'}
+            {node.title || DEFAULT_NOTE_TITLE}
           </Button>
           <Button
             variant="ghost"

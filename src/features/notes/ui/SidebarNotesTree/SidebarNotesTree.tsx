@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNotesQuery, useCreateNote, useUpdateNote } from '../../model/useNotes';
+import { DEFAULT_NOTE_TITLE } from '../../model/types';
+import { notesRoutes } from '../../lib/routes';
 import * as notesApi from '../../api/notesApi';
 import { getAncestorChain } from '../../model/noteHierarchy';
 import { buildMaps } from './treeUtils';
@@ -115,11 +117,11 @@ export function SidebarNotesTree() {
 
   const handleCreateRoot = useCallback(async () => {
     const note = await createNote.mutateAsync({
-      title: 'Untitled',
+      title: DEFAULT_NOTE_TITLE,
       parent_id: null,
       rich_content: [{ type: 'paragraph', content: [] }],
     });
-    navigate(`/notes/${note.id}`);
+    navigate(notesRoutes.editor(note.id));
   }, [createNote, navigate]);
 
   const handleCreateChild = useCallback(
@@ -132,7 +134,7 @@ export function SidebarNotesTree() {
       });
 
       const child = await createNote.mutateAsync({
-        title: 'Untitled',
+        title: DEFAULT_NOTE_TITLE,
         parent_id: parentId,
         rich_content: [{ type: 'paragraph', content: [] }],
       });
@@ -149,7 +151,7 @@ export function SidebarNotesTree() {
         await updateNote.mutateAsync({
           id: parentId,
           payload: {
-            title: parent?.title?.trim() || 'Untitled',
+            title: parent?.title?.trim() || DEFAULT_NOTE_TITLE,
             rich_content: updatedBlocks,
           },
         });
@@ -164,7 +166,7 @@ export function SidebarNotesTree() {
 
   const handleNavigate = useCallback(
     (id: string) => {
-      navigate(`/notes/${id}`);
+      navigate(notesRoutes.editor(id));
     },
     [navigate]
   );

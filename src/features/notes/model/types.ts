@@ -1,6 +1,8 @@
 /** BlockNote blocks array - typed as unknown for flexibility with BlockNote's Block[] */
 export type RichContent = unknown;
 
+export const DEFAULT_NOTE_TITLE = 'Untitled';
+
 export interface NoteListItem {
   id: string;
   title: string;
