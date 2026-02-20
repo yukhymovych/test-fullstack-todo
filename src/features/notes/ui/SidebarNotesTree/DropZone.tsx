@@ -23,7 +23,7 @@ export function DropZone({
       ref={setNodeRef}
       className={cn(
         'transition-colors',
-        variant === 'between' && 'min-h-[20px] flex items-center justify-center',
+        variant === 'between' && 'min-h-[5px] flex items-center justify-center',
         variant === 'between' && isOver && 'bg-primary/15',
         variant === 'default' && isOver && 'bg-primary/20 rounded',
         className

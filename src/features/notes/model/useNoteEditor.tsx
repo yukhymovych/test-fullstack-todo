@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateBlockNote, useEditorChange } from '@blocknote/react';
 import { BlockNoteSchema, createCodeBlockSpec } from '@blocknote/core';
@@ -82,11 +82,13 @@ export function useNoteEditor(id: string | undefined) {
     if (note) setTitle(note.title || '');
   }, [note]);
 
+  const lastVisitedIdRef = useRef<string | null>(null);
   useEffect(() => {
-    if (id && note) {
-      updateLastVisited.mutate(id);
-    }
-  }, [id, note?.id, updateLastVisited]);
+    if (!id || !note || id === lastVisitedIdRef.current) return;
+    lastVisitedIdRef.current = id;
+    updateLastVisited.mutate(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mutate is stable; ref guard prevents duplicate calls
+  }, [id, note?.id]);
 
   const handleTitleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

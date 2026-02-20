@@ -72,9 +72,8 @@ export function useUpdateNoteLastVisited() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => notesApi.updateNoteLastVisited(id),
-    onSuccess: (_, id) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: NOTES_KEY });
-      queryClient.invalidateQueries({ queryKey: NOTE_KEY(id) });
     },
   });
 }
