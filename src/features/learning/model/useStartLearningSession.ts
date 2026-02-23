@@ -17,6 +17,18 @@ export function useStartLearningSession() {
   });
 }
 
+export function useRefillSessionDebug() {
+  const queryClient = useQueryClient();
+  const timezone = getBrowserTimezone();
+
+  return useMutation({
+    mutationFn: () => learningApi.refillSessionDebug(timezone),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: LEARNING_KEYS.all });
+    },
+  });
+}
+
 export function useStartScopedLearningSession() {
   const queryClient = useQueryClient();
   const timezone = getBrowserTimezone();

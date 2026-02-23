@@ -16,6 +16,11 @@ export const gradeBodySchema = z.object({
   grade: gradeSchema,
 });
 
+export const gradeByPageBodySchema = z.object({
+  pageId: z.string().uuid(),
+  grade: gradeSchema,
+});
+
 export const studyItemStatusQuerySchema = z.object({
   pageId: z.string().uuid(),
 });

@@ -4,6 +4,7 @@ import {
   startSessionSchema,
   startScopedSessionSchema,
   gradeBodySchema,
+  gradeByPageBodySchema,
   studyItemStatusQuerySchema,
   activateBodySchema,
   activateScopedBodySchema,
@@ -79,6 +80,35 @@ export async function getTodaySession(
       return;
     }
     res.json(data);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function gradeByPage(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const input = gradeByPageBodySchema.parse(req.body);
+    const timezoneParam = req.query.timezone;
+    const timezone = await learningService.resolveTimezone(
+      userId,
+      typeof timezoneParam === 'string' ? timezoneParam : undefined
+    );
+    const result = await learningService.gradeByPage(
+      userId,
+      input.pageId,
+      input.grade,
+      timezone
+    );
+    if (!result.success) {
+      res.status(404).json({ error: result.error });
+      return;
+    }
+    res.json(result);
   } catch (error) {
     next(error);
   }
@@ -171,6 +201,29 @@ export async function deactivateStudyItem(
   }
 }
 
+export async function refillSessionDebug(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const timezoneParam = req.query.timezone;
+    const timezone = await learningService.resolveTimezone(
+      userId,
+      typeof timezoneParam === 'string' ? timezoneParam : undefined
+    );
+    const data = await learningService.refillSessionDebug(userId, timezone);
+    if (!data) {
+      res.status(404).json({ error: 'No session found' });
+      return;
+    }
+    res.json(data);
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function getDueStudyItemsCount(
   req: Request,
   res: Response,
@@ -193,7 +246,16 @@ export async function getStudyItemStatus(
   try {
     const userId = req.user!.id;
     const { pageId } = studyItemStatusQuerySchema.parse(req.query);
-    const status = await learningService.getStudyItemStatus(userId, pageId);
+    const timezoneParam = req.query.timezone;
+    const timezone = await learningService.resolveTimezone(
+      userId,
+      typeof timezoneParam === 'string' ? timezoneParam : undefined
+    );
+    const status = await learningService.getStudyItemStatus(
+      userId,
+      pageId,
+      timezone
+    );
     res.json(status);
   } catch (error) {
     next(error);

@@ -6,6 +6,7 @@ import { NoteEditorToolbar } from '../features/notes/ui/NoteEditorToolbar';
 import { NoteTitleInput } from '../features/notes/ui/NoteTitleInput';
 import { NoteEditorBody } from '../features/notes/ui/NoteEditorBody';
 import { NoteEmbedsList } from '../features/notes/ui/NoteEmbedsList';
+import { NoteEditorLearningGradeBar } from '../features/learning/ui/NoteEditorLearningGradeBar';
 
 const contentStyles = {
   padding: '20px',
@@ -76,6 +77,7 @@ export function NoteEditorPage() {
           onNavigate={(embedId) => navigate(notesRoutes.editor(embedId))}
         />
       )}
+      <NoteEditorLearningGradeBar noteId={id} />
     </div>
   );
 }

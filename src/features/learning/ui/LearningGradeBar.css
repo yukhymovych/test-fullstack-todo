@@ -1,0 +1,22 @@
+.learning-grade-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.learning-grade-bar__btn {
+  flex: 1;
+  min-width: 70px;
+}
+
+.note-editor-learning-grade-bar {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #333;
+}
+
+.note-editor-learning-grade-bar--studied {
+  font-size: 14px;
+  color: #9ca3af;
+  font-style: italic;
+}

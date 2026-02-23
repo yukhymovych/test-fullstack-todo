@@ -108,6 +108,21 @@ export async function insertSessionItems(
   }
 }
 
+export async function insertSessionItemAsDone(
+  client: PoolClient,
+  sessionId: string,
+  noteId: string,
+  position: number,
+  grade: string,
+  reviewedAt: Date
+): Promise<void> {
+  await client.query(
+    `INSERT INTO learning_session_items (session_id, note_id, position, state, grade, reviewed_at, is_retry)
+     VALUES ($1, $2, $3, 'done', $4, $5, false)`,
+    [sessionId, noteId, position, grade, reviewedAt]
+  );
+}
+
 export async function getSessionWithItems(
   sessionId: string,
   userId: string
@@ -176,6 +191,36 @@ export async function getSessionItemById(
   return result.rows[0] || null;
 }
 
+export async function getPendingSessionItemBySessionAndNote(
+  sessionId: string,
+  noteId: string,
+  userId: string
+): Promise<(LearningSessionItem & { session_id: string }) | null> {
+  const result = await pool.query(
+    `SELECT lsi.id, lsi.session_id, lsi.note_id, lsi.position, lsi.state, lsi.grade, lsi.reviewed_at, lsi.is_retry
+     FROM learning_session_items lsi
+     JOIN learning_sessions ls ON ls.id = lsi.session_id AND ls.user_id = $1
+     WHERE lsi.session_id = $2 AND lsi.note_id = $3 AND lsi.state = 'pending'`,
+    [userId, sessionId, noteId]
+  );
+  return result.rows[0] || null;
+}
+
+export async function getSessionItemBySessionAndNote(
+  sessionId: string,
+  noteId: string,
+  userId: string
+): Promise<{ state: string } | null> {
+  const result = await pool.query(
+    `SELECT lsi.state
+     FROM learning_session_items lsi
+     JOIN learning_sessions ls ON ls.id = lsi.session_id AND ls.user_id = $1
+     WHERE lsi.session_id = $2 AND lsi.note_id = $3`,
+    [userId, sessionId, noteId]
+  );
+  return result.rows[0] || null;
+}
+
 export async function getStudyItemByUserAndNote(
   userId: string,
   noteId: string
@@ -230,6 +275,37 @@ export async function getDueStudyItemsCount(
     [userId]
   );
   return result.rows[0]?.cnt ?? 0;
+}
+
+/** Debug: get active study items not yet in session, for refilling (ignores due_at) */
+export async function getActiveStudyItemsForRefill(
+  userId: string,
+  sessionId: string,
+  limit: number
+): Promise<StudyItem[]> {
+  const result = await pool.query(
+    `SELECT si.id, si.user_id, si.note_id, si.is_active, si.due_at, si.last_reviewed_at
+     FROM study_items si
+     WHERE si.user_id = $1 AND si.is_active = true
+       AND si.note_id NOT IN (
+         SELECT note_id FROM learning_session_items
+         WHERE session_id = $2 AND note_id IS NOT NULL
+       )
+     ORDER BY si.due_at ASC, si.last_reviewed_at NULLS FIRST, si.note_id ASC
+     LIMIT $3`,
+    [userId, sessionId, limit]
+  );
+  return result.rows;
+}
+
+export async function getMaxPositionInSessionPool(
+  sessionId: string
+): Promise<number> {
+  const result = await pool.query(
+    `SELECT COALESCE(MAX(position), -1) AS max_pos FROM learning_session_items WHERE session_id = $1`,
+    [sessionId]
+  );
+  return (result.rows[0]?.max_pos ?? -1) + 1;
 }
 
 export async function updateSessionItemGrade(

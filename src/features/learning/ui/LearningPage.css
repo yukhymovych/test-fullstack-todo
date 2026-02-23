@@ -76,13 +76,13 @@
   background: linear-gradient(transparent, #1a1a1a);
 }
 
-.learning-grade-bar {
+.learning-page__grade-bar .learning-grade-bar {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
 }
 
-.learning-grade-bar__btn {
+.learning-page__grade-bar .learning-grade-bar__btn {
   flex: 1;
   min-width: 70px;
 }
@@ -109,8 +109,20 @@
   margin: 0 0 24px;
 }
 
+.learning-summary__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
 .learning-summary__btn {
   min-width: 120px;
+}
+
+.learning-summary__btn--debug {
+  font-size: 12px;
+  opacity: 0.8;
 }
 
 .learning-animated-switch {

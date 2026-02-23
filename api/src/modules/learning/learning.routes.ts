@@ -10,9 +10,14 @@ learningRouter.post('/session/start', learningController.startSession);
 learningRouter.post('/session/start-scoped', learningController.startScopedSession);
 learningRouter.get('/session/today', learningController.getTodaySession);
 learningRouter.post(
+  '/session/refill-debug',
+  learningController.refillSessionDebug
+);
+learningRouter.post(
   '/session/item/:id/grade',
   learningController.gradeSessionItem
 );
+learningRouter.post('/session/grade-by-page', learningController.gradeByPage);
 learningRouter.post('/study-items/activate', learningController.activateStudyItem);
 learningRouter.post(
   '/study-items/activate-scoped',

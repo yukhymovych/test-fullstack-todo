@@ -21,6 +21,15 @@ export async function startScopedSession(
   });
 }
 
+export async function refillSessionDebug(
+  timezone?: string
+): Promise<TodaySessionResponse | null> {
+  const tz = timezone ?? 'UTC';
+  return http.post<TodaySessionResponse | null>(
+    `/learning/session/refill-debug?timezone=${encodeURIComponent(tz)}`
+  );
+}
+
 export async function getTodaySession(
   timezone?: string
 ): Promise<TodaySessionResponse | null> {
@@ -28,6 +37,18 @@ export async function getTodaySession(
   return http.get<TodaySessionResponse | null>(
     `/learning/session/today?timezone=${encodeURIComponent(tz)}`
   );
+}
+
+export async function submitGradeByPage(
+  pageId: string,
+  grade: Grade,
+  timezone?: string
+): Promise<{ success: boolean; alreadyGraded?: boolean }> {
+  const tz = timezone ?? 'UTC';
+  return http.post(`/learning/session/grade-by-page?timezone=${encodeURIComponent(tz)}`, {
+    pageId,
+    grade,
+  });
 }
 
 export async function submitGrade(
@@ -61,9 +82,11 @@ export async function getDueStudyItemsCount(): Promise<number> {
 }
 
 export async function getStudyItemStatus(
-  pageId: string
+  pageId: string,
+  timezone?: string
 ): Promise<StudyItemStatusResponse> {
+  const tz = timezone ?? 'UTC';
   return http.get<StudyItemStatusResponse>(
-    `/learning/study-items/status?pageId=${encodeURIComponent(pageId)}`
+    `/learning/study-items/status?pageId=${encodeURIComponent(pageId)}&timezone=${encodeURIComponent(tz)}`
   );
 }
