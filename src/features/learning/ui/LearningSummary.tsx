@@ -1,11 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/shared/ui';
-import {
-  useRefillSessionDebug,
-  useResetSessionDebug,
-  useStartLearningSession,
-} from '../model';
-import { learningRoutes } from '../lib/routes';
 import type { LearningSessionItem } from '../domain/learning.types';
 
 export interface LearningSummaryProps {
@@ -14,42 +8,8 @@ export interface LearningSummaryProps {
 
 export function LearningSummary({ items }: LearningSummaryProps) {
   const navigate = useNavigate();
-  const refillSession = useRefillSessionDebug();
-  const resetSession = useResetSessionDebug();
-  const startSession = useStartLearningSession();
   const doneCount = items.filter((i) => i.state === 'done').length;
   const totalCount = items.length;
-
-  const handleDone = () => {
-    navigate('/notes');
-  };
-
-  const handleAddMore = () => {
-    refillSession.mutate(undefined, {
-      onSuccess: (data) => {
-        if (data && data.items.some((i) => i.state === 'pending')) {
-          // Stay on page - session will refetch and show pending items
-        }
-      },
-    });
-  };
-
-  const handleResetSession = () => {
-    resetSession.mutate(undefined, {
-      onSuccess: () => {
-        startSession.mutate(undefined, {
-          onSuccess: (data) => {
-            if (data) {
-              navigate(learningRoutes.session());
-            }
-          },
-        });
-      },
-    });
-  };
-
-  const isResetting =
-    resetSession.isPending || (resetSession.isSuccess && startSession.isPending);
 
   return (
     <div className="learning-summary">
@@ -58,24 +18,8 @@ export function LearningSummary({ items }: LearningSummaryProps) {
         You reviewed {doneCount} of {totalCount} items.
       </p>
       <div className="learning-summary__actions">
-        <Button variant="primary" onClick={handleDone} className="learning-summary__btn">
+        <Button variant="primary" onClick={() => navigate('/notes')} className="learning-summary__btn">
           Done
-        </Button>
-        <Button
-          variant="secondary"
-          onClick={handleAddMore}
-          disabled={refillSession.isPending}
-          className="learning-summary__btn learning-summary__btn--debug"
-        >
-          {refillSession.isPending ? 'Adding...' : 'Add more items (debug)'}
-        </Button>
-        <Button
-          variant="secondary"
-          onClick={handleResetSession}
-          disabled={isResetting}
-          className="learning-summary__btn learning-summary__btn--debug"
-        >
-          {isResetting ? 'Resetting...' : 'Reset session (debug)'}
         </Button>
       </div>
     </div>

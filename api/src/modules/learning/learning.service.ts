@@ -14,6 +14,12 @@ function getDayKey(timezone: string): string {
   return new Date().toLocaleDateString('en-CA', { timeZone: timezone });
 }
 
+function isDateTodayInTimezone(date: Date | null, timezone: string): boolean {
+  if (!date) return false;
+  const dayKey = date.toLocaleDateString('en-CA', { timeZone: timezone });
+  return dayKey === getDayKey(timezone);
+}
+
 function addDays(date: Date, days: number): Date {
   const result = new Date(date);
   result.setUTCDate(result.getUTCDate() + days);
@@ -202,7 +208,7 @@ export async function gradeByPage(
   }
 
   const dayKey = getDayKey(timezone);
-  let session = await learningSQL.getSessionByUserAndDay(userId, dayKey);
+  const session = await learningSQL.getSessionByUserAndDay(userId, dayKey);
   const existingSessionItem = session
     ? await learningSQL.getSessionItemBySessionAndNote(
         session.id,
@@ -223,40 +229,20 @@ export async function gradeByPage(
     return { success: true, alreadyGraded: true as const };
   }
 
+  if (isDateTodayInTimezone(studyItem.last_reviewed_at, timezone)) {
+    return { success: true, alreadyGraded: true as const };
+  }
+
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-
-    if (!session) {
-      const insertResult = await client.query(
-        `INSERT INTO learning_sessions (user_id, day_key, status)
-         VALUES ($1, $2, 'active')
-         RETURNING id, user_id, day_key, status, created_at`,
-        [userId, dayKey]
-      );
-      session = insertResult.rows[0];
-    }
-
-    if (!session) throw new Error('Failed to create or get session');
 
     const now = new Date();
     const intervalDays = GRADE_INTERVALS_DAYS[grade];
     const baseDate =
       studyItem.due_at > now ? studyItem.due_at : now;
     const dueAt = addDays(baseDate, intervalDays);
-    const position = await learningSQL.getMaxPositionInSession(
-      client,
-      session.id
-    );
 
-    await learningSQL.insertSessionItemAsDone(
-      client,
-      session.id,
-      pageId,
-      position,
-      grade,
-      now
-    );
     await learningSQL.updateStudyItemAfterReview(
       client,
       userId,
@@ -269,7 +255,7 @@ export async function gradeByPage(
       pageId,
       grade,
       'manual',
-      session.id
+      null
     );
 
     await client.query('COMMIT');
@@ -365,10 +351,13 @@ export async function getStudyItemStatus(
   const item = await learningSQL.getStudyItemByUserAndNote(userId, pageId);
   if (!item) return { status: 'inactive' as const };
   const status = item.is_active ? ('active' as const) : ('inactive' as const);
+  const gradedToday =
+    !!timezone && isDateTodayInTimezone(item.last_reviewed_at, timezone);
   const base = {
     status,
     dueAt: item.due_at,
     lastReviewedAt: item.last_reviewed_at,
+    gradedToday: gradedToday || undefined,
   };
 
   if (!timezone) return base;

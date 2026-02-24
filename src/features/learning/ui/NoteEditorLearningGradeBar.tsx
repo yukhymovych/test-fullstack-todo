@@ -15,7 +15,8 @@ export function NoteEditorLearningGradeBar({ noteId }: NoteEditorLearningGradeBa
   if (status?.status !== 'active') return null;
 
   const studiedToday =
-    status.inTodaySession && status.sessionItemState === 'done';
+    status.gradedToday ||
+    (status.inTodaySession && status.sessionItemState === 'done');
 
   if (studiedToday) {
     return (
