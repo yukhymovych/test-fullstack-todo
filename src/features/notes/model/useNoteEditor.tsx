@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateBlockNote, useEditorChange } from '@blocknote/react';
-import { BlockNoteSchema, createCodeBlockSpec } from '@blocknote/core';
-import { codeBlockOptions } from '@blocknote/code-block';
 import { filterSuggestionItems, insertOrUpdateBlockForSlashMenu } from '@blocknote/core/extensions';
 import { RiFileTextLine } from 'react-icons/ri';
 import {
@@ -20,7 +18,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import * as notesApi from '../api/notesApi';
 import { createChildNote } from '../lib/createChildNote';
 import { DEFAULT_NOTE_TITLE } from './types';
-import { EmbeddedPageBlock } from '../blocks/EmbeddedPageBlock';
+import { createNoteEditorSchema } from '../lib/noteEditorSchema';
 import { ensureBlocksArray, DEFAULT_BLOCKS } from '../lib/blocks';
 import { notesRoutes } from '../lib/routes';
 import { useDebouncedCallback } from '@/shared/lib/useDebouncedCallback';
@@ -49,14 +47,7 @@ export function useNoteEditor(id: string | undefined) {
     return map;
   }, [notes, embeds]);
 
-  const schema = useMemo(() => {
-    return BlockNoteSchema.create().extend({
-      blockSpecs: {
-        codeBlock: createCodeBlockSpec(codeBlockOptions),
-        embeddedPage: EmbeddedPageBlock(),
-      },
-    });
-  }, []);
+  const schema = useMemo(() => createNoteEditorSchema(), []);
 
   const initialContent = note ? ensureBlocksArray(note.rich_content) : DEFAULT_BLOCKS;
 

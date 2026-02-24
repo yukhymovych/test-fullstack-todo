@@ -69,6 +69,15 @@
   white-space: pre-wrap;
 }
 
+.learning-reveal__rich-content {
+  min-height: 200px;
+  padding: 6px 0;
+}
+
+.learning-reveal__rich-content .bn-editor {
+  padding: 0;
+}
+
 .learning-page__grade-bar {
   position: sticky;
   bottom: 0;

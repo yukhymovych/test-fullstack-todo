@@ -1,6 +1,9 @@
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import * as notesApi from '../features/notes/api/notesApi';
 import { useTodayLearningSession } from '../features/learning/model/useTodayLearningSession';
+import { useNoteEmbeds } from '../features/notes/model/useNotes';
+import { DEFAULT_NOTE_TITLE } from '../features/notes/model/types';
 import { useSubmitLearningGrade } from '../features/learning/model/useSubmitLearningGrade';
 import { LearningProgressHeader } from '../features/learning/ui/LearningProgressHeader';
 import { LearningReveal } from '../features/learning/ui/LearningReveal';
@@ -21,6 +24,15 @@ export function LearningSessionPage() {
     queryFn: () => notesApi.getNote(currentItem!.note_id!),
     enabled: !!currentItem?.note_id,
   });
+  const { data: embeds } = useNoteEmbeds(
+    currentItem?.note_id ?? undefined,
+    !!currentItem?.note_id
+  );
+  const noteTitlesMap = useMemo(() => {
+    const map = new Map<string, string>();
+    embeds?.forEach((e) => map.set(e.id, e.title || DEFAULT_NOTE_TITLE));
+    return map;
+  }, [embeds]);
 
   if (isLoading) {
     return <div className="learning-page-loading">Loading session...</div>;
@@ -65,6 +77,7 @@ export function LearningSessionPage() {
   const note = noteQuery.data;
   const title = currentItem.title ?? note?.title ?? '(Untitled)';
   const content = note?.content_text ?? '';
+  const richContent = note?.rich_content;
 
   const handleGrade = (grade: Grade) => {
     if (submitGrade.isPending) return;
@@ -79,7 +92,13 @@ export function LearningSessionPage() {
       <LearningProgressHeader items={session.items} currentIndex={displayIndex} />
       <main className="learning-page__main">
         <LearningAnimatedSwitch key={currentItem.id}>
-          <LearningReveal title={title} content={content} />
+          <LearningReveal
+            title={title}
+            content={content}
+            richContent={richContent}
+            noteTitlesMap={noteTitlesMap}
+            contentKey={currentItem.note_id ?? currentItem.id}
+          />
         </LearningAnimatedSwitch>
         <div className="learning-page__grade-bar">
           <LearningGradeBar
