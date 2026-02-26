@@ -2,6 +2,8 @@ import { pool } from '../../db/pool.js';
 import * as notesSQL from '../notes/notes.sql.js';
 import * as learningSQL from './learning.sql.js';
 import type { Grade } from './learning.schemas.js';
+import { getDayKey, isDateTodayInTimezone } from './learning.timezone.js';
+import { computeEligibleScopedNoteIds } from './learning.helpers.js';
 
 const GRADE_INTERVALS_DAYS: Record<Grade, number> = {
   again: 1,
@@ -9,16 +11,6 @@ const GRADE_INTERVALS_DAYS: Record<Grade, number> = {
   good: 5,
   easy: 10,
 };
-
-function getDayKey(timezone: string): string {
-  return new Date().toLocaleDateString('en-CA', { timeZone: timezone });
-}
-
-function isDateTodayInTimezone(date: Date | null, timezone: string): boolean {
-  if (!date) return false;
-  const dayKey = date.toLocaleDateString('en-CA', { timeZone: timezone });
-  return dayKey === getDayKey(timezone);
-}
 
 function addDays(date: Date, days: number): Date {
   const result = new Date(date);
@@ -59,50 +51,75 @@ export async function startSession(userId: string, timezone: string) {
   return data;
 }
 
+export type StartScopedSessionResult =
+  | { created: true; sessionId: string; total: number; session: Awaited<ReturnType<typeof learningSQL.getSessionWithItems>> }
+  | { created: false; sessionId: string; total: number; session: Awaited<ReturnType<typeof learningSQL.getSessionWithItems>> }
+  | { created: false; reason: 'NO_ELIGIBLE_PAGES' }
+  | { created: false; reason: 'ROOT_NOT_FOUND' };
+
 export async function startScopedSession(
   userId: string,
-  scopePageId: string,
+  rootNoteId: string,
   timezone: string
-) {
-  const note = await notesSQL.getNoteById(scopePageId, userId);
-  if (!note) {
-    return null;
+): Promise<StartScopedSessionResult> {
+  const rootNote = await notesSQL.getNoteById(rootNoteId, userId);
+  if (!rootNote) {
+    return { created: false, reason: 'ROOT_NOT_FOUND' };
   }
 
-  const descendantIds = await notesSQL.getDescendantIds(scopePageId, userId);
-  const scopeNoteIds = [scopePageId, ...descendantIds];
+  const descendantIds = await notesSQL.getDescendantIdsOrdered(rootNoteId, userId);
+  if (descendantIds.length === 0) {
+    return { created: false, reason: 'NO_ELIGIBLE_PAGES' };
+  }
 
+  const studyItems = await learningSQL.getStudyItemsByNoteIds(userId, descendantIds);
   const dayKey = getDayKey(timezone);
-  let session = await learningSQL.getSessionByUserAndDay(userId, dayKey);
-
-  const cap = learningSQL.getDailyCap();
-  const items = await learningSQL.getDueStudyItems(userId, cap, scopeNoteIds);
-
-  if (!session) {
-    if (items.length === 0) {
-      return null;
-    }
-    session = await learningSQL.createSession(userId, dayKey);
-    const sessionItems = items.map((item, i) => ({
-      noteId: item.note_id,
-      position: i,
-      isRetry: false,
-    }));
-    await learningSQL.insertSessionItems(session.id, sessionItems);
-  } else {
-    const existingData = await learningSQL.getSessionWithItems(session.id, userId);
-    if (existingData && existingData.items.length === 0 && items.length > 0) {
-      const sessionItems = items.map((item, i) => ({
-        noteId: item.note_id,
-        position: i,
-        isRetry: false,
-      }));
-      await learningSQL.insertSessionItems(session.id, sessionItems);
-    }
+  const eligibleIds = computeEligibleScopedNoteIds({
+    descendantIds,
+    studyItems,
+    timezone,
+    dayKey,
+  });
+  if (eligibleIds.length === 0) {
+    return { created: false, reason: 'NO_ELIGIBLE_PAGES' };
   }
+
+  const existingSession = await learningSQL.findActiveScopedSession(
+    userId,
+    dayKey,
+    rootNoteId
+  );
+  if (existingSession) {
+    const data = await learningSQL.getSessionWithItems(existingSession.id, userId);
+    if (!data) return { created: false, reason: 'NO_ELIGIBLE_PAGES' };
+    return {
+      created: false as const,
+      sessionId: existingSession.id,
+      total: data.items.length,
+      session: data,
+    };
+  }
+
+  const session = await learningSQL.createScopedSession(
+    userId,
+    dayKey,
+    rootNoteId
+  );
+  const sessionItems = eligibleIds.map((noteId, i) => ({
+    noteId,
+    position: i,
+    isRetry: false,
+  }));
+  await learningSQL.insertSessionItems(session.id, sessionItems);
 
   const data = await learningSQL.getSessionWithItems(session.id, userId);
-  return data;
+  if (!data) return { created: false, reason: 'NO_ELIGIBLE_PAGES' };
+  return {
+    created: true,
+    sessionId: session.id,
+    total: data.items.length,
+    session: data,
+  };
 }
 
 export async function resolveTimezone(userId: string, override?: string): Promise<string> {
@@ -115,6 +132,23 @@ export async function getTodaySession(userId: string, timezone: string) {
   const session = await learningSQL.getSessionByUserAndDay(userId, dayKey);
   if (!session) return null;
   return learningSQL.getSessionWithItems(session.id, userId);
+}
+
+export async function getSessionById(
+  userId: string,
+  sessionId: string
+) {
+  const session = await learningSQL.getSessionById(sessionId, userId);
+  if (!session) return null;
+  return learningSQL.getSessionWithItems(sessionId, userId);
+}
+
+export async function listTodayScopedSessions(
+  userId: string,
+  timezone: string
+) {
+  const dayKey = getDayKey(timezone);
+  return learningSQL.listTodayScopedSessions(userId, dayKey);
 }
 
 export async function gradeSessionItem(
@@ -312,6 +346,16 @@ export async function deleteFutureSessionsDebug(
 ) {
   const todayKey = getDayKey(timezone);
   const deleted = await learningSQL.deleteFutureSessions(userId, todayKey);
+  return { deleted };
+}
+
+/** Debug: delete today's scoped sessions. Returns deleted count. */
+export async function deleteTodayScopedSessionsDebug(
+  userId: string,
+  timezone: string
+) {
+  const dayKey = getDayKey(timezone);
+  const deleted = await learningSQL.deleteTodayScopedSessions(userId, dayKey);
   return { deleted };
 }
 

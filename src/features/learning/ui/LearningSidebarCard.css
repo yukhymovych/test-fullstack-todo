@@ -44,3 +44,22 @@
   color: #9ca3af;
   font-size: 12px;
 }
+
+.learning-sidebar-card__scoped {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #333;
+}
+
+.learning-sidebar-card__scoped-label {
+  display: block;
+  font-size: 11px;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+
+.learning-sidebar-card__scoped-btn {
+  margin-top: 4px;
+  font-size: 12px;
+  justify-content: flex-start;
+}

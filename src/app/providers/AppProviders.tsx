@@ -3,6 +3,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { MantineProvider } from '@mantine/core';
 import type { ReactNode } from 'react';
 import { AuthProvider } from '../contexts/AuthContext';
+import { Toaster } from '../../shared/ui/Toaster';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,6 +25,7 @@ export function AppProviders({ children }: AppProvidersProps) {
         <MantineProvider>
           <AuthProvider>
             {children}
+            <Toaster />
           </AuthProvider>
         </MantineProvider>
       </QueryClientProvider>

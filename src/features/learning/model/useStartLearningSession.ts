@@ -41,25 +41,24 @@ export function useDeleteFutureSessionsDebug() {
   });
 }
 
-export function useRefillSessionDebug() {
+export function useDeleteTodayScopedSessionsDebug() {
   const queryClient = useQueryClient();
   const timezone = getBrowserTimezone();
 
   return useMutation({
-    mutationFn: () => learningApi.refillSessionDebug(timezone),
+    mutationFn: () => learningApi.deleteTodayScopedSessionsDebug(timezone),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: LEARNING_KEYS.all });
     },
   });
 }
 
-export function useStartScopedLearningSession() {
+export function useRefillSessionDebug() {
   const queryClient = useQueryClient();
   const timezone = getBrowserTimezone();
 
   return useMutation({
-    mutationFn: (scopePageId: string) =>
-      learningApi.startScopedSession(scopePageId, timezone),
+    mutationFn: () => learningApi.refillSessionDebug(timezone),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: LEARNING_KEYS.all });
     },

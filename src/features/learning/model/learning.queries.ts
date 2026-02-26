@@ -2,6 +2,10 @@ export const LEARNING_KEYS = {
   all: ['learning'] as const,
   todaySession: (timezone?: string) =>
     [...LEARNING_KEYS.all, 'today', timezone ?? 'browser'] as const,
+  sessionById: (sessionId: string) =>
+    [...LEARNING_KEYS.all, 'session', sessionId] as const,
+  todayScopedSessions: (timezone?: string) =>
+    [...LEARNING_KEYS.all, 'scoped', 'today', timezone ?? 'browser'] as const,
   studyItemStatus: (pageId: string) =>
     [...LEARNING_KEYS.all, 'studyItem', pageId] as const,
 };

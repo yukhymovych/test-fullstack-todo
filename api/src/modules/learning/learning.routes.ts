@@ -7,7 +7,9 @@ export const learningRouter = Router();
 learningRouter.use(requireAuth);
 
 learningRouter.post('/session/start', learningController.startSession);
-learningRouter.post('/session/start-scoped', learningController.startScopedSession);
+learningRouter.post('/scoped/start', learningController.startScopedSession);
+learningRouter.get('/scoped/today', learningController.getTodayScopedSessions);
+learningRouter.get('/sessions/:id', learningController.getSessionById);
 learningRouter.get('/session/today', learningController.getTodaySession);
 learningRouter.post(
   '/session/reset-debug',
@@ -16,6 +18,10 @@ learningRouter.post(
 learningRouter.post(
   '/session/delete-future-debug',
   learningController.deleteFutureSessionsDebug
+);
+learningRouter.post(
+  '/session/delete-today-scoped-debug',
+  learningController.deleteTodayScopedSessionsDebug
 );
 learningRouter.post(
   '/session/refill-debug',

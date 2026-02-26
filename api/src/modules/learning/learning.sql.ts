@@ -18,6 +18,8 @@ export interface LearningSession {
   day_key: string;
   status: string;
   created_at: Date;
+  kind?: string;
+  root_note_id?: string | null;
 }
 
 export interface LearningSessionItem {
@@ -44,9 +46,9 @@ export async function getSessionByUserAndDay(
   dayKey: string
 ): Promise<LearningSession | null> {
   const result = await pool.query(
-    `SELECT id, user_id, day_key, status, created_at
+    `SELECT id, user_id, day_key, status, created_at, kind, root_note_id
      FROM learning_sessions
-     WHERE user_id = $1 AND day_key = $2`,
+     WHERE user_id = $1 AND day_key = $2 AND kind = 'global'`,
     [userId, dayKey]
   );
   return result.rows[0] || null;
@@ -58,7 +60,7 @@ export async function deleteSessionByUserAndDay(
   dayKey: string
 ): Promise<number> {
   const result = await pool.query(
-    `DELETE FROM learning_sessions WHERE user_id = $1 AND day_key = $2`,
+    `DELETE FROM learning_sessions WHERE user_id = $1 AND day_key = $2 AND kind = 'global'`,
     [userId, dayKey]
   );
   return result.rowCount ?? 0;
@@ -85,14 +87,26 @@ export async function deleteFutureSessions(
   return result.rowCount ?? 0;
 }
 
+/** Debug: delete today's scoped sessions. Returns deleted count. */
+export async function deleteTodayScopedSessions(
+  userId: string,
+  dayKey: string
+): Promise<number> {
+  const result = await pool.query(
+    `DELETE FROM learning_sessions WHERE user_id = $1 AND day_key = $2 AND kind = 'scoped'`,
+    [userId, dayKey]
+  );
+  return result.rowCount ?? 0;
+}
+
 export async function createSession(
   userId: string,
   dayKey: string
 ): Promise<LearningSession> {
   const result = await pool.query(
-    `INSERT INTO learning_sessions (user_id, day_key, status)
-     VALUES ($1, $2, 'active')
-     RETURNING id, user_id, day_key, status, created_at`,
+    `INSERT INTO learning_sessions (user_id, day_key, status, kind)
+     VALUES ($1, $2, 'active', 'global')
+     RETURNING id, user_id, day_key, status, created_at, kind, root_note_id`,
     [userId, dayKey]
   );
   return result.rows[0];
@@ -164,7 +178,7 @@ export async function getSessionWithItems(
   items: (LearningSessionItem & { title?: string })[];
 } | null> {
   const sessionResult = await pool.query(
-    `SELECT id, user_id, day_key, status, created_at
+    `SELECT id, user_id, day_key, status, created_at, kind, root_note_id
      FROM learning_sessions
      WHERE id = $1 AND user_id = $2`,
     [sessionId, userId]
@@ -202,7 +216,7 @@ export async function getSessionById(
   userId: string
 ): Promise<LearningSession | null> {
   const result = await pool.query(
-    `SELECT id, user_id, day_key, status, created_at
+    `SELECT id, user_id, day_key, status, created_at, kind, root_note_id
      FROM learning_sessions
      WHERE id = $1 AND user_id = $2`,
     [sessionId, userId]
@@ -441,4 +455,78 @@ export async function insertReviewLog(
      VALUES ($1, $2, $3, $4, $5)`,
     [userId, noteId, grade, source, sessionId]
   );
+}
+
+export async function findActiveScopedSession(
+  userId: string,
+  dayKey: string,
+  rootNoteId: string
+): Promise<LearningSession | null> {
+  const result = await pool.query(
+    `SELECT id, user_id, day_key, status, created_at, kind, root_note_id
+     FROM learning_sessions
+     WHERE user_id = $1 AND day_key = $2 AND kind = 'scoped' AND root_note_id = $3 AND status = 'active'`,
+    [userId, dayKey, rootNoteId]
+  );
+  return result.rows[0] || null;
+}
+
+export async function createScopedSession(
+  userId: string,
+  dayKey: string,
+  rootNoteId: string
+): Promise<LearningSession> {
+  const result = await pool.query(
+    `INSERT INTO learning_sessions (user_id, day_key, status, kind, root_note_id)
+     VALUES ($1, $2, 'active', 'scoped', $3)
+     RETURNING id, user_id, day_key, status, created_at, kind, root_note_id`,
+    [userId, dayKey, rootNoteId]
+  );
+  return result.rows[0];
+}
+
+export interface ScopedSessionSummary {
+  sessionId: string;
+  rootNoteId: string;
+  rootTitle: string;
+  done: number;
+  total: number;
+}
+
+export async function getStudyItemsByNoteIds(
+  userId: string,
+  noteIds: string[]
+): Promise<StudyItem[]> {
+  if (noteIds.length === 0) return [];
+  const result = await pool.query(
+    `SELECT id, user_id, note_id, is_active, due_at, last_reviewed_at
+     FROM study_items
+     WHERE user_id = $1 AND note_id = ANY($2::uuid[])`,
+    [userId, noteIds]
+  );
+  return result.rows;
+}
+
+export async function listTodayScopedSessions(
+  userId: string,
+  dayKey: string
+): Promise<ScopedSessionSummary[]> {
+  const result = await pool.query(
+    `SELECT ls.id AS session_id, ls.root_note_id, n.title AS root_title,
+            COUNT(lsi.id) FILTER (WHERE lsi.state = 'done') AS done,
+            COUNT(lsi.id) AS total
+     FROM learning_sessions ls
+     LEFT JOIN notes n ON n.id = ls.root_note_id AND n.user_id = ls.user_id
+     LEFT JOIN learning_session_items lsi ON lsi.session_id = ls.id
+     WHERE ls.user_id = $1 AND ls.day_key = $2 AND ls.kind = 'scoped' AND ls.status = 'active'
+     GROUP BY ls.id, ls.root_note_id, n.title`,
+    [userId, dayKey]
+  );
+  return result.rows.map((r) => ({
+    sessionId: r.session_id,
+    rootNoteId: r.root_note_id,
+    rootTitle: r.root_title ?? '(deleted)',
+    done: Number(r.done),
+    total: Number(r.total),
+  }));
 }

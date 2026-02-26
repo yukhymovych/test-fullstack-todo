@@ -20,12 +20,28 @@ export interface LearningSession {
   day_key: string;
   status: string;
   created_at: string;
+  kind?: string;
+  root_note_id?: string | null;
 }
 
 export interface TodaySessionResponse {
   session: LearningSession;
   items: LearningSessionItem[];
 }
+
+export interface ScopedSessionSummary {
+  sessionId: string;
+  rootNoteId: string;
+  rootTitle: string;
+  done: number;
+  total: number;
+}
+
+export type StartScopedSessionResponse =
+  | { created: true; sessionId: string; total: number; session: TodaySessionResponse }
+  | { created: false; sessionId: string; total: number; session: TodaySessionResponse }
+  | { created: false; reason: 'NO_ELIGIBLE_PAGES' }
+  | { created: false; reason: 'ROOT_NOT_FOUND' };
 
 export type StudyItemStatus = 'active' | 'inactive';
 

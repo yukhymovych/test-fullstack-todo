@@ -47,16 +47,63 @@ export async function startScopedSession(
       userId,
       input.timezone
     );
-    const data = await learningService.startScopedSession(
+    const result = await learningService.startScopedSession(
       userId,
-      input.scopePageId,
+      input.rootNoteId,
       timezone
     );
-    if (!data) {
-      res.status(200).json(null);
+    if ('reason' in result) {
+      res.status(200).json({ created: false, reason: result.reason });
       return;
     }
-    res.status(201).json(data);
+    const status = result.created ? 201 : 200;
+    res.status(status).json({
+      created: result.created,
+      sessionId: result.sessionId,
+      total: result.total,
+      session: result.session,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getTodayScopedSessions(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const timezoneParam = req.query.timezone;
+    const timezone = await learningService.resolveTimezone(
+      userId,
+      typeof timezoneParam === 'string' ? timezoneParam : undefined
+    );
+    const sessions = await learningService.listTodayScopedSessions(
+      userId,
+      timezone
+    );
+    res.json(sessions);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getSessionById(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const sessionId = sessionItemIdSchema.parse(req.params.id);
+    const data = await learningService.getSessionById(userId, sessionId);
+    if (!data) {
+      res.status(404).json({ error: 'Session not found' });
+      return;
+    }
+    res.json(data);
   } catch (error) {
     next(error);
   }
@@ -233,6 +280,28 @@ export async function deleteFutureSessionsDebug(
       typeof timezoneParam === 'string' ? timezoneParam : undefined
     );
     const data = await learningService.deleteFutureSessionsDebug(
+      userId,
+      timezone
+    );
+    res.json(data);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function deleteTodayScopedSessionsDebug(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const timezoneParam = req.query.timezone;
+    const timezone = await learningService.resolveTimezone(
+      userId,
+      typeof timezoneParam === 'string' ? timezoneParam : undefined
+    );
+    const data = await learningService.deleteTodayScopedSessionsDebug(
       userId,
       timezone
     );

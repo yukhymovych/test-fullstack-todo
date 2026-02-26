@@ -8,7 +8,7 @@ export const startSessionSchema = z.object({
 });
 
 export const startScopedSessionSchema = z.object({
-  scopePageId: z.string().uuid(),
+  rootNoteId: z.string().uuid(),
   timezone: z.string().max(64).optional().default('UTC'),
 });
 

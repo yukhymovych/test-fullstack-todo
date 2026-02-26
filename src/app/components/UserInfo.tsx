@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { decodeTokenPayload } from '@/shared/lib/auth';
 import {
   useDeleteFutureSessionsDebug,
+  useDeleteTodayScopedSessionsDebug,
   useRefillSessionDebug,
   useResetSessionDebug,
   useStartLearningSession,
@@ -17,7 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/ui';
-import { LogOut, Plus, RotateCcw, Trash2 } from 'lucide-react';
+import { FolderMinus, LogOut, Plus, RotateCcw, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 function getInitials(username: string): string {
@@ -34,6 +35,7 @@ export function UserInfo() {
   const payload = token ? decodeTokenPayload(token) : null;
   const username = payload?.username ?? 'User';
   const deleteFutureSessions = useDeleteFutureSessionsDebug();
+  const deleteTodayScopedSessions = useDeleteTodayScopedSessionsDebug();
   const refillSession = useRefillSessionDebug();
   const resetSession = useResetSessionDebug();
   const startSession = useStartLearningSession();
@@ -107,6 +109,16 @@ export function UserInfo() {
           {deleteFutureSessions.isPending
             ? 'Deleting...'
             : 'Delete future sessions (debug)'}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => deleteTodayScopedSessions.mutate(undefined)}
+          disabled={deleteTodayScopedSessions.isPending}
+          className="text-muted-foreground"
+        >
+          <FolderMinus className="size-4" />
+          {deleteTodayScopedSessions.isPending
+            ? 'Deleting...'
+            : 'Delete today scoped sessions (debug)'}
         </DropdownMenuItem>
         <DropdownMenuItem variant="destructive" onClick={logout}>
           <LogOut className="size-4" />

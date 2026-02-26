@@ -3,22 +3,41 @@ import type {
   TodaySessionResponse,
   StudyItemStatusResponse,
   Grade,
+  ScopedSessionSummary,
+  StartScopedSessionResponse,
 } from '../domain/learning.types';
 
-export async function startSession(timezone?: string): Promise<TodaySessionResponse> {
-  return http.post<TodaySessionResponse>('/learning/session/start', {
+export async function startSession(timezone?: string): Promise<TodaySessionResponse | null> {
+  return http.post<TodaySessionResponse | null>('/learning/session/start', {
     timezone: timezone ?? 'UTC',
   });
 }
 
 export async function startScopedSession(
-  scopePageId: string,
+  rootNoteId: string,
   timezone?: string
-): Promise<TodaySessionResponse> {
-  return http.post<TodaySessionResponse>('/learning/session/start-scoped', {
-    scopePageId,
+): Promise<StartScopedSessionResponse> {
+  return http.post<StartScopedSessionResponse>('/learning/scoped/start', {
+    rootNoteId,
     timezone: timezone ?? 'UTC',
   });
+}
+
+export async function getTodayScopedSessions(
+  timezone?: string
+): Promise<ScopedSessionSummary[]> {
+  const tz = timezone ?? 'UTC';
+  return http.get<ScopedSessionSummary[]>(
+    `/learning/scoped/today?timezone=${encodeURIComponent(tz)}`
+  );
+}
+
+export async function getLearningSessionById(
+  sessionId: string
+): Promise<TodaySessionResponse | null> {
+  return http.get<TodaySessionResponse | null>(
+    `/learning/sessions/${encodeURIComponent(sessionId)}`
+  );
 }
 
 export async function resetSessionDebug(
@@ -36,6 +55,15 @@ export async function deleteFutureSessionsDebug(
   const tz = timezone ?? 'UTC';
   return http.post<{ deleted: number }>(
     `/learning/session/delete-future-debug?timezone=${encodeURIComponent(tz)}`
+  );
+}
+
+export async function deleteTodayScopedSessionsDebug(
+  timezone?: string
+): Promise<{ deleted: number }> {
+  const tz = timezone ?? 'UTC';
+  return http.post<{ deleted: number }>(
+    `/learning/session/delete-today-scoped-debug?timezone=${encodeURIComponent(tz)}`
   );
 }
 

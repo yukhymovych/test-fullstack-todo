@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { BookOpen } from 'lucide-react';
 import { Button } from '@/shared/ui';
 import { useTodayLearningSession } from '../model/useTodayLearningSession';
+import { useTodayScopedSessions } from '../model/useTodayScopedSessions';
 import { useDueStudyItemsCount } from '../model/useDueStudyItemsCount';
 import { useStartLearningSession } from '../model/useStartLearningSession';
 import { learningRoutes } from '../lib/routes';
@@ -10,6 +11,8 @@ import './LearningSidebarCard.css';
 export function LearningSidebarCard() {
   const navigate = useNavigate();
   const { data: session, isLoading } = useTodayLearningSession();
+  const { data: scopedSessions = [], isLoading: scopedLoading } =
+    useTodayScopedSessions();
   const { data: dueCount = 0 } = useDueStudyItemsCount(!session);
   const startSession = useStartLearningSession();
 
@@ -19,6 +22,7 @@ export function LearningSidebarCard() {
   const hasSession = !!session && totalCount > 0;
   const canContinue = hasSession && pendingCount > 0;
   const hasItemsReady = !hasSession && dueCount > 0;
+  const activeScopedSessions = scopedSessions.filter((s) => s.total > 0);
 
   const handleStartOrContinue = () => {
     if (canContinue) {
@@ -32,7 +36,7 @@ export function LearningSidebarCard() {
     });
   };
 
-  if (isLoading) {
+  if (isLoading || scopedLoading) {
     return (
       <div className="learning-sidebar-card">
         <div className="learning-sidebar-card__loading">Loading...</div>
@@ -75,6 +79,24 @@ export function LearningSidebarCard() {
             ? 'Continue'
             : 'Start Learning'}
       </Button>
+      {activeScopedSessions.length > 0 && (
+        <div className="learning-sidebar-card__scoped">
+          <span className="learning-sidebar-card__scoped-label">
+            Continue scoped sessions
+          </span>
+          {activeScopedSessions.map((s) => (
+            <Button
+              key={s.sessionId}
+              variant="ghost-muted"
+              fullWidth
+              className="learning-sidebar-card__scoped-btn"
+              onClick={() => navigate(learningRoutes.sessionById(s.sessionId))}
+            >
+              {s.rootTitle}: {s.done}/{s.total}
+            </Button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

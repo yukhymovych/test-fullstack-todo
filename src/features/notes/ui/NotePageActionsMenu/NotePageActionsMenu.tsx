@@ -5,12 +5,16 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from '@/shared/ui';
+import { useNavigate } from 'react-router-dom';
+import { showToast } from '@/shared/lib/toast';
 import {
   useStudyItemStatus,
   useActivateLearningPage,
   useActivateLearningPageScoped,
   useDeactivateLearningPage,
+  useStartScopedLearningSession,
 } from '@/features/learning/model';
+import { learningRoutes } from '@/features/learning/lib/routes';
 import type { NotePageActionsMenuProps } from './NotePageActionsMenu.types';
 
 export function NotePageActionsMenu({
@@ -23,12 +27,30 @@ export function NotePageActionsMenu({
   onDelete,
   isDeleting,
 }: NotePageActionsMenuProps) {
+  const navigate = useNavigate();
   const { data: studyStatus } = useStudyItemStatus(noteId);
   const activateLearning = useActivateLearningPage();
   const activateLearningScoped = useActivateLearningPageScoped();
   const deactivateLearning = useDeactivateLearningPage();
+  const startScopedSession = useStartScopedLearningSession();
 
   const isLearningActive = studyStatus?.status === 'active';
+
+  const handleLearnAllChildren = () => {
+    startScopedSession.mutate(noteId, {
+      onSuccess: (result) => {
+        if ('reason' in result) {
+          if (result.reason === 'NO_ELIGIBLE_PAGES') {
+            showToast(
+              'No eligible pages to learn. All child pages are either due in global learning or already studied today.'
+            );
+          }
+          return;
+        }
+        navigate(learningRoutes.sessionById(result.sessionId));
+      },
+    });
+  };
 
   const handleSetAsLearning = () => {
     activateLearning.mutate(noteId);
@@ -75,6 +97,14 @@ export function NotePageActionsMenu({
             Set as learning page
           </DropdownMenuItem>
         )
+      )}
+      {hasChildren && (
+        <DropdownMenuItem
+          onClick={handleLearnAllChildren}
+          disabled={startScopedSession.isPending}
+        >
+          {startScopedSession.isPending ? 'Starting...' : 'Learn all children pages'}
+        </DropdownMenuItem>
       )}
       <DropdownMenuItem onClick={() => onCreateChild(noteId)}>
         Add new page

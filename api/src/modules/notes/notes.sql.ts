@@ -128,6 +128,26 @@ export async function getDescendantIds(
   return result.rows.map((r) => r.id);
 }
 
+/** Descendants of root, ordered by depth, sort_order, id (breadth-first, deterministic). */
+export async function getDescendantIdsOrdered(
+  rootNoteId: string,
+  userId: string
+): Promise<string[]> {
+  const result = await pool.query(
+    `WITH RECURSIVE tree AS (
+      SELECT id, 1 AS depth, COALESCE(sort_order, 0) AS sort_order
+      FROM notes WHERE parent_id = $1 AND user_id = $2
+      UNION ALL
+      SELECT n.id, t.depth + 1, COALESCE(n.sort_order, 0)
+      FROM notes n
+      JOIN tree t ON n.parent_id = t.id AND n.user_id = $2
+    )
+    SELECT id FROM tree ORDER BY depth, sort_order, id`,
+    [rootNoteId, userId]
+  );
+  return result.rows.map((r) => r.id);
+}
+
 export async function getChildrenByParent(
   userId: string,
   parentId: string | null

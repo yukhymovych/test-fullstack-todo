@@ -36,7 +36,6 @@ export function NoteEditorToolbar({
   const { data: studyStatus } = useStudyItemStatus(activeId);
   const showDueAt =
     studyStatus?.status === 'active' && studyStatus?.dueAt;
-    console.log(studyStatus);
 
   return (
     <div
@@ -79,6 +78,7 @@ export function NoteEditorToolbar({
           <NotePageActionsMenu
             noteId={activeId}
             isFavorite={isFavorite}
+            hasChildren={notes?.some((n) => n.parent_id === activeId) ?? false}
             onAddToFavorites={onAddToFavorites}
             onRemoveFromFavorites={onRemoveFromFavorites}
             onCreateChild={onCreateChild}

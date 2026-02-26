@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import * as notesApi from '../features/notes/api/notesApi';
+import { useSearchParams } from 'react-router-dom';
 import { useTodayLearningSession } from '../features/learning/model/useTodayLearningSession';
-import { useNoteEmbeds } from '../features/notes/model/useNotes';
+import { useLearningSessionById } from '../features/learning/model/useLearningSessionById';
+import { useNoteQuery, useNoteEmbeds } from '../features/notes/model/useNotes';
 import { DEFAULT_NOTE_TITLE } from '../features/notes/model/types';
 import { useSubmitLearningGrade } from '../features/learning/model/useSubmitLearningGrade';
 import { LearningProgressHeader } from '../features/learning/ui/LearningProgressHeader';
@@ -14,16 +14,20 @@ import type { Grade } from '../features/learning/domain/learning.types';
 import '../features/learning/ui/LearningPage.css';
 
 export function LearningSessionPage() {
-  const { data: session, isLoading, error } = useTodayLearningSession();
+  const [searchParams] = useSearchParams();
+  const sessionId = searchParams.get('sessionId') ?? undefined;
+  const todaySession = useTodayLearningSession();
+  const sessionById = useLearningSessionById(sessionId);
+  const sessionQuery = sessionId ? sessionById : todaySession;
+  const { data: session, isLoading, error } = sessionQuery;
   const submitGrade = useSubmitLearningGrade();
 
   const pendingItems = session?.items.filter((i) => i.state === 'pending') ?? [];
   const currentItem = pendingItems[0];
-  const noteQuery = useQuery({
-    queryKey: ['note', currentItem?.note_id],
-    queryFn: () => notesApi.getNote(currentItem!.note_id!),
-    enabled: !!currentItem?.note_id,
-  });
+  const noteQuery = useNoteQuery(
+    currentItem?.note_id ?? undefined,
+    !!currentItem?.note_id
+  );
   const { data: embeds } = useNoteEmbeds(
     currentItem?.note_id ?? undefined,
     !!currentItem?.note_id
