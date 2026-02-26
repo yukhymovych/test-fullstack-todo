@@ -33,7 +33,7 @@ cp .env.example .env
 
 ```
 DATABASE_URL=postgresql://todo_user:password@localhost:5432/todo_db
-PORT=3001
+PORT=4000
 ```
 
 ### 4. Запуск міграцій

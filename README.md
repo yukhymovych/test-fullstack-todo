@@ -55,7 +55,7 @@ cp .env.example .env
 # Запуск міграцій
 npm run migrate:up
 
-# Запуск dev сервера (http://localhost:3001)
+# Запуск dev сервера (http://localhost:4000)
 npm run dev
 ```
 
@@ -153,7 +153,7 @@ VITE_API_URL=http://localhost:3001
 ### Backend (api/.env)
 ```
 DATABASE_URL=postgresql://todo_user:password@localhost:5432/todo_db
-PORT=3001
+PORT=4000
 JWT_SECRET=your-secret-key-change-in-production
 ```
 
