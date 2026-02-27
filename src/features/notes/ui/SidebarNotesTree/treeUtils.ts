@@ -22,7 +22,9 @@ export function buildMaps(notes: NoteItem[]): TreeMaps {
     childrenByParent.set(pid, arr);
   }
 
-  // Sort children by sort_order ASC, then updated_at DESC
+  // Sort children by sort_order ASC, then by id (stable tiebreaker).
+  // Using updated_at as tiebreaker caused positions to jump when switching between
+  // siblings, since the editor triggers saves on mount which update updated_at.
   for (const [, ids] of childrenByParent) {
     ids.sort((a, b) => {
       const na = byId.get(a)!;
@@ -30,9 +32,7 @@ export function buildMaps(notes: NoteItem[]): TreeMaps {
       const sortA = na.sort_order ?? 0;
       const sortB = nb.sort_order ?? 0;
       if (sortA !== sortB) return sortA - sortB;
-      return (
-        new Date(nb.updated_at).getTime() - new Date(na.updated_at).getTime()
-      );
+      return a.localeCompare(b);
     });
   }
 
