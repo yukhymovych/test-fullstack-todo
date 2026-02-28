@@ -3,6 +3,17 @@ import * as learningApi from '../api/learningApi';
 import type { Grade } from '../domain/learning.types';
 import { LEARNING_KEYS, getBrowserTimezone } from './learning.queries';
 
+function getDaysDiff(
+  reviewedAt: string | null,
+  dueAfter: string | null
+): number | null {
+  if (!reviewedAt || !dueAfter) return null;
+  const beforeMs = new Date(reviewedAt).getTime();
+  const afterMs = new Date(dueAfter).getTime();
+  const oneDayMs = 24 * 60 * 60 * 1000;
+  return Number(((afterMs - beforeMs) / oneDayMs).toFixed(2));
+}
+
 async function logReviewHistoryForPage(pageId?: string | null): Promise<void> {
   if (!pageId) return;
   try {
@@ -17,6 +28,7 @@ async function logReviewHistoryForPage(pageId?: string | null): Promise<void> {
       difficulty_before: log.difficulty_before,
       difficulty_after: log.difficulty_after,
       due_before: log.due_before,
+      daysDiff: getDaysDiff(log.reviewed_at, log.due_after),
       due_after: log.due_after,
       review_day_key: log.review_day_key,
       session_id: log.session_id,
