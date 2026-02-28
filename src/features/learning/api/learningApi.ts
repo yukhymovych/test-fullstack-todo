@@ -77,6 +77,23 @@ export async function refillSessionDebug(
   );
 }
 
+export async function refreshAllGradesDebug(
+  timezone?: string
+): Promise<{
+  deletedTodaySessions: number;
+  deletedReviewLogs: number;
+  resetStudyItems: number;
+}> {
+  const tz = timezone ?? 'UTC';
+  return http.post<{
+    deletedTodaySessions: number;
+    deletedReviewLogs: number;
+    resetStudyItems: number;
+  }>(
+    `/learning/session/refresh-all-grades-debug?timezone=${encodeURIComponent(tz)}`
+  );
+}
+
 export async function getTodaySession(
   timezone?: string
 ): Promise<TodaySessionResponse | null> {

@@ -28,6 +28,10 @@ learningRouter.post(
   learningController.refillSessionDebug
 );
 learningRouter.post(
+  '/session/refresh-all-grades-debug',
+  learningController.refreshAllGradesDebug
+);
+learningRouter.post(
   '/session/item/:id/grade',
   learningController.gradeSessionItem
 );

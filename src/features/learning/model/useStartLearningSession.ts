@@ -64,3 +64,15 @@ export function useRefillSessionDebug() {
     },
   });
 }
+
+export function useRefreshAllGradesDebug() {
+  const queryClient = useQueryClient();
+  const timezone = getBrowserTimezone();
+
+  return useMutation({
+    mutationFn: () => learningApi.refreshAllGradesDebug(timezone),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: LEARNING_KEYS.all });
+    },
+  });
+}

@@ -445,6 +445,25 @@ export async function refillSessionDebug(
   return learningSQL.getSessionWithItems(session.id, userId);
 }
 
+/** Debug: clear all grade history and unlock all pages for grading today. */
+export async function refreshAllGradesDebug(
+  userId: string,
+  timezone: string
+) {
+  const dayKey = getDayKey(timezone);
+  const deletedTodaySessions =
+    await learningSQL.deleteSessionsByUserAndDayAllKinds(userId, dayKey);
+  const deletedReviewLogs = await learningSQL.deleteReviewLogsByUser(userId);
+  const resetStudyItems =
+    await learningSQL.resetStudyItemsForRefreshAllGrades(userId);
+
+  return {
+    deletedTodaySessions,
+    deletedReviewLogs,
+    resetStudyItems,
+  };
+}
+
 export async function getStudyItemStatus(
   userId: string,
   pageId: string,

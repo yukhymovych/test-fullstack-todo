@@ -86,10 +86,47 @@ export async function deleteSessionByUserAndDay(
   return result.rowCount ?? 0;
 }
 
+/** Debug: delete all today's sessions (global + scoped). Returns deleted count. */
+export async function deleteSessionsByUserAndDayAllKinds(
+  userId: string,
+  dayKey: string
+): Promise<number> {
+  const result = await pool.query(
+    `DELETE FROM learning_sessions WHERE user_id = $1 AND day_key = $2`,
+    [userId, dayKey]
+  );
+  return result.rowCount ?? 0;
+}
+
 /** Debug: reset due_at to NOW() for all active study items of a user */
 export async function resetStudyItemsDueAt(userId: string): Promise<number> {
   const result = await pool.query(
     `UPDATE study_items SET due_at = NOW() WHERE user_id = $1 AND is_active = true`,
+    [userId]
+  );
+  return result.rowCount ?? 0;
+}
+
+/** Debug: reset study item review state and FSRS params. */
+export async function resetStudyItemsForRefreshAllGrades(
+  userId: string
+): Promise<number> {
+  const result = await pool.query(
+    `UPDATE study_items
+     SET due_at = NOW(),
+         last_reviewed_at = NULL,
+         stability_days = 7,
+         difficulty = 5
+     WHERE user_id = $1`,
+    [userId]
+  );
+  return result.rowCount ?? 0;
+}
+
+/** Debug: delete all user review logs. */
+export async function deleteReviewLogsByUser(userId: string): Promise<number> {
+  const result = await pool.query(
+    `DELETE FROM review_logs WHERE user_id = $1`,
     [userId]
   );
   return result.rowCount ?? 0;

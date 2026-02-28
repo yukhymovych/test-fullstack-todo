@@ -4,6 +4,7 @@ import { decodeTokenPayload } from '@/shared/lib/auth';
 import {
   useDeleteFutureSessionsDebug,
   useDeleteTodayScopedSessionsDebug,
+  useRefreshAllGradesDebug,
   useRefillSessionDebug,
   useResetSessionDebug,
   useStartLearningSession,
@@ -18,7 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/ui';
-import { FolderMinus, LogOut, Plus, RotateCcw, Trash2 } from 'lucide-react';
+import { FolderMinus, LogOut, Plus, RefreshCw, RotateCcw, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 function getInitials(username: string): string {
@@ -36,6 +37,7 @@ export function UserInfo() {
   const username = payload?.username ?? 'User';
   const deleteFutureSessions = useDeleteFutureSessionsDebug();
   const deleteTodayScopedSessions = useDeleteTodayScopedSessionsDebug();
+  const refreshAllGrades = useRefreshAllGradesDebug();
   const refillSession = useRefillSessionDebug();
   const resetSession = useResetSessionDebug();
   const startSession = useStartLearningSession();
@@ -119,6 +121,16 @@ export function UserInfo() {
           {deleteTodayScopedSessions.isPending
             ? 'Deleting...'
             : 'Delete today scoped sessions (debug)'}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => refreshAllGrades.mutate(undefined)}
+          disabled={refreshAllGrades.isPending}
+          className="text-muted-foreground"
+        >
+          <RefreshCw className="size-4" />
+          {refreshAllGrades.isPending
+            ? 'Refreshing...'
+            : 'Refresh all grades (debug)'}
         </DropdownMenuItem>
         <DropdownMenuItem variant="destructive" onClick={logout}>
           <LogOut className="size-4" />

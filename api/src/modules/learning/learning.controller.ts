@@ -335,6 +335,25 @@ export async function refillSessionDebug(
   }
 }
 
+export async function refreshAllGradesDebug(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const timezoneParam = req.query.timezone;
+    const timezone = await learningService.resolveTimezone(
+      userId,
+      typeof timezoneParam === 'string' ? timezoneParam : undefined
+    );
+    const data = await learningService.refreshAllGradesDebug(userId, timezone);
+    res.json(data);
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function getDueStudyItemsCount(
   req: Request,
   res: Response,
