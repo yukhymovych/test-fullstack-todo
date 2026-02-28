@@ -50,3 +50,7 @@ learningRouter.get(
   learningController.getDescendantsWithLearningCount
 );
 learningRouter.get('/study-items/status', learningController.getStudyItemStatus);
+learningRouter.get(
+  '/study-items/review-logs',
+  learningController.getStudyItemReviewLogs
+);

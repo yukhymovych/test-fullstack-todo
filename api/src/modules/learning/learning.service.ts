@@ -3,20 +3,8 @@ import * as notesSQL from '../notes/notes.sql.js';
 import * as learningSQL from './learning.sql.js';
 import type { Grade } from './learning.schemas.js';
 import { getDayKey, isDateTodayInTimezone } from './learning.timezone.js';
+import { scheduleFsrsLight } from './fsrsLight.js';
 import { computeEligibleScopedNoteIds } from './learning.helpers.js';
-
-const GRADE_INTERVALS_DAYS: Record<Grade, number> = {
-  again: 1,
-  hard: 2,
-  good: 5,
-  easy: 10,
-};
-
-function addDays(date: Date, days: number): Date {
-  const result = new Date(date);
-  result.setUTCDate(result.getUTCDate() + days);
-  return result;
-}
 
 export async function startSession(userId: string, timezone: string) {
   const dayKey = getDayKey(timezone);
@@ -168,6 +156,7 @@ export async function gradeSessionItem(
 
   const session = await learningSQL.getSessionById(item.session_id, userId);
   const dayKey = session?.day_key ?? null;
+  const timezone = await learningSQL.getUserTimezone(userId);
 
   const client = await pool.connect();
   try {
@@ -190,39 +179,54 @@ export async function gradeSessionItem(
       return { success: true };
     }
 
+    await learningSQL.ensureStudyItemExists(client, userId, item.note_id);
+    const studyItem = await learningSQL.getStudyItemByUserAndNoteForUpdate(
+      client,
+      userId,
+      item.note_id
+    );
+    if (!studyItem) {
+      await client.query('ROLLBACK');
+      return { success: false, error: 'Study item not found' as const };
+    }
+
     const now = new Date();
-    const intervalDays = GRADE_INTERVALS_DAYS[grade];
-    const dueAt = addDays(now, intervalDays);
+    const schedule = scheduleFsrsLight({
+      grade,
+      timezone,
+      stabilityDays: studyItem.stability_days,
+      difficulty: studyItem.difficulty,
+      lastReviewedAt: studyItem.last_reviewed_at,
+      now,
+    });
 
     await learningSQL.updateSessionItemGrade(client, sessionItemId, grade, now);
-    await learningSQL.updateStudyItemAfterReview(
+    await learningSQL.updateStudyItemAfterReviewV2(
       client,
       userId,
       item.note_id,
-      dueAt
+      schedule.dueAt,
+      schedule.nextStabilityDays,
+      schedule.nextDifficulty
     );
-    await learningSQL.ensureStudyItemExists(client, userId, item.note_id);
-    await learningSQL.insertReviewLog(
-      client,
+    await learningSQL.insertReviewLogV2(client, {
       userId,
-      item.note_id,
+      noteId: item.note_id,
       grade,
-      'session',
-      item.session_id
-    );
+      source: 'user',
+      sessionId: item.session_id,
+      elapsedDays: schedule.elapsedDays,
+      stabilityBefore: studyItem.stability_days,
+      difficultyBefore: studyItem.difficulty,
+      stabilityAfter: schedule.nextStabilityDays,
+      difficultyAfter: schedule.nextDifficulty,
+      dueBefore: studyItem.due_at,
+      dueAfter: schedule.dueAt,
+      reviewDayKey: schedule.todayKey,
+    });
 
-    if (grade === 'again') {
-      const maxPos = await learningSQL.getMaxPositionInSession(
-        client,
-        item.session_id
-      );
-      await learningSQL.insertRetrySessionItem(
-        client,
-        item.session_id,
-        item.note_id,
-        maxPos
-      );
-    }
+    // FSRS-light rule: a page is reviewed at most once per day.
+    // Even on "again", do not enqueue a same-day retry item.
 
     // Sync grade to same note in other today's sessions (global/scoped)
     if (dayKey) {
@@ -295,26 +299,49 @@ export async function gradeByPage(
   try {
     await client.query('BEGIN');
 
-    const now = new Date();
-    const intervalDays = GRADE_INTERVALS_DAYS[grade];
-    const baseDate =
-      studyItem.due_at > now ? studyItem.due_at : now;
-    const dueAt = addDays(baseDate, intervalDays);
+    const lockedStudyItem = await learningSQL.getStudyItemByUserAndNoteForUpdate(
+      client,
+      userId,
+      pageId
+    );
+    if (!lockedStudyItem || !lockedStudyItem.is_active) {
+      await client.query('ROLLBACK');
+      return { success: false, error: 'Page not in learning' as const };
+    }
 
-    await learningSQL.updateStudyItemAfterReview(
-      client,
-      userId,
-      pageId,
-      dueAt
-    );
-    await learningSQL.insertReviewLog(
-      client,
-      userId,
-      pageId,
+    const now = new Date();
+    const schedule = scheduleFsrsLight({
       grade,
-      'manual',
-      null
+      timezone,
+      stabilityDays: lockedStudyItem.stability_days,
+      difficulty: lockedStudyItem.difficulty,
+      lastReviewedAt: lockedStudyItem.last_reviewed_at,
+      now,
+    });
+
+    await learningSQL.updateStudyItemAfterReviewV2(
+      client,
+      userId,
+      pageId,
+      schedule.dueAt,
+      schedule.nextStabilityDays,
+      schedule.nextDifficulty
     );
+    await learningSQL.insertReviewLogV2(client, {
+      userId,
+      noteId: pageId,
+      grade,
+      source: 'manual',
+      sessionId: null,
+      elapsedDays: schedule.elapsedDays,
+      stabilityBefore: lockedStudyItem.stability_days,
+      difficultyBefore: lockedStudyItem.difficulty,
+      stabilityAfter: schedule.nextStabilityDays,
+      difficultyAfter: schedule.nextDifficulty,
+      dueBefore: lockedStudyItem.due_at,
+      dueAfter: schedule.dueAt,
+      reviewDayKey: schedule.todayKey,
+    });
 
     await client.query('COMMIT');
     return { success: true };
@@ -450,4 +477,8 @@ export async function getStudyItemStatus(
     inTodaySession: true as const,
     sessionItemState: sessionItem.state as 'pending' | 'done' | 'skipped' | 'unavailable',
   };
+}
+
+export async function getStudyItemReviewLogs(userId: string, pageId: string) {
+  return learningSQL.getReviewLogsByUserAndNote(userId, pageId);
 }

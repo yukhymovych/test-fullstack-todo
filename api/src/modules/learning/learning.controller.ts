@@ -390,3 +390,18 @@ export async function getStudyItemStatus(
     next(error);
   }
 }
+
+export async function getStudyItemReviewLogs(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const { pageId } = studyItemStatusQuerySchema.parse(req.query);
+    const logs = await learningService.getStudyItemReviewLogs(userId, pageId);
+    res.json(logs);
+  } catch (error) {
+    next(error);
+  }
+}

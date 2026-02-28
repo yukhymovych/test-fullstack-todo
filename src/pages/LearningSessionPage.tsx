@@ -86,7 +86,7 @@ export function LearningSessionPage() {
   const handleGrade = (grade: Grade) => {
     if (submitGrade.isPending) return;
     submitGrade.mutate(
-      { sessionItemId: currentItem.id, grade },
+      { sessionItemId: currentItem.id, grade, noteId: currentItem.note_id },
       {}
     );
   };

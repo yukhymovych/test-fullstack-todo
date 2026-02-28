@@ -53,3 +53,21 @@ export interface StudyItemStatusResponse {
   inTodaySession?: boolean;
   sessionItemState?: SessionItemState;
 }
+
+export interface StudyItemReviewLog {
+  id: string;
+  user_id: string;
+  note_id: string;
+  reviewed_at: string;
+  grade: Grade | null;
+  source: string;
+  session_id: string | null;
+  elapsed_days: number | null;
+  stability_before: number | null;
+  difficulty_before: number | null;
+  stability_after: number | null;
+  difficulty_after: number | null;
+  due_before: string | null;
+  due_after: string | null;
+  review_day_key: string | null;
+}

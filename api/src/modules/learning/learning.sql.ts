@@ -10,6 +10,8 @@ export interface StudyItem {
   is_active: boolean;
   due_at: Date;
   last_reviewed_at: Date | null;
+  stability_days: number;
+  difficulty: number;
 }
 
 export interface LearningSession {
@@ -31,6 +33,24 @@ export interface LearningSessionItem {
   grade: string | null;
   reviewed_at: Date | null;
   is_retry: boolean;
+}
+
+export interface StudyItemReviewLog {
+  id: string;
+  user_id: string;
+  note_id: string;
+  reviewed_at: Date;
+  grade: string | null;
+  source: string;
+  session_id: string | null;
+  elapsed_days: number | null;
+  stability_before: number | null;
+  difficulty_before: number | null;
+  stability_after: number | null;
+  difficulty_after: number | null;
+  due_before: Date | null;
+  due_after: Date | null;
+  review_day_key: string | null;
 }
 
 export async function getUserTimezone(userId: string): Promise<string> {
@@ -119,7 +139,8 @@ export async function getDueStudyItems(
 ): Promise<StudyItem[]> {
   if (scopeNoteIds && scopeNoteIds.length > 0) {
     const result = await pool.query(
-      `SELECT si.id, si.user_id, si.note_id, si.is_active, si.due_at, si.last_reviewed_at
+      `SELECT si.id, si.user_id, si.note_id, si.is_active, si.due_at, si.last_reviewed_at,
+              si.stability_days, si.difficulty
        FROM study_items si
        WHERE si.user_id = $1 AND si.is_active = true AND si.due_at <= NOW()
          AND si.note_id = ANY($2::uuid[])
@@ -130,7 +151,8 @@ export async function getDueStudyItems(
     return result.rows;
   }
   const result = await pool.query(
-    `SELECT id, user_id, note_id, is_active, due_at, last_reviewed_at
+    `SELECT id, user_id, note_id, is_active, due_at, last_reviewed_at,
+            stability_days, difficulty
      FROM study_items
      WHERE user_id = $1 AND is_active = true AND due_at <= NOW()
      ORDER BY due_at ASC, last_reviewed_at NULLS FIRST, note_id ASC
@@ -327,9 +349,26 @@ export async function getStudyItemByUserAndNote(
   noteId: string
 ): Promise<StudyItem | null> {
   const result = await pool.query(
-    `SELECT id, user_id, note_id, is_active, due_at, last_reviewed_at
+    `SELECT id, user_id, note_id, is_active, due_at, last_reviewed_at,
+            stability_days, difficulty
      FROM study_items
      WHERE user_id = $1 AND note_id = $2`,
+    [userId, noteId]
+  );
+  return result.rows[0] || null;
+}
+
+export async function getStudyItemByUserAndNoteForUpdate(
+  client: PoolClient,
+  userId: string,
+  noteId: string
+): Promise<StudyItem | null> {
+  const result = await client.query(
+    `SELECT id, user_id, note_id, is_active, due_at, last_reviewed_at,
+            stability_days, difficulty
+     FROM study_items
+     WHERE user_id = $1 AND note_id = $2
+     FOR UPDATE`,
     [userId, noteId]
   );
   return result.rows[0] || null;
@@ -343,7 +382,8 @@ export async function createStudyItem(
     `INSERT INTO study_items (user_id, note_id, is_active, due_at)
      VALUES ($1, $2, true, NOW())
      ON CONFLICT (user_id, note_id) DO UPDATE SET is_active = true
-     RETURNING id, user_id, note_id, is_active, due_at, last_reviewed_at`,
+     RETURNING id, user_id, note_id, is_active, due_at, last_reviewed_at,
+               stability_days, difficulty`,
     [userId, noteId]
   );
   return result.rows[0];
@@ -385,7 +425,8 @@ export async function getActiveStudyItemsForRefill(
   limit: number
 ): Promise<StudyItem[]> {
   const result = await pool.query(
-    `SELECT si.id, si.user_id, si.note_id, si.is_active, si.due_at, si.last_reviewed_at
+    `SELECT si.id, si.user_id, si.note_id, si.is_active, si.due_at, si.last_reviewed_at,
+            si.stability_days, si.difficulty
      FROM study_items si
      WHERE si.user_id = $1 AND si.is_active = true
        AND si.note_id NOT IN (
@@ -445,17 +486,22 @@ export async function markSessionItemsUnavailableByNoteId(
   return result.rowCount ?? 0;
 }
 
-export async function updateStudyItemAfterReview(
+export async function updateStudyItemAfterReviewV2(
   client: PoolClient,
   userId: string,
   noteId: string,
-  dueAt: Date
+  dueAt: Date,
+  stabilityDays: number,
+  difficulty: number
 ): Promise<void> {
   await client.query(
     `UPDATE study_items
-     SET due_at = $1, last_reviewed_at = NOW()
-     WHERE user_id = $2 AND note_id = $3`,
-    [dueAt, userId, noteId]
+     SET due_at = $1,
+         last_reviewed_at = NOW(),
+         stability_days = $2,
+         difficulty = $3
+     WHERE user_id = $4 AND note_id = $5`,
+    [dueAt, stabilityDays, difficulty, userId, noteId]
   );
 }
 
@@ -516,10 +562,75 @@ export async function insertReviewLog(
   source: string,
   sessionId: string | null
 ): Promise<void> {
+  await insertReviewLogV2(client, {
+    userId,
+    noteId,
+    grade,
+    source,
+    sessionId,
+    elapsedDays: null,
+    stabilityBefore: null,
+    difficultyBefore: null,
+    stabilityAfter: null,
+    difficultyAfter: null,
+    dueBefore: null,
+    dueAfter: null,
+    reviewDayKey: null,
+  });
+}
+
+interface InsertReviewLogV2Params {
+  userId: string;
+  noteId: string;
+  grade: string;
+  source: string;
+  sessionId: string | null;
+  elapsedDays: number | null;
+  stabilityBefore: number | null;
+  difficultyBefore: number | null;
+  stabilityAfter: number | null;
+  difficultyAfter: number | null;
+  dueBefore: Date | null;
+  dueAfter: Date | null;
+  reviewDayKey: string | null;
+}
+
+export async function insertReviewLogV2(
+  client: PoolClient,
+  params: InsertReviewLogV2Params
+): Promise<void> {
   await client.query(
-    `INSERT INTO review_logs (user_id, note_id, grade, source, session_id)
-     VALUES ($1, $2, $3, $4, $5)`,
-    [userId, noteId, grade, source, sessionId]
+    `INSERT INTO review_logs (
+      user_id,
+      note_id,
+      grade,
+      source,
+      session_id,
+      elapsed_days,
+      stability_before,
+      difficulty_before,
+      stability_after,
+      difficulty_after,
+      due_before,
+      due_after,
+      review_day_key
+     )
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
+    [
+      params.userId,
+      params.noteId,
+      params.grade,
+      params.source,
+      params.sessionId,
+      params.elapsedDays,
+      params.stabilityBefore,
+      params.difficultyBefore,
+      params.stabilityAfter,
+      params.difficultyAfter,
+      params.dueBefore,
+      params.dueAfter,
+      params.reviewDayKey,
+    ]
   );
 }
 
@@ -585,7 +696,8 @@ export async function getStudyItemsByNoteIds(
 ): Promise<StudyItem[]> {
   if (noteIds.length === 0) return [];
   const result = await pool.query(
-    `SELECT id, user_id, note_id, is_active, due_at, last_reviewed_at
+    `SELECT id, user_id, note_id, is_active, due_at, last_reviewed_at,
+            stability_days, difficulty
      FROM study_items
      WHERE user_id = $1 AND note_id = ANY($2::uuid[])`,
     [userId, noteIds]
@@ -615,4 +727,33 @@ export async function listTodayScopedSessions(
     done: Number(r.done),
     total: Number(r.total),
   }));
+}
+
+export async function getReviewLogsByUserAndNote(
+  userId: string,
+  noteId: string
+): Promise<StudyItemReviewLog[]> {
+  const result = await pool.query(
+    `SELECT
+        id,
+        user_id,
+        note_id,
+        reviewed_at,
+        grade,
+        source,
+        session_id,
+        elapsed_days,
+        stability_before,
+        difficulty_before,
+        stability_after,
+        difficulty_after,
+        due_before,
+        due_after,
+        review_day_key
+     FROM review_logs
+     WHERE user_id = $1 AND note_id = $2
+     ORDER BY reviewed_at DESC`,
+    [userId, noteId]
+  );
+  return result.rows;
 }

@@ -2,6 +2,7 @@ import { http } from '../../../shared/api/http';
 import type {
   TodaySessionResponse,
   StudyItemStatusResponse,
+  StudyItemReviewLog,
   Grade,
   ScopedSessionSummary,
   StartScopedSessionResponse,
@@ -142,5 +143,13 @@ export async function getStudyItemStatus(
   const tz = timezone ?? 'UTC';
   return http.get<StudyItemStatusResponse>(
     `/learning/study-items/status?pageId=${encodeURIComponent(pageId)}&timezone=${encodeURIComponent(tz)}`
+  );
+}
+
+export async function getStudyItemReviewLogs(
+  pageId: string
+): Promise<StudyItemReviewLog[]> {
+  return http.get<StudyItemReviewLog[]>(
+    `/learning/study-items/review-logs?pageId=${encodeURIComponent(pageId)}`
   );
 }
