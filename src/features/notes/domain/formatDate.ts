@@ -63,3 +63,26 @@ export function formatDueDate(iso: string): string {
     year: 'numeric',
   });
 }
+
+/**
+ * Formats past/today ISO dates for "ready" display: "Today" or "Mar 8, 2026".
+ * Pure function - no side effects, no React.
+ */
+export function formatTodayOrPastDate(iso: string): string {
+  const d = new Date(iso);
+  const now = new Date();
+  const todayStart = new Date(now);
+  todayStart.setHours(0, 0, 0, 0);
+  const dueStart = new Date(d);
+  dueStart.setHours(0, 0, 0, 0);
+
+  if (dueStart.getTime() === todayStart.getTime()) {
+    return 'Today';
+  }
+
+  return d.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}

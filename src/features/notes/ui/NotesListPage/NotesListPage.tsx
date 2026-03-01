@@ -1,7 +1,5 @@
-import { Clock, Star } from 'lucide-react';
-import { Button } from '@/shared/ui';
-import { formatDate } from '../../domain/formatDate';
-import { NotesListItem } from '../NotesListItem';
+import { BookOpen, CircleAlert, Clock } from 'lucide-react';
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui';
 import { NotesSliderSection } from '../NotesSliderSection';
 import type { NotesListPageProps } from './NotesListPage.types';
 import './NotesListPage.css';
@@ -9,15 +7,18 @@ import './NotesListPage.css';
 export function NotesListPageView({
   notes,
   recentNotes,
-  favoriteNotes,
+  mainLearningSessionNotes,
+  dueReadyNotes,
   recentFormattedTimes,
-  favoriteFormattedTimes,
+  mainLearningSessionFormattedTimes,
+  dueReadyFormattedTimes,
   isLoading,
   error,
   createError,
   createPending,
   onNewNote,
   onNoteClick,
+  onMainLearningSessionClick,
 }: NotesListPageProps) {
   if (isLoading) {
     return <div className="notes-list-page__container">Loading notes...</div>;
@@ -58,10 +59,38 @@ export function NotesListPageView({
           onNoteClick={onNoteClick}
         />
         <NotesSliderSection
-          title="Favorites"
-          icon={Star}
-          notes={favoriteNotes}
-          formattedTimes={favoriteFormattedTimes}
+          title="Today's main learning session"
+          icon={BookOpen}
+          notes={mainLearningSessionNotes}
+          formattedTimes={mainLearningSessionFormattedTimes}
+          onNoteClick={onMainLearningSessionClick}
+        />
+        <NotesSliderSection
+          title="Ready for learning"
+          icon={BookOpen}
+          titleSuffix={
+            <>
+              <span className="font-medium text-[#9ca3af]">
+                {dueReadyNotes.length}
+              </span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label="Due items info"
+                    className="inline-flex cursor-help items-center border-0 bg-transparent p-0 text-[#9ca3af] hover:text-[#d1d5db]"
+                  >
+                    <CircleAlert className="size-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  All notes with next review date equals Today or in the past.
+                </TooltipContent>
+              </Tooltip>
+            </>
+          }
+          notes={dueReadyNotes}
+          formattedTimes={dueReadyFormattedTimes}
           onNoteClick={onNoteClick}
         />
       </div>

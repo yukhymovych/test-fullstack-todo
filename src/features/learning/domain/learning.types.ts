@@ -71,3 +71,8 @@ export interface StudyItemReviewLog {
   due_after: string | null;
   review_day_key: string | null;
 }
+
+export interface DueStudyItem {
+  noteId: string;
+  dueAt: string;
+}

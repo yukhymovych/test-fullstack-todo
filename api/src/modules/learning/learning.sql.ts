@@ -455,6 +455,22 @@ export async function getDueStudyItemsCount(
   return result.rows[0]?.cnt ?? 0;
 }
 
+export async function getDueStudyItemsAll(
+  userId: string
+): Promise<Array<{ note_id: string; due_at: Date }>> {
+  const result = await pool.query(
+    `SELECT note_id, due_at
+     FROM study_items
+     WHERE user_id = $1 AND is_active = true AND due_at <= NOW()
+     ORDER BY due_at ASC, last_reviewed_at NULLS FIRST, note_id ASC`,
+    [userId]
+  );
+  return result.rows.map((row) => ({
+    note_id: row.note_id as string,
+    due_at: row.due_at as Date,
+  }));
+}
+
 /** Debug: get active study items not yet in session, for refilling (ignores due_at) */
 export async function getActiveStudyItemsForRefill(
   userId: string,

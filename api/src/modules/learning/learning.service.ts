@@ -382,6 +382,10 @@ export async function getDueStudyItemsCount(userId: string): Promise<number> {
   return learningSQL.getDueStudyItemsCount(userId);
 }
 
+export async function getDueStudyItems(userId: string) {
+  return learningSQL.getDueStudyItemsAll(userId);
+}
+
 export async function getDescendantsWithLearningCount(
   userId: string,
   rootNoteId: string

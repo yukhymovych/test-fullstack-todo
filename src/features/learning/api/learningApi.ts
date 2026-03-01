@@ -6,6 +6,7 @@ import type {
   Grade,
   ScopedSessionSummary,
   StartScopedSessionResponse,
+  DueStudyItem,
 } from '../domain/learning.types';
 
 export async function startSession(timezone?: string): Promise<TodaySessionResponse | null> {
@@ -143,6 +144,16 @@ export async function getDueStudyItemsCount(): Promise<number> {
     '/learning/study-items/due-count'
   );
   return res.count;
+}
+
+export async function getDueStudyItems(): Promise<DueStudyItem[]> {
+  const rows = await http.get<Array<{ note_id: string; due_at: string }>>(
+    '/learning/study-items/due'
+  );
+  return rows.map((row) => ({
+    noteId: row.note_id,
+    dueAt: row.due_at,
+  }));
 }
 
 export async function getDescendantsWithLearningCount(

@@ -6,6 +6,7 @@ export const LEARNING_KEYS = {
     [...LEARNING_KEYS.all, 'session', sessionId] as const,
   todayScopedSessions: (timezone?: string) =>
     [...LEARNING_KEYS.all, 'scoped', 'today', timezone ?? 'browser'] as const,
+  dueItems: () => [...LEARNING_KEYS.all, 'dueItems'] as const,
   studyItemStatus: (pageId: string) =>
     [...LEARNING_KEYS.all, 'studyItem', pageId] as const,
 };

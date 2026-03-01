@@ -368,6 +368,20 @@ export async function getDueStudyItemsCount(
   }
 }
 
+export async function getDueStudyItems(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const items = await learningService.getDueStudyItems(userId);
+    res.json(items);
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function getDescendantsWithLearningCount(
   req: Request,
   res: Response,

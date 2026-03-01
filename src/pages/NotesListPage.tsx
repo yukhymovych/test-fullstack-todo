@@ -5,29 +5,35 @@ export function NotesListPage() {
   const {
     notes,
     recentNotes,
-    favoriteNotes,
+    mainLearningSessionNotes,
+    dueReadyNotes,
     recentFormattedTimes,
-    favoriteFormattedTimes,
+    mainLearningSessionFormattedTimes,
+    dueReadyFormattedTimes,
     isLoading,
     error,
     createMutation,
     handleNewNote,
     handleNoteClick,
+    handleMainLearningSessionClick,
   } = useNotesListPage();
 
   return (
     <NotesListPageView
       notes={notes}
       recentNotes={recentNotes}
-      favoriteNotes={favoriteNotes}
+      mainLearningSessionNotes={mainLearningSessionNotes}
+      dueReadyNotes={dueReadyNotes}
       recentFormattedTimes={recentFormattedTimes}
-      favoriteFormattedTimes={favoriteFormattedTimes}
+      mainLearningSessionFormattedTimes={mainLearningSessionFormattedTimes}
+      dueReadyFormattedTimes={dueReadyFormattedTimes}
       isLoading={isLoading}
       error={error}
       createError={createMutation.error}
       createPending={createMutation.isPending}
       onNewNote={handleNewNote}
       onNoteClick={handleNoteClick}
+      onMainLearningSessionClick={handleMainLearningSessionClick}
     />
   );
 }

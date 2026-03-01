@@ -1,7 +1,7 @@
 import type { NoteListItem } from '../model/types';
 
 /**
- * Returns last N visited notes, ordered from earliest to latest by last_visited_at.
+ * Returns last N visited notes, ordered from latest to earliest by last_visited_at.
  * Pure function - no side effects.
  */
 export function getRecentNotes(
@@ -24,8 +24,7 @@ export function getRecentNotes(
       if (a.ts !== b.ts) return b.ts - a.ts;
       return a.note.id.localeCompare(b.note.id);
     })
-    .slice(0, limit)
-    .reverse();
+    .slice(0, limit);
 
   return recentWindow.map((entry) => entry.note);
 }

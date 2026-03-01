@@ -50,6 +50,10 @@ learningRouter.get(
   learningController.getDueStudyItemsCount
 );
 learningRouter.get(
+  '/study-items/due',
+  learningController.getDueStudyItems
+);
+learningRouter.get(
   '/study-items/descendants-with-learning-count',
   learningController.getDescendantsWithLearningCount
 );

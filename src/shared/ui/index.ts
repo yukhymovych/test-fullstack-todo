@@ -33,3 +33,9 @@ export {
   CarouselPrevious,
   CarouselNext,
 } from './carousel';
+export {
+  TooltipProvider,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from './tooltip';

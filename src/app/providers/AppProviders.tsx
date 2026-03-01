@@ -4,6 +4,7 @@ import { MantineProvider } from '@mantine/core';
 import type { ReactNode } from 'react';
 import { AuthProvider } from '../contexts/AuthContext';
 import { Toaster } from '../../shared/ui/Toaster';
+import { TooltipProvider } from '../../shared/ui';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,10 +24,12 @@ export function AppProviders({ children }: AppProvidersProps) {
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <MantineProvider>
-          <AuthProvider>
-            {children}
-            <Toaster />
-          </AuthProvider>
+          <TooltipProvider>
+            <AuthProvider>
+              {children}
+              <Toaster />
+            </AuthProvider>
+          </TooltipProvider>
         </MantineProvider>
       </QueryClientProvider>
     </BrowserRouter>

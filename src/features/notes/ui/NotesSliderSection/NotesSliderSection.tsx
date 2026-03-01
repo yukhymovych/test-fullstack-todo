@@ -11,6 +11,7 @@ import './NotesSliderSection.css';
 export function NotesSliderSection({
   title,
   icon: Icon,
+  titleSuffix,
   notes,
   formattedTimes,
   onNoteClick,
@@ -22,6 +23,7 @@ export function NotesSliderSection({
       <h2 className="notes-slider-section__title">
         <Icon className="notes-slider-section__title-icon size-4" />
         {title}
+        {titleSuffix}
       </h2>
       <Carousel
         dir="ltr"
