@@ -37,6 +37,8 @@ export interface ScopedSessionSummary {
   total: number;
 }
 
+export type ScopedSessionMode = 'deep_dive' | 'due_only';
+
 export type StartScopedSessionResponse =
   | { created: true; sessionId: string; total: number; session: TodaySessionResponse }
   | { created: false; sessionId: string; total: number; session: TodaySessionResponse }

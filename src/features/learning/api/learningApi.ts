@@ -7,6 +7,7 @@ import type {
   ScopedSessionSummary,
   StartScopedSessionResponse,
   DueStudyItem,
+  ScopedSessionMode,
 } from '../domain/learning.types';
 
 export async function startSession(timezone?: string): Promise<TodaySessionResponse | null> {
@@ -17,10 +18,12 @@ export async function startSession(timezone?: string): Promise<TodaySessionRespo
 
 export async function startScopedSession(
   rootNoteId: string,
+  mode: ScopedSessionMode,
   timezone?: string
 ): Promise<StartScopedSessionResponse> {
   return http.post<StartScopedSessionResponse>('/learning/scoped/start', {
     rootNoteId,
+    mode,
     timezone: timezone ?? 'UTC',
   });
 }

@@ -4,7 +4,10 @@ import * as learningSQL from './learning.sql.js';
 import type { Grade } from './learning.schemas.js';
 import { getDayKey, isDateTodayInTimezone } from './learning.timezone.js';
 import { scheduleFsrsLight } from './fsrsLight.js';
-import { computeEligibleScopedNoteIds } from './learning.helpers.js';
+import {
+  computeDueOnlyScopedNoteIds,
+  computeEligibleScopedNoteIds,
+} from './learning.helpers.js';
 
 export async function startSession(userId: string, timezone: string) {
   const dayKey = getDayKey(timezone);
@@ -48,7 +51,8 @@ export type StartScopedSessionResult =
 export async function startScopedSession(
   userId: string,
   rootNoteId: string,
-  timezone: string
+  timezone: string,
+  mode: 'deep_dive' | 'due_only' = 'due_only'
 ): Promise<StartScopedSessionResult> {
   const rootNote = await notesSQL.getNoteById(rootNoteId, userId);
   if (!rootNote) {
@@ -62,11 +66,19 @@ export async function startScopedSession(
 
   const studyItems = await learningSQL.getStudyItemsByNoteIds(userId, descendantIds);
   const dayKey = getDayKey(timezone);
-  const eligibleIds = computeEligibleScopedNoteIds({
-    descendantIds,
-    studyItems,
-    timezone,
-  });
+  const eligibleIds =
+    mode === 'deep_dive'
+      ? computeEligibleScopedNoteIds({
+          descendantIds,
+          studyItems,
+          timezone,
+        })
+      : computeDueOnlyScopedNoteIds({
+          descendantIds,
+          studyItems,
+          timezone,
+          dayKey,
+        });
   if (eligibleIds.length === 0) {
     return { created: false, reason: 'NO_ELIGIBLE_PAGES' };
   }

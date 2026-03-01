@@ -52,7 +52,8 @@ export async function startScopedSession(
     const result = await learningService.startScopedSession(
       userId,
       input.rootNoteId,
-      timezone
+      timezone,
+      input.mode
     );
     if ('reason' in result) {
       res.status(200).json({ created: false, reason: result.reason });

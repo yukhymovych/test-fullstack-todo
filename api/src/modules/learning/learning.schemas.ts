@@ -10,6 +10,7 @@ export const startSessionSchema = z.object({
 export const startScopedSessionSchema = z.object({
   rootNoteId: z.string().uuid(),
   timezone: z.string().max(64).optional().default('UTC'),
+  mode: z.enum(['deep_dive', 'due_only']).optional().default('due_only'),
 });
 
 export const gradeBodySchema = z.object({

@@ -40,3 +40,23 @@ export function computeEligibleScopedNoteIds(params: {
   }
   return descendantIds.filter((id) => inGlobalAndNotStudiedToday.has(id));
 }
+
+/**
+ * Pure: compute due-only scoped note IDs from descendants.
+ * Includes only pages in GLOBAL (active study_items) that are due today or in the past.
+ */
+export function computeDueOnlyScopedNoteIds(params: {
+  descendantIds: string[];
+  studyItems: StudyItemForEligibility[];
+  timezone: string;
+  dayKey: string;
+}): string[] {
+  const { descendantIds, studyItems, timezone, dayKey } = params;
+  const dueInGlobal = new Set<string>();
+  for (const si of studyItems) {
+    if (!si.is_active) continue;
+    if (!isDueTodayOrPast(si.due_at, timezone, dayKey)) continue;
+    dueInGlobal.add(si.note_id);
+  }
+  return descendantIds.filter((id) => dueInGlobal.has(id));
+}

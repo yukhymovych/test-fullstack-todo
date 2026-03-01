@@ -41,7 +41,7 @@ export function NotesListPageView({
             onClick={onNewNote}
             disabled={createPending}
           >
-            {createPending ? 'Creating...' : 'New note'}
+            {createPending ? 'Creating...' : 'New page'}
           </Button>
         </div>
       </div>

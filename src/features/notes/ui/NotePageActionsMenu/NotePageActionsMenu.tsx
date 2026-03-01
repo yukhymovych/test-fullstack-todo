@@ -40,12 +40,28 @@ export function NotePageActionsMenu({
   const isLearningActive = studyStatus?.status === 'active';
 
   const handleLearnAllChildren = () => {
-    startScopedSession.mutate(noteId, {
+    startScopedSession.mutate({ rootNoteId: noteId, mode: 'deep_dive' }, {
       onSuccess: (result) => {
         if ('reason' in result) {
           if (result.reason === 'NO_ELIGIBLE_PAGES') {
             showToast(
               'No eligible pages to learn. All child pages have already been studied today.'
+            );
+          }
+          return;
+        }
+        navigate(learningRoutes.sessionById(result.sessionId));
+      },
+    });
+  };
+
+  const handleLearnDueChildren = () => {
+    startScopedSession.mutate({ rootNoteId: noteId, mode: 'due_only' }, {
+      onSuccess: (result) => {
+        if ('reason' in result) {
+          if (result.reason === 'NO_ELIGIBLE_PAGES') {
+            showToast(
+              'No due child pages to learn right now.'
             );
           }
           return;
@@ -109,12 +125,23 @@ export function NotePageActionsMenu({
         )
       )}
       {hasChildren && hasDescendantsInGlobal && (
-        <DropdownMenuItem
-          onClick={handleLearnAllChildren}
-          disabled={startScopedSession.isPending}
-        >
-          {startScopedSession.isPending ? 'Starting...' : 'Learn all children pages'}
-        </DropdownMenuItem>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>Start scoped learning session</DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
+            <DropdownMenuItem
+              onClick={handleLearnAllChildren}
+              disabled={startScopedSession.isPending}
+            >
+              {startScopedSession.isPending ? 'Starting...' : 'Deep dive (all children)'}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={handleLearnDueChildren}
+              disabled={startScopedSession.isPending}
+            >
+              {startScopedSession.isPending ? 'Starting...' : 'Due only (todays review)'}
+            </DropdownMenuItem>
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
       )}
       <DropdownMenuItem onClick={() => onCreateChild(noteId)}>
         Add new page
