@@ -1,10 +1,18 @@
 import { NoteBreadcrumbs } from '../NoteBreadcrumbs';
 import { NotePageActionsMenu } from '../NotePageActionsMenu';
 import { useStudyItemStatus } from '@/features/learning/model/useStudyItemStatus';
+import { useStudyItemReviewLogs } from '@/features/learning/model/useStudyItemReviewLogs';
 import { useDescendantsWithLearningCount } from '@/features/learning/model/useDescendantsWithLearningCount';
 import { formatDueDate } from '../../domain/formatDate';
-import { Button, DropdownMenu, DropdownMenuTrigger } from '@/shared/ui';
-import { MoreVertical } from 'lucide-react';
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/shared/ui';
+import { CircleAlert, MoreVertical } from 'lucide-react';
 import type { SaveStatus } from '../../model/useNoteEditor';
 import type { NoteEditorToolbarProps } from './NoteEditorToolbar.types';
 
@@ -22,6 +30,28 @@ const SAVE_STATUS_LABEL: Record<SaveStatus, string> = {
   idle: '\u00A0',
 };
 
+function getDaysAgoLabel(iso: string | null | undefined): string {
+  if (!iso) return 'N/A';
+  const now = Date.now();
+  const reviewedAt = new Date(iso).getTime();
+  if (Number.isNaN(reviewedAt)) return 'N/A';
+  const diffMs = Math.max(0, now - reviewedAt);
+  const days = Math.floor(diffMs / (24 * 60 * 60 * 1000));
+  return days === 0 ? 'Today' : `${days} day${days === 1 ? '' : 's'} ago`;
+}
+
+function getScheduledIntervalLabel(
+  lastReviewedAt: string | null | undefined,
+  dueAt: string | undefined
+): string {
+  if (!lastReviewedAt || !dueAt) return 'N/A';
+  const fromMs = new Date(lastReviewedAt).getTime();
+  const toMs = new Date(dueAt).getTime();
+  if (Number.isNaN(fromMs) || Number.isNaN(toMs)) return 'N/A';
+  const interval = Math.max(0, (toMs - fromMs) / (24 * 60 * 60 * 1000));
+  return `${interval.toFixed(1)} day${interval >= 1.5 ? 's' : ''}`;
+}
+
 export function NoteEditorToolbar({
   activeId,
   notes,
@@ -35,6 +65,10 @@ export function NoteEditorToolbar({
   isDeleting,
 }: NoteEditorToolbarProps) {
   const { data: studyStatus } = useStudyItemStatus(activeId);
+  const dueLabel = studyStatus?.dueAt ? formatDueDate(studyStatus.dueAt) : null;
+  const isDueToday = dueLabel === 'Today';
+  const { data: reviewLogs } = useStudyItemReviewLogs(activeId, isDueToday);
+  const latestReviewLog = reviewLogs?.[0];
   const hasChildren = notes?.some((n) => n.parent_id === activeId) ?? false;
   const { data: descendantsWithLearning } = useDescendantsWithLearningCount(
     hasChildren ? activeId : undefined
@@ -59,15 +93,86 @@ export function NoteEditorToolbar({
         {showDueAt && (
           <span
             style={{
-              fontSize: '12px',
+              fontSize: '13px',
               color: 'var(--muted-foreground, #6b7280)',
               whiteSpace: 'nowrap',
             }}
-            title={`Next review: ${new Date(studyStatus.dueAt!).toLocaleString()}`}
           >
-            Next review: {formatDueDate(studyStatus.dueAt!)} (
-              {new Date(studyStatus.dueAt!).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-            )
+            {!isDueToday && (
+              <>
+                Next review: {dueLabel} (
+                {new Date(studyStatus.dueAt!).toLocaleDateString(undefined, {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
+                )
+              </>
+            )}
+            {isDueToday && (
+              <span
+                style={{
+                  display: 'inline-flex',
+                  flexDirection: 'column',
+                  gap: '2px',
+                  verticalAlign: 'top',
+                }}
+              >
+                <span>
+                  Next review: {dueLabel} (
+                  {new Date(studyStatus.dueAt!).toLocaleDateString(undefined, {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
+                  )
+                </span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label="Why review is due today"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        width: 'fit-content',
+                        border: 0,
+                        background: 'transparent',
+                        padding: 0,
+                        fontSize: '13px',
+                        color: 'var(--muted-foreground, #6b7280)',
+                        cursor: 'help',
+                      }}
+                    >
+                      Why today?
+                      <CircleAlert className="size-4" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" align="start">
+                    <div style={{ display: 'grid', gap: '2px' }}>
+                      <div>Last review: {getDaysAgoLabel(studyStatus.lastReviewedAt)}</div>
+                      <div>
+                        Stability: {studyStatus.stabilityDays?.toFixed(1) ?? 'N/A'} days
+                      </div>
+                      <div>
+                        Difficulty: {studyStatus.difficulty?.toFixed(1) ?? 'N/A'} / 10
+                      </div>
+                      <div>
+                        Last grade:{' '}
+                        {latestReviewLog?.grade
+                          ? latestReviewLog.grade[0].toUpperCase() + latestReviewLog.grade.slice(1)
+                          : 'N/A'}
+                      </div>
+                      <div>
+                        Scheduled interval:{' '}
+                        {getScheduledIntervalLabel(studyStatus.lastReviewedAt, studyStatus.dueAt)}
+                      </div>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </span>
+            )}
           </span>
         )}
       </div>

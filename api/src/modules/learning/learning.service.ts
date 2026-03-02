@@ -509,6 +509,8 @@ export async function getStudyItemStatus(
     status,
     dueAt: item.due_at,
     lastReviewedAt: item.last_reviewed_at,
+    stabilityDays: Number(item.stability_days),
+    difficulty: Number(item.difficulty),
     gradedToday: gradedToday || undefined,
   };
 

@@ -53,6 +53,8 @@ export interface StudyItemStatusResponse {
   status: StudyItemStatus;
   dueAt?: string;
   lastReviewedAt?: string | null;
+  stabilityDays?: number;
+  difficulty?: number;
   gradedToday?: boolean;
   inTodaySession?: boolean;
   sessionItemState?: SessionItemState;
