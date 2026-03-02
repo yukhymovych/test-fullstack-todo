@@ -1,0 +1,51 @@
+---
+description: Supplemental frontend layering, typing, state, and quality constraints
+alwaysApply: true
+---
+
+# Frontend Architecture Supplement (Non-duplicate Rules)
+
+This rule adds only constraints not already covered by existing rules.
+
+## A) Layering
+
+- UI layer is presentational only.
+- Domain layer contains pure functions only (no React imports/usages).
+- Application layer orchestrates use-cases.
+- Data layer owns API calls and DTO mapping.
+
+## B) Types
+
+- All shared types must live in `*.types.ts`.
+- Use discriminated unions for async/state shapes (`loading`/`success`/`error`).
+- Use exhaustive checks in `switch` statements (no `default` branch).
+
+## D) State
+
+- Maintain a single source of truth for each state concern.
+- No side effects inside render.
+
+## E) Testability
+
+- Provide unit tests for domain logic.
+
+## F) Code Quality
+
+- Prefer early returns.
+- Avoid deep nesting in logic and component flow.
+- Replace magic numbers with named constants.
+- Use intent-revealing names for symbols and functions.
+
+## Constraints
+
+- Do not refactor unrelated parts.
+- If a requested change would violate these rules, stop and explain before continuing.
+
+## Output Format
+
+When implementation is provided, structure it as:
+
+1. Architecture overview
+2. File plan (with purpose)
+3. Code by file
+4. Self-review checklist

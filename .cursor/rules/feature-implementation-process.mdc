@@ -1,0 +1,27 @@
+---
+description: Enforce phased feature delivery with approval gate
+alwaysApply: true
+---
+
+# New Feature Delivery Process
+
+When implementing a new feature, follow this process strictly.
+
+## Process Phases
+
+1. Architecture overview - define layers and responsibilities.
+2. File plan - list NEW and MODIFIED files with purpose, grouped by domain/ui/api.
+3. Implementation - code grouped by file with clear headers.
+4. Self-review - check rule compliance and list improvements.
+
+## Mandatory Approval Gate
+
+- Stop after phase 2 (file plan).
+- Wait for explicit user confirmation before phase 3 implementation.
+
+## Output Format (Mandatory)
+
+1. Architecture overview
+2. File plan (NEW and MODIFIED files, directory, purpose)
+3. After confirmation, implementation
+4. Self-review (check each architecture/styling rule)

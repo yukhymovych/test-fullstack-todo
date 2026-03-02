@@ -1,0 +1,65 @@
+---
+description: Frontend architecture, typing, data, and UI complexity rules
+alwaysApply: true
+---
+
+# Frontend Architecture and Styling Principles
+
+Apply these rules strictly for frontend feature work.
+
+## A) Separation of concerns
+
+- UI (components/pages) must only render and handle user events.
+- Forbidden inside UI: API calls, DTO types, validation logic, business logic, API-to-domain mapping.
+- Business logic must be in feature/model or feature/hooks.
+- API calls must live in `shared/api` (HTTP client) or `feature/api` (feature-specific requests and query hooks).
+
+## B) Types and validation
+
+- All domain types go into `.types.ts` files inside `feature/domain`.
+- Define Zod schemas once for input and reuse everywhere.
+- API DTO types must not be exposed in UI.
+
+## C) Data fetching
+
+- Use React Query (TanStack Query) hooks only in model/hooks layer.
+- No React Query inside UI components directly.
+- UI should consume custom feature hooks.
+
+## D) Reusability and DRY
+
+- If similar JSX appears multiple times, extract a reusable UI component.
+- If logic repeats, extract a pure helper or custom hook.
+- Do not duplicate query keys, constants, selectors, validation, or types.
+
+## E) Testability
+
+- Domain/business logic must be pure and testable independent of React.
+- API ↔ domain mapping functions must be pure and testable.
+- Even without tests now, keep structure test-friendly without hacks.
+
+## F) UI complexity
+
+- Keep components small and focused.
+- Avoid nested JSX deeper than ~3 levels; extract subcomponents.
+- Avoid inline complex types; prefer named types from `.types.ts`.
+
+## G) Local state
+
+- Do not store server state in local state unless necessary.
+- Compute derived state instead of storing it.
+
+## Complexity Rules
+
+- No file over ~200 lines.
+- No nested JSX deeper than 3 levels.
+- No inline style objects in pages.
+- Extract repeated layout blocks.
+
+## Forbidden Patterns
+
+- Direct `fetch`/`axios` calls in UI.
+- Inline Zod schemas in components.
+- DTO types in pages or components.
+- Duplicated types/constants.
+- Nested ternaries in JSX.
