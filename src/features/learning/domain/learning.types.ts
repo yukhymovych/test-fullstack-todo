@@ -22,6 +22,7 @@ export interface LearningSession {
   created_at: string;
   kind?: string;
   root_note_id?: string | null;
+  scoped_mode?: ScopedSessionMode | null;
 }
 
 export interface TodaySessionResponse {
@@ -33,6 +34,7 @@ export interface ScopedSessionSummary {
   sessionId: string;
   rootNoteId: string;
   rootTitle: string;
+  mode: ScopedSessionMode;
   done: number;
   total: number;
 }

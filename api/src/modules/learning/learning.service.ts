@@ -86,7 +86,8 @@ export async function startScopedSession(
   const existingSession = await learningSQL.findActiveScopedSession(
     userId,
     dayKey,
-    rootNoteId
+    rootNoteId,
+    mode
   );
   if (existingSession) {
     const data = await learningSQL.getSessionWithItems(existingSession.id, userId);
@@ -107,7 +108,8 @@ export async function startScopedSession(
   const session = await learningSQL.createScopedSession(
     userId,
     dayKey,
-    rootNoteId
+    rootNoteId,
+    mode
   );
   const sessionItems = eligibleIds.map((noteId, i) => ({
     noteId,

@@ -22,6 +22,7 @@ export interface LearningSession {
   created_at: Date;
   kind?: string;
   root_note_id?: string | null;
+  scoped_mode?: 'deep_dive' | 'due_only' | null;
 }
 
 export interface LearningSessionItem {
@@ -66,7 +67,7 @@ export async function getSessionByUserAndDay(
   dayKey: string
 ): Promise<LearningSession | null> {
   const result = await pool.query(
-    `SELECT id, user_id, day_key, status, created_at, kind, root_note_id
+    `SELECT id, user_id, day_key, status, created_at, kind, root_note_id, scoped_mode
      FROM learning_sessions
      WHERE user_id = $1 AND day_key = $2 AND kind = 'global'`,
     [userId, dayKey]
@@ -163,7 +164,7 @@ export async function createSession(
   const result = await pool.query(
     `INSERT INTO learning_sessions (user_id, day_key, status, kind)
      VALUES ($1, $2, 'active', 'global')
-     RETURNING id, user_id, day_key, status, created_at, kind, root_note_id`,
+     RETURNING id, user_id, day_key, status, created_at, kind, root_note_id, scoped_mode`,
     [userId, dayKey]
   );
   return result.rows[0];
@@ -237,7 +238,7 @@ export async function getSessionWithItems(
   items: (LearningSessionItem & { title?: string })[];
 } | null> {
   const sessionResult = await pool.query(
-    `SELECT id, user_id, day_key, status, created_at, kind, root_note_id
+    `SELECT id, user_id, day_key, status, created_at, kind, root_note_id, scoped_mode
      FROM learning_sessions
      WHERE id = $1 AND user_id = $2`,
     [sessionId, userId]
@@ -275,7 +276,7 @@ export async function getSessionById(
   userId: string
 ): Promise<LearningSession | null> {
   const result = await pool.query(
-    `SELECT id, user_id, day_key, status, created_at, kind, root_note_id
+    `SELECT id, user_id, day_key, status, created_at, kind, root_note_id, scoped_mode
      FROM learning_sessions
      WHERE id = $1 AND user_id = $2`,
     [sessionId, userId]
@@ -690,13 +691,15 @@ export async function insertReviewLogV2(
 export async function findActiveScopedSession(
   userId: string,
   dayKey: string,
-  rootNoteId: string
+  rootNoteId: string,
+  scopedMode: 'deep_dive' | 'due_only'
 ): Promise<LearningSession | null> {
   const result = await pool.query(
-    `SELECT id, user_id, day_key, status, created_at, kind, root_note_id
+    `SELECT id, user_id, day_key, status, created_at, kind, root_note_id, scoped_mode
      FROM learning_sessions
-     WHERE user_id = $1 AND day_key = $2 AND kind = 'scoped' AND root_note_id = $3 AND status = 'active'`,
-    [userId, dayKey, rootNoteId]
+     WHERE user_id = $1 AND day_key = $2 AND kind = 'scoped' AND root_note_id = $3
+       AND scoped_mode = $4 AND status = 'active'`,
+    [userId, dayKey, rootNoteId, scopedMode]
   );
   return result.rows[0] || null;
 }
@@ -704,13 +707,14 @@ export async function findActiveScopedSession(
 export async function createScopedSession(
   userId: string,
   dayKey: string,
-  rootNoteId: string
+  rootNoteId: string,
+  scopedMode: 'deep_dive' | 'due_only'
 ): Promise<LearningSession> {
   const result = await pool.query(
-    `INSERT INTO learning_sessions (user_id, day_key, status, kind, root_note_id)
-     VALUES ($1, $2, 'active', 'scoped', $3)
-     RETURNING id, user_id, day_key, status, created_at, kind, root_note_id`,
-    [userId, dayKey, rootNoteId]
+    `INSERT INTO learning_sessions (user_id, day_key, status, kind, root_note_id, scoped_mode)
+     VALUES ($1, $2, 'active', 'scoped', $3, $4)
+     RETURNING id, user_id, day_key, status, created_at, kind, root_note_id, scoped_mode`,
+    [userId, dayKey, rootNoteId, scopedMode]
   );
   return result.rows[0];
 }
@@ -719,6 +723,7 @@ export interface ScopedSessionSummary {
   sessionId: string;
   rootNoteId: string;
   rootTitle: string;
+  mode: 'deep_dive' | 'due_only';
   done: number;
   total: number;
 }
@@ -763,20 +768,21 @@ export async function listTodayScopedSessions(
   dayKey: string
 ): Promise<ScopedSessionSummary[]> {
   const result = await pool.query(
-    `SELECT ls.id AS session_id, ls.root_note_id, n.title AS root_title,
+    `SELECT ls.id AS session_id, ls.root_note_id, ls.scoped_mode, n.title AS root_title,
             COUNT(lsi.id) FILTER (WHERE lsi.state = 'done') AS done,
             COUNT(lsi.id) AS total
      FROM learning_sessions ls
      LEFT JOIN notes n ON n.id = ls.root_note_id AND n.user_id = ls.user_id
      LEFT JOIN learning_session_items lsi ON lsi.session_id = ls.id
      WHERE ls.user_id = $1 AND ls.day_key = $2 AND ls.kind = 'scoped' AND ls.status = 'active'
-     GROUP BY ls.id, ls.root_note_id, n.title`,
+     GROUP BY ls.id, ls.root_note_id, ls.scoped_mode, n.title`,
     [userId, dayKey]
   );
   return result.rows.map((r) => ({
     sessionId: r.session_id,
     rootNoteId: r.root_note_id,
     rootTitle: r.root_title ?? '(deleted)',
+    mode: (r.scoped_mode ?? 'due_only') as 'deep_dive' | 'due_only',
     done: Number(r.done),
     total: Number(r.total),
   }));

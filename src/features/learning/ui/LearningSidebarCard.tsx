@@ -10,6 +10,11 @@ import './LearningSidebarCard.css';
 
 const GLOBAL_DAILY_CAP = 15;
 
+const SCOPED_MODE_LABEL: Record<'deep_dive' | 'due_only', string> = {
+  deep_dive: 'Deep dive',
+  due_only: 'Due only',
+};
+
 export function LearningSidebarCard() {
   const navigate = useNavigate();
   const { data: session, isLoading } = useTodayLearningSession();
@@ -110,7 +115,7 @@ export function LearningSidebarCard() {
               className="learning-sidebar-card__scoped-btn"
               onClick={() => navigate(learningRoutes.sessionById(s.sessionId))}
             >
-              {s.rootTitle}: {s.done}/{s.total}
+              {s.rootTitle} ({SCOPED_MODE_LABEL[s.mode]}): {s.done}/{s.total}
             </Button>
           ))}
         </div>
