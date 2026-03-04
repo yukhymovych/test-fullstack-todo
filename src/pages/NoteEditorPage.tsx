@@ -5,14 +5,7 @@ import { NoteEditorToolbar } from '../features/notes/ui/NoteEditorToolbar';
 import { NoteTitleInput } from '../features/notes/ui/NoteTitleInput';
 import { NoteEditorBody } from '../features/notes/ui/NoteEditorBody';
 import { NoteEditorLearningGradeBar } from '../features/learning/ui/NoteEditorLearningGradeBar';
-
-const contentStyles = {
-  padding: '20px',
-  maxWidth: 800,
-  width: '100%',
-  margin: '0 auto',
-  boxSizing: 'border-box' as const,
-};
+import './NoteEditorPage.css';
 
 export function NoteEditorPage() {
   const { id } = useParams<{ id: string }>();
@@ -36,19 +29,19 @@ export function NoteEditorPage() {
   } = useNoteEditor(id);
 
   if (isLoading || !id) {
-    return <div style={contentStyles}>Loading note...</div>;
+    return <div className="note-editor-page note-editor-page--loading">Loading note...</div>;
   }
 
   if (error || !note) {
     return (
-      <div style={{ ...contentStyles, color: 'red' }}>
+      <div className="note-editor-page note-editor-page--error">
         Error: {error?.message ?? 'Note not found'}
       </div>
     );
   }
 
   return (
-    <div style={contentStyles}>
+    <div className="note-editor-page">
       <NoteEditorToolbar
         activeId={id}
         notes={notes}

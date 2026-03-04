@@ -53,3 +53,14 @@
   list-style: none;
   padding: 0;
 }
+
+@media (max-width: 767px) {
+  .notes-list-page__container {
+    padding: 14px;
+  }
+
+  .notes-list-page__header {
+    margin: 20px 0 28px;
+    font-size: 30px;
+  }
+}

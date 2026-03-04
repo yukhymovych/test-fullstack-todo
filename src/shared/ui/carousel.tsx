@@ -67,7 +67,8 @@ const Carousel = React.forwardRef<
     const [canScrollPrev, setCanScrollPrev] = React.useState(false);
     const [canScrollNext, setCanScrollNext] = React.useState(false);
 
-    const onSelect = React.useCallback((emblaApi: CarouselApi) => {
+    const onSelect = React.useCallback((emblaApi?: CarouselApi) => {
+      if (!emblaApi) return;
       setCanScrollPrev(emblaApi.canScrollPrev());
       setCanScrollNext(emblaApi.canScrollNext());
     }, []);

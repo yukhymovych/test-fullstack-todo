@@ -1,0 +1,10 @@
+.note-editor-body {
+  min-height: 300px;
+  padding: 16px;
+}
+
+@media (max-width: 767px) {
+  .note-editor-body {
+    padding: 8px 4px 12px;
+  }
+}

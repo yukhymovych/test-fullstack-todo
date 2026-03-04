@@ -1,0 +1,17 @@
+.note-editor-page {
+  padding: 20px;
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.note-editor-page--error {
+  color: red;
+}
+
+@media (max-width: 767px) {
+  .note-editor-page {
+    padding: 14px;
+  }
+}

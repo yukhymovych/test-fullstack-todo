@@ -28,7 +28,7 @@ import type {
   NoteBreadcrumbsProps,
 } from './NoteBreadcrumbs.types';
 
-const TRUNCATE_CLASS = 'max-w-[220px] truncate inline-block';
+const TRUNCATE_CLASS = 'max-w-[130px] sm:max-w-[220px] truncate inline-block';
 const MAX_VISIBLE_LINKS = 3;
 
 function BreadcrumbEllipsisDropdown({

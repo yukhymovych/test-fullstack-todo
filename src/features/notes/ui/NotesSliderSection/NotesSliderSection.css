@@ -68,3 +68,27 @@
 .notes-slider-section__nav:disabled {
   opacity: 0.35;
 }
+
+@media (max-width: 767px) {
+  .notes-slider-section {
+    margin-bottom: 32px;
+  }
+
+  .notes-slider-section__carousel {
+    padding: 0 4px;
+  }
+
+  .notes-slider-section__item {
+    flex-basis: 82%;
+  }
+
+  .notes-slider-section__card {
+    min-height: 88px;
+    padding: 14px;
+    border-radius: 12px;
+  }
+
+  .notes-slider-section__nav {
+    display: none;
+  }
+}

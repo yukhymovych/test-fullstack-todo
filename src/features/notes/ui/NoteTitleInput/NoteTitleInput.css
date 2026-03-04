@@ -1,0 +1,16 @@
+.note-title-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 16px;
+  font-size: 40px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 767px) {
+  .note-title-input {
+    padding: 10px 12px;
+    font-size: 30px;
+    margin-bottom: 12px;
+  }
+}

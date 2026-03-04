@@ -15,6 +15,7 @@ import {
 import { CircleAlert, MoreVertical } from 'lucide-react';
 import type { SaveStatus } from '../../model/useNoteEditor';
 import type { NoteEditorToolbarProps } from './NoteEditorToolbar.types';
+import './NoteEditorToolbar.css';
 
 const SAVE_STATUS_COLOR: Record<SaveStatus, string> = {
   saving: '#2563eb',
@@ -78,26 +79,11 @@ export function NoteEditorToolbar({
     studyStatus?.status === 'active' && studyStatus?.dueAt;
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '16px',
-        gap: '12px',
-        flexWrap: 'wrap',
-      }}
-    >
-      <div style={{ minWidth: 0, flex: 1, display: 'flex', alignItems: 'center', gap: '12px' }}>
+    <div className="note-editor-toolbar">
+      <div className="note-editor-toolbar__left">
         <NoteBreadcrumbs activeId={activeId} notes={notes} currentTitle={currentTitle} />
         {showDueAt && (
-          <span
-            style={{
-              fontSize: '13px',
-              color: 'var(--muted-foreground, #6b7280)',
-              whiteSpace: 'nowrap',
-            }}
-          >
+          <span className="note-editor-toolbar__due">
             {!isDueToday && (
               <>
                 Next review: {dueLabel} (
@@ -111,12 +97,7 @@ export function NoteEditorToolbar({
             )}
             {isDueToday && (
               <span
-                style={{
-                  display: 'inline-flex',
-                  flexDirection: 'column',
-                  gap: '2px',
-                  verticalAlign: 'top',
-                }}
+                className="note-editor-toolbar__due-today"
               >
                 <span>
                   Next review: {dueLabel} (
@@ -132,25 +113,14 @@ export function NoteEditorToolbar({
                     <button
                       type="button"
                       aria-label="Why review is due today"
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        width: 'fit-content',
-                        border: 0,
-                        background: 'transparent',
-                        padding: 0,
-                        fontSize: '13px',
-                        color: 'var(--muted-foreground, #6b7280)',
-                        cursor: 'help',
-                      }}
+                      className="note-editor-toolbar__why-today"
                     >
                       Why today?
                       <CircleAlert className="size-4" />
                     </button>
                   </TooltipTrigger>
                   <TooltipContent side="bottom" align="start">
-                    <div style={{ display: 'grid', gap: '2px' }}>
+                    <div className="note-editor-toolbar__tooltip-grid">
                       <div>Last review: {getDaysAgoLabel(studyStatus.lastReviewedAt)}</div>
                       <div>
                         Stability: {studyStatus.stabilityDays?.toFixed(1) ?? 'N/A'} days
@@ -176,8 +146,8 @@ export function NoteEditorToolbar({
           </span>
         )}
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <span style={{ fontSize: '13px', color: SAVE_STATUS_COLOR[saveStatus] }}>
+      <div className="note-editor-toolbar__right">
+        <span className="note-editor-toolbar__save-status" style={{ color: SAVE_STATUS_COLOR[saveStatus] }}>
           {SAVE_STATUS_LABEL[saveStatus]}
         </span>
         <DropdownMenu>

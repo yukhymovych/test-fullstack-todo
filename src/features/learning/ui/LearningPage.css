@@ -143,3 +143,30 @@
 .learning-animated-switch {
   flex: 1;
 }
+
+@media (max-width: 767px) {
+  .learning-progress-header {
+    padding: 10px 12px;
+  }
+
+  .learning-page__main {
+    padding: 14px;
+  }
+
+  .learning-reveal {
+    padding: 12px 0;
+  }
+
+  .learning-reveal__title {
+    font-size: 20px;
+    margin: 0 0 12px;
+  }
+
+  .learning-summary {
+    padding: 20px;
+  }
+
+  .learning-summary__title {
+    font-size: 20px;
+  }
+}

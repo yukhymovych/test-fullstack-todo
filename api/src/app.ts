@@ -11,9 +11,17 @@ if (!process.env.JWT_SECRET) {
 
 export const app = express();
 
-app.use(cors({
-  origin: 'http://localhost:5173',
-}));
+// Allow localhost and local network origins (for mobile testing via http://192.168.x.x:5173)
+const allowedOrigin = (origin: string | undefined, cb: (err: Error | null, allow?: boolean) => void) => {
+  if (!origin) return cb(null, true);
+  const ok =
+    origin === 'http://localhost:5173' ||
+    origin.startsWith('http://127.0.0.1:') ||
+    origin.startsWith('http://192.168.') ||
+    origin.startsWith('http://10.');
+  cb(null, ok);
+};
+app.use(cors({ origin: allowedOrigin }));
 
 app.use(express.json());
 

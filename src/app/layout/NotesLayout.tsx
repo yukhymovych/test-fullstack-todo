@@ -1,39 +1,56 @@
+import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
+import { Menu, X } from 'lucide-react';
 import { SidebarNotesTree } from '../../features/notes/ui/SidebarNotesTree';
+import './NotesLayout.css';
 
 export function NotesLayout() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
+  const closeSidebar = () => setIsSidebarOpen(false);
+
+  useEffect(() => {
+    if (!isSidebarOpen) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeSidebar();
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isSidebarOpen]);
+
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        display: 'flex',
-        overflow: 'hidden',
-      }}
-    >
+    <div className="notes-layout">
+      <button
+        type="button"
+        className="notes-layout__menu-button"
+        aria-label={isSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+        aria-expanded={isSidebarOpen}
+        aria-controls="notes-sidebar"
+        onClick={toggleSidebar}
+      >
+        {isSidebarOpen ? <X size={18} /> : <Menu size={18} />}
+      </button>
+
       <aside
-        style={{
-          width: 280,
-          minWidth: 280,
-          height: '100%',
-          overflowY: 'auto',
-          backgroundColor: '#111',
-          borderRight: '1px solid #222',
-          flexShrink: 0,
-        }}
+        id="notes-sidebar"
+        className={`notes-layout__sidebar ${isSidebarOpen ? 'notes-layout__sidebar--open' : ''}`}
       >
         <SidebarNotesTree />
       </aside>
-      <main
-        style={{
-          flex: 1,
-          overflow: 'auto',
-          backgroundColor: '#1a1a1a',
-        }}
-      >
+
+      <button
+        type="button"
+        className={`notes-layout__backdrop ${isSidebarOpen ? 'notes-layout__backdrop--visible' : ''}`}
+        aria-label="Close sidebar overlay"
+        onClick={closeSidebar}
+      />
+
+      <main className="notes-layout__main">
         <Outlet />
       </main>
     </div>
