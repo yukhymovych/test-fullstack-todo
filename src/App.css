@@ -66,6 +66,6 @@
 
 @media (max-width: 767px) {
   .bn-editor {
-    padding-inline: 28px 0 !important;
+    padding-inline: 0 !important;
   }
 }

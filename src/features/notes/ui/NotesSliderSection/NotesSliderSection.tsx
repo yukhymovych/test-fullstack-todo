@@ -27,7 +27,7 @@ export function NotesSliderSection({
       </h2>
       <Carousel
         dir="ltr"
-        opts={{ align: 'start', direction: 'ltr', loop: false, startIndex: 0 }}
+        opts={{ align: 'start', direction: 'ltr', loop: false, startIndex: 0, slidesToScroll: 2 }}
         className="notes-slider-section__carousel"
       >
         <CarouselContent

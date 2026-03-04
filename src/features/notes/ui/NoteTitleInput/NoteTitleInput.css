@@ -9,7 +9,7 @@
 
 @media (max-width: 767px) {
   .note-title-input {
-    padding: 10px 12px;
+    padding: 10px 0;
     font-size: 30px;
     margin-bottom: 12px;
   }

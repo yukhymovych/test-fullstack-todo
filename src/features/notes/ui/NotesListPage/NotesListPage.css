@@ -59,6 +59,10 @@
     padding: 14px;
   }
 
+  .notes-list-page__toolbar-actions {
+    padding-left: 52px;
+  }
+
   .notes-list-page__header {
     margin: 20px 0 28px;
     font-size: 30px;
