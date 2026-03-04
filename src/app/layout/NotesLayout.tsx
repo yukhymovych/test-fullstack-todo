@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
-import { SidebarNotesTree } from '../../features/notes/ui/SidebarNotesTree';
+import { SidebarNotesTree } from '../../features/notes/ui/SidebarNotesTree/SidebarNotesTree';
 import './NotesLayout.css';
 
 export function NotesLayout() {
@@ -40,7 +40,7 @@ export function NotesLayout() {
         id="notes-sidebar"
         className={`notes-layout__sidebar ${isSidebarOpen ? 'notes-layout__sidebar--open' : ''}`}
       >
-        <SidebarNotesTree />
+        <SidebarNotesTree onNavigate={closeSidebar} />
       </aside>
 
       <button

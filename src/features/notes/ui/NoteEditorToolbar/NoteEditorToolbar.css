@@ -1,18 +1,21 @@
 .note-editor-toolbar {
   display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin-bottom: 16px;
+  gap: 8px;
+}
+
+.note-editor-toolbar__top-row {
+  display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
   gap: 12px;
-  flex-wrap: wrap;
 }
 
 .note-editor-toolbar__left {
   min-width: 0;
   flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 12px;
 }
 
 .note-editor-toolbar__due {
@@ -57,16 +60,8 @@
 }
 
 @media (max-width: 767px) {
-  .note-editor-toolbar {
-    align-items: flex-start;
-    gap: 8px;
-  }
-
-  .note-editor-toolbar__left {
-    width: 100%;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
+  .note-editor-toolbar__top-row {
+    padding-left: 50px;
   }
 
   .note-editor-toolbar__due {
@@ -75,7 +70,17 @@
   }
 
   .note-editor-toolbar__right {
-    width: 100%;
-    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .note-editor-toolbar__save-status {
+    display: none;
+  }
+}
+
+@media (max-width: 479px) {
+  .note-editor-toolbar__top-row {
+    padding-left: 46px;
+    gap: 8px;
   }
 }

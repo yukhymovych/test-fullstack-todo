@@ -11,7 +11,11 @@ import { Button } from '@/shared/ui';
 import { UserInfo } from '@/app/components/UserInfo';
 import './SidebarNotesTree.css';
 
-export function SidebarNotesTree() {
+export interface SidebarNotesTreeProps {
+  onNavigate?: () => void;
+}
+
+export function SidebarNotesTree({ onNavigate }: SidebarNotesTreeProps) {
   const {
     isLoading,
     error,
@@ -74,6 +78,14 @@ export function SidebarNotesTree() {
     [byId, childrenByParent, rootIds.length, handleMoveNote]
   );
 
+  const handleNavigateAndClose = useCallback(
+    (id: string) => {
+      handleNavigate(id);
+      onNavigate?.();
+    },
+    [handleNavigate, onNavigate]
+  );
+
   if (isLoading) {
     return <div className="sidebar-loading">Loading...</div>;
   }
@@ -102,7 +114,7 @@ export function SidebarNotesTree() {
         recentFormattedTimes={recentFormattedTimes}
         isExpanded={recentsExpanded}
         onToggleExpand={toggleRecentsExpand}
-        navigate={handleNavigate}
+        navigate={handleNavigateAndClose}
         activeId={activeId}
       />
       <SidebarFavoritesList
@@ -118,7 +130,7 @@ export function SidebarNotesTree() {
         onCreateChild={handleCreateChild}
         onDeletePage={handleDeletePage}
         isDeleting={deleteNote.isPending}
-        navigate={handleNavigate}
+        navigate={handleNavigateAndClose}
         activeId={activeId}
       />
       <div className="sidebar-all-pages">
@@ -152,7 +164,7 @@ export function SidebarNotesTree() {
                   onAddToFavorites={handleAddToFavorites}
                   onRemoveFromFavorites={handleRemoveFromFavorites}
                   isDeleting={deleteNote.isPending}
-                  navigate={handleNavigate}
+                  navigate={handleNavigateAndClose}
                   activeId={activeId}
                 />
               ))}

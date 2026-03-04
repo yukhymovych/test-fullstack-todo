@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { BookOpen, CircleAlert, Clock } from 'lucide-react';
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui';
 import { NotesSliderSection } from '../NotesSliderSection';
@@ -20,6 +21,8 @@ export function NotesListPageView({
   onNoteClick,
   onMainLearningSessionClick,
 }: NotesListPageProps) {
+  const [isDueTooltipOpen, setIsDueTooltipOpen] = useState(false);
+
   if (isLoading) {
     return <div className="notes-list-page__container">Loading notes...</div>;
   }
@@ -73,12 +76,13 @@ export function NotesListPageView({
               <span className="font-medium text-[#9ca3af]">
                 {dueReadyNotes.length}
               </span>
-              <Tooltip>
+              <Tooltip open={isDueTooltipOpen} onOpenChange={setIsDueTooltipOpen}>
                 <TooltipTrigger asChild>
                   <button
                     type="button"
                     aria-label="Due items info"
                     className="inline-flex cursor-help items-center border-0 bg-transparent p-0 text-[#9ca3af] hover:text-[#d1d5db]"
+                    onClick={() => setIsDueTooltipOpen((prev) => !prev)}
                   >
                     <CircleAlert className="size-4" />
                   </button>

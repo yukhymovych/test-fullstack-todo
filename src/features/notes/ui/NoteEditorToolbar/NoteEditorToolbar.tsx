@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { NoteBreadcrumbs } from '../NoteBreadcrumbs';
 import { NotePageActionsMenu } from '../NotePageActionsMenu';
 import { useStudyItemStatus } from '@/features/learning/model/useStudyItemStatus';
@@ -65,6 +66,7 @@ export function NoteEditorToolbar({
   onDelete,
   isDeleting,
 }: NoteEditorToolbarProps) {
+  const [isWhyTodayTooltipOpen, setIsWhyTodayTooltipOpen] = useState(false);
   const { data: studyStatus } = useStudyItemStatus(activeId);
   const dueLabel = studyStatus?.dueAt ? formatDueDate(studyStatus.dueAt) : null;
   const isDueToday = dueLabel === 'Today';
@@ -80,12 +82,50 @@ export function NoteEditorToolbar({
 
   return (
     <div className="note-editor-toolbar">
-      <div className="note-editor-toolbar__left">
-        <NoteBreadcrumbs activeId={activeId} notes={notes} currentTitle={currentTitle} />
-        {showDueAt && (
-          <span className="note-editor-toolbar__due">
-            {!isDueToday && (
-              <>
+      <div className="note-editor-toolbar__top-row">
+        <div className="note-editor-toolbar__left">
+          <NoteBreadcrumbs activeId={activeId} notes={notes} currentTitle={currentTitle} />
+        </div>
+        <div className="note-editor-toolbar__right">
+          <span className="note-editor-toolbar__save-status" style={{ color: SAVE_STATUS_COLOR[saveStatus] }}>
+            {SAVE_STATUS_LABEL[saveStatus]}
+          </span>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" icon title="Page options" style={{ opacity: 0.7 }}>
+                <MoreVertical className="size-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <NotePageActionsMenu
+              noteId={activeId}
+              isFavorite={isFavorite}
+              hasChildren={hasChildren}
+              hasDescendantsInGlobal={hasDescendantsInGlobal}
+              onAddToFavorites={onAddToFavorites}
+              onRemoveFromFavorites={onRemoveFromFavorites}
+              onCreateChild={onCreateChild}
+              onDelete={onDelete}
+              isDeleting={isDeleting}
+            />
+          </DropdownMenu>
+        </div>
+      </div>
+      {showDueAt && (
+        <span className="note-editor-toolbar__due">
+          {!isDueToday && (
+            <>
+              Next review: {dueLabel} (
+              {new Date(studyStatus.dueAt!).toLocaleDateString(undefined, {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              })}
+              )
+            </>
+          )}
+          {isDueToday && (
+            <span className="note-editor-toolbar__due-today">
+              <span>
                 Next review: {dueLabel} (
                 {new Date(studyStatus.dueAt!).toLocaleDateString(undefined, {
                   month: 'short',
@@ -93,82 +133,45 @@ export function NoteEditorToolbar({
                   year: 'numeric',
                 })}
                 )
-              </>
-            )}
-            {isDueToday && (
-              <span
-                className="note-editor-toolbar__due-today"
-              >
-                <span>
-                  Next review: {dueLabel} (
-                  {new Date(studyStatus.dueAt!).toLocaleDateString(undefined, {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })}
-                  )
-                </span>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      type="button"
-                      aria-label="Why review is due today"
-                      className="note-editor-toolbar__why-today"
-                    >
-                      Why today?
-                      <CircleAlert className="size-4" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" align="start">
-                    <div className="note-editor-toolbar__tooltip-grid">
-                      <div>Last review: {getDaysAgoLabel(studyStatus.lastReviewedAt)}</div>
-                      <div>
-                        Stability: {studyStatus.stabilityDays?.toFixed(1) ?? 'N/A'} days
-                      </div>
-                      <div>
-                        Difficulty: {studyStatus.difficulty?.toFixed(1) ?? 'N/A'} / 10
-                      </div>
-                      <div>
-                        Last grade:{' '}
-                        {latestReviewLog?.grade
-                          ? latestReviewLog.grade[0].toUpperCase() + latestReviewLog.grade.slice(1)
-                          : 'N/A'}
-                      </div>
-                      <div>
-                        Scheduled interval:{' '}
-                        {getScheduledIntervalLabel(studyStatus.lastReviewedAt, studyStatus.dueAt)}
-                      </div>
-                    </div>
-                  </TooltipContent>
-                </Tooltip>
               </span>
-            )}
-          </span>
-        )}
-      </div>
-      <div className="note-editor-toolbar__right">
-        <span className="note-editor-toolbar__save-status" style={{ color: SAVE_STATUS_COLOR[saveStatus] }}>
-          {SAVE_STATUS_LABEL[saveStatus]}
+              <Tooltip open={isWhyTodayTooltipOpen} onOpenChange={setIsWhyTodayTooltipOpen}>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label="Why review is due today"
+                    className="note-editor-toolbar__why-today"
+                    onClick={() => setIsWhyTodayTooltipOpen((prev) => !prev)}
+                  >
+                    Why today?
+                    <CircleAlert className="size-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" align="start">
+                  <div className="note-editor-toolbar__tooltip-grid">
+                    <div>Last review: {getDaysAgoLabel(studyStatus.lastReviewedAt)}</div>
+                    <div>
+                      Stability: {studyStatus.stabilityDays?.toFixed(1) ?? 'N/A'} days
+                    </div>
+                    <div>
+                      Difficulty: {studyStatus.difficulty?.toFixed(1) ?? 'N/A'} / 10
+                    </div>
+                    <div>
+                      Last grade:{' '}
+                      {latestReviewLog?.grade
+                        ? latestReviewLog.grade[0].toUpperCase() + latestReviewLog.grade.slice(1)
+                        : 'N/A'}
+                    </div>
+                    <div>
+                      Scheduled interval:{' '}
+                      {getScheduledIntervalLabel(studyStatus.lastReviewedAt, studyStatus.dueAt)}
+                    </div>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </span>
+          )}
         </span>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" icon title="Page options" style={{ opacity: 0.7 }}>
-              <MoreVertical className="size-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <NotePageActionsMenu
-            noteId={activeId}
-            isFavorite={isFavorite}
-            hasChildren={hasChildren}
-            hasDescendantsInGlobal={hasDescendantsInGlobal}
-            onAddToFavorites={onAddToFavorites}
-            onRemoveFromFavorites={onRemoveFromFavorites}
-            onCreateChild={onCreateChild}
-            onDelete={onDelete}
-            isDeleting={isDeleting}
-          />
-        </DropdownMenu>
-      </div>
+      )}
     </div>
   );
 }

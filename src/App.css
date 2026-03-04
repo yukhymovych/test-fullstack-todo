@@ -63,3 +63,9 @@
 .bn-container .ProseMirror{
   background-color: rgb(26, 26, 26);
 }
+
+@media (max-width: 767px) {
+  .bn-editor {
+    padding-inline: 28px 0 !important;
+  }
+}
