@@ -1,4 +1,5 @@
 import { Star } from 'lucide-react';
+import { RiArrowDownSLine } from 'react-icons/ri';
 import { Button } from '@/shared/ui';
 import { TreeNode } from '../SidebarNotesTree/TreeNode';
 import type { NoteListItem } from '../../model/types';
@@ -49,8 +50,11 @@ export function SidebarFavoritesList({
       >
         <Star className="sidebar-favorites__star size-4" />
         <span>Favorite</span>
-        <span className="sidebar-favorites__chevron">
-          {isExpanded ? '▼' : '▶'}
+        <span
+          className={`sidebar-favorites__chevron ${!isExpanded ? 'sidebar-favorites__chevron--collapsed' : ''}`}
+          aria-hidden
+        >
+          <RiArrowDownSLine />
         </span>
       </Button>
       {isExpanded && (

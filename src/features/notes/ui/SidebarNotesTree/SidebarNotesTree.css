@@ -45,8 +45,35 @@
 
 .sidebar-all-pages__chevron {
   margin-left: auto;
-  font-size: 10px;
-  opacity: 0.7;
+  display: inline-flex;
+  align-items: center;
+  color: #9ca3af;
+  transition: transform 0.2s ease;
+}
+
+.sidebar-all-pages__chevron--collapsed {
+  transform: rotate(-90deg);
+}
+
+.notes-tree-row__expand-btn {
+  min-width: 24px;
+  min-height: 24px;
+}
+
+.notes-tree-row__chevron {
+  display: inline-flex;
+  align-items: center;
+  color: #9ca3af;
+  transition: transform 0.2s ease;
+}
+
+.notes-tree-row__chevron--collapsed {
+  transform: rotate(-90deg);
+}
+
+.notes-tree-row__page-btn:hover {
+  background: transparent;
+  color: inherit;
 }
 
 @media (max-width: 767px) {

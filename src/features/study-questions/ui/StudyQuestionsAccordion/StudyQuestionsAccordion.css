@@ -6,7 +6,7 @@
 
 .study-qa-accordion__title {
   margin: 0 0 10px;
-  font-size: 16px;
+  font-size: 24px;
   color: #e5e7eb;
 }
 
@@ -16,16 +16,37 @@
 }
 
 .study-qa-accordion__item {
-  border: 1px solid #2b2f36;
-  border-radius: 8px;
   padding: 8px 10px;
-  background: #0f1218;
 }
 
 .study-qa-accordion__question {
+  display: flex;
+  gap: 8px;
   cursor: pointer;
   color: #f3f4f6;
   font-weight: 600;
+  list-style: none;
+}
+
+.study-qa-accordion__question::-webkit-details-marker,
+.study-qa-accordion__question::marker {
+  display: none;
+}
+
+.study-qa-accordion__chevron {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  color: #9ca3af;
+  transition: transform 0.2s ease;
+}
+
+.study-qa-accordion__item:not([open]) .study-qa-accordion__chevron {
+  transform: rotate(-90deg);
+}
+
+.study-qa-accordion__item[open] .study-qa-accordion__chevron {
+  transform: rotate(0deg);
 }
 
 .study-qa-accordion__answer {

@@ -1,4 +1,5 @@
 import { Clock } from 'lucide-react';
+import { RiArrowDownSLine } from 'react-icons/ri';
 import { Button } from '@/shared/ui';
 import type { NoteListItem } from '../../model/types';
 import './SidebarRecentsList.css';
@@ -34,8 +35,11 @@ export function SidebarRecentsList({
       >
         <Clock className="sidebar-recents__clock size-4" />
         <span>Recently visited</span>
-        <span className="sidebar-recents__chevron">
-          {isExpanded ? '▼' : '▶'}
+        <span
+          className={`sidebar-recents__chevron ${!isExpanded ? 'sidebar-recents__chevron--collapsed' : ''}`}
+          aria-hidden
+        >
+          <RiArrowDownSLine />
         </span>
       </Button>
       {isExpanded && (

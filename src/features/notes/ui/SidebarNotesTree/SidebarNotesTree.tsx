@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { FileStack } from 'lucide-react';
+import { RiArrowDownSLine } from 'react-icons/ri';
 import { useNotesTree } from '../../model/useNotesTree';
 import { TreeNode } from './TreeNode';
 import { DndContextWrapper } from './DndContextWrapper';
@@ -142,8 +143,11 @@ export function SidebarNotesTree({ onNavigate }: SidebarNotesTreeProps) {
         >
           <FileStack className="sidebar-all-pages__icon size-4" />
           <span>All pages</span>
-          <span className="sidebar-all-pages__chevron">
-            {allPagesExpanded ? '▼' : '▶'}
+          <span
+            className={`sidebar-all-pages__chevron ${!allPagesExpanded ? 'sidebar-all-pages__chevron--collapsed' : ''}`}
+            aria-hidden
+          >
+            <RiArrowDownSLine />
           </span>
         </Button>
         {allPagesExpanded && (

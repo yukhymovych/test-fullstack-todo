@@ -9,6 +9,7 @@ import {
 } from '@/shared/ui';
 import { cn } from '@/lib/utils';
 import { MoreVertical } from 'lucide-react';
+import { RiArrowDownSLine } from 'react-icons/ri';
 
 export interface TreeNodeRowProps {
   node: NoteItem;
@@ -77,18 +78,29 @@ export function TreeNodeRow({
         <Button
           variant="ghost"
           icon
+          className="notes-tree-row__expand-btn"
           onClick={() => hasChildren && toggleExpand(nodeId)}
           style={{
             cursor: hasChildren ? 'pointer' : 'default',
             flex: 0,
           }}
         >
-          {hasChildren ? (isExpanded ? '▼' : '▶') : ' '}
+          {hasChildren && (
+            <span
+              className={cn(
+                'notes-tree-row__chevron',
+                !isExpanded && 'notes-tree-row__chevron--collapsed'
+              )}
+              aria-hidden
+            >
+              <RiArrowDownSLine />
+            </span>
+          )}
         </Button>
         <Button
           variant="ghost"
           onClick={() => navigate(nodeId)}
-          className="justify-start"
+          className="notes-tree-row__page-btn justify-start"
           style={{
             flex: 1,
             textAlign: 'left',
@@ -97,7 +109,7 @@ export function TreeNodeRow({
             whiteSpace: 'nowrap',
             color: isActive ? '#fff' : '#d1d5db',
             fontSize: '14px',
-            marginLeft: '2px',
+            paddingLeft: '5px',
           }}
         >
           {node.title || DEFAULT_NOTE_TITLE}
@@ -107,6 +119,7 @@ export function TreeNodeRow({
             <Button
               variant="ghost"
               icon
+              className="menu-trigger-btn"
               onClick={(e) => e.stopPropagation()}
               onPointerDown={(e) => e.stopPropagation()}
               title="Page options"

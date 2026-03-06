@@ -92,7 +92,13 @@ export function NoteEditorToolbar({
           </span>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" icon title="Page options" style={{ opacity: 0.7 }}>
+              <Button
+                variant="ghost"
+                icon
+                className="menu-trigger-btn"
+                title="Page options"
+                style={{ opacity: 0.7 }}
+              >
                 <MoreVertical className="size-4" />
               </Button>
             </DropdownMenuTrigger>

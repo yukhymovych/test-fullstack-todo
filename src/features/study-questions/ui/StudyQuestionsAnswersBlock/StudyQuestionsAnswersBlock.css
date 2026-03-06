@@ -1,9 +1,6 @@
 .study-qa-block {
   margin-top: 16px;
-  border: 1px solid #2b2f36;
-  border-radius: 10px;
   padding: 12px;
-  background: #13161b;
 }
 
 .study-qa-block__header {
@@ -16,7 +13,7 @@
 
 .study-qa-block__title {
   margin: 0;
-  font-size: 18px;
+  font-size: 24px;
   color: #f3f4f6;
 }
 
@@ -27,15 +24,18 @@
 
 .study-qa-block__create {
   display: grid;
-  gap: 8px;
-  margin-bottom: 14px;
+  gap: 20px;
+  margin-bottom: 50px;
+}
+
+.study-qa-block__create > button {
+  justify-self: start;
+  width: auto;
 }
 
 .study-qa-block__input,
 .study-qa-block__textarea {
-  border: 1px solid #3a3f47;
-  border-radius: 8px;
-  background: #0f1216;
+  border-bottom: 1px solid #3a3f47;
   color: #f3f4f6;
   padding: 8px 10px;
   width: 100%;
@@ -51,10 +51,14 @@
 }
 
 .study-qa-block__item {
-  border: 1px solid #2b2f36;
-  border-radius: 8px;
-  padding: 10px;
-  background: #101319;
+  margin-bottom: 25px;
+}
+
+.study-qa-block__item-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .study-qa-block__question {
@@ -72,4 +76,13 @@
 .study-qa-block__actions {
   display: flex;
   gap: 8px;
+}
+
+.study-qa-block__icon-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.study-qa-block__delete-icon-btn {
+  color: #ef4444;
 }

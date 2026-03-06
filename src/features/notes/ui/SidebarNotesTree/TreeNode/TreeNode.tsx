@@ -21,7 +21,7 @@ export function TreeNode({
   activeId,
 }: TreeNodeProps) {
   const node = byId.get(nodeId);
-  if (!node) return null;
+
 
   const children = childrenByParent.get(nodeId) ?? [];
   const hasChildren = children.length > 0;
@@ -41,10 +41,12 @@ export function TreeNode({
 
   const style = transform
     ? {
-        transform: CSS.Translate.toString(transform),
-        opacity: isDragging ? 0.5 : 1,
-      }
+      transform: CSS.Translate.toString(transform),
+      opacity: isDragging ? 0.5 : 1,
+    }
     : undefined;
+
+  if (!node) return null;
 
   const rowContent = (
     <TreeNodeRow
@@ -67,6 +69,7 @@ export function TreeNode({
       rowStyle={style}
     />
   );
+
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>

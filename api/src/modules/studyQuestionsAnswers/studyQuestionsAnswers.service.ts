@@ -122,7 +122,7 @@ async function generatePairsWithOpenAI(
 
   const model = process.env.OPENAI_MODEL || 'gpt-4o-mini';
   const prompt = [
-    'Generate up to 5 question-answer pairs based only on the provided text.',
+    'Generate up to 5 question-answer pairs based only on the provided text. First identify the main concepts from the text, then generate questions based on different concepts.',
     '',
     'Rules:',
     '- Each pair must cover a different concept or fact from the text.',
@@ -192,9 +192,28 @@ async function generatePairsWithOpenAI(
       );
     }
 
-    if (response.status === 401 || response.status === 403) {
+    if (
+      response.status === 404 ||
+      providerCode === 'model_not_found' ||
+      providerMessage.toLowerCase().includes('model') &&
+      providerMessage.toLowerCase().includes('not')
+    ) {
       throw createError(
-        'OpenAI API authentication failed. Please verify OPENAI_API_KEY permissions.',
+        `OpenAI model "${model}" is not available for this API project/account. Verify model access or use a supported model.`,
+        400
+      );
+    }
+
+    if (response.status === 403) {
+      throw createError(
+        `OpenAI denied access for model "${model}". Check project permissions, region availability, and model access settings.`,
+        403
+      );
+    }
+
+    if (response.status === 401) {
+      throw createError(
+        'OpenAI API authentication failed. Please verify OPENAI_API_KEY and project/org linkage.',
         502
       );
     }

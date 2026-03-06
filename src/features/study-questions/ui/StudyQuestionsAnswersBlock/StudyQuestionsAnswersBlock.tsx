@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Button } from '@/shared/ui';
+import { RiDeleteBinLine, RiPencilLine } from 'react-icons/ri';
 import {
   useStudyQuestions,
   useCreateStudyQuestion,
@@ -94,7 +95,7 @@ export function StudyQuestionsAnswersBlock({ pageId }: StudyQuestionsAnswersBloc
           onClick={() => generateMutation.mutate()}
           disabled={isBusy}
         >
-          Generate questions and answers
+          Generate Q/A with AI
         </Button>
       </div>
 
@@ -103,7 +104,7 @@ export function StudyQuestionsAnswersBlock({ pageId }: StudyQuestionsAnswersBloc
       <div className="study-qa-block__create">
         <input
           className="study-qa-block__input"
-          placeholder="New question"
+          placeholder="Question"
           value={newDraft.question}
           onChange={(event) =>
             setNewDraft((prev) => ({ ...prev, question: event.target.value }))
@@ -111,7 +112,7 @@ export function StudyQuestionsAnswersBlock({ pageId }: StudyQuestionsAnswersBloc
         />
         <textarea
           className="study-qa-block__textarea"
-          placeholder="New answer"
+          placeholder="Answer"
           value={newDraft.answer}
           onChange={(event) =>
             setNewDraft((prev) => ({ ...prev, answer: event.target.value }))
@@ -119,12 +120,12 @@ export function StudyQuestionsAnswersBlock({ pageId }: StudyQuestionsAnswersBloc
           rows={3}
         />
         <Button
-          variant="primary"
+          variant="secondary"
           size="sm"
           onClick={submitNew}
           disabled={isBusy}
         >
-          Add new question
+          Create new Q/A
         </Button>
       </div>
 
@@ -166,26 +167,33 @@ export function StudyQuestionsAnswersBlock({ pageId }: StudyQuestionsAnswersBloc
                 </>
               ) : (
                 <>
-                  <p className="study-qa-block__question">{pair.question}</p>
-                  <p className="study-qa-block__answer">{pair.answer}</p>
-                  <div className="study-qa-block__actions">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => startEdit(pair)}
-                      disabled={isBusy}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={() => removePair(pair.id)}
-                      disabled={isBusy}
-                    >
-                      Delete
-                    </Button>
+                  <div className="study-qa-block__item-header">
+                    <p className="study-qa-block__question">{pair.question}</p>
+                    <div className="study-qa-block__icon-actions">
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => startEdit(pair)}
+                        disabled={isBusy}
+                        aria-label="Edit question and answer"
+                        title="Edit"
+                      >
+                        <RiPencilLine />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => removePair(pair.id)}
+                        disabled={isBusy}
+                        aria-label="Delete question and answer"
+                        title="Delete"
+                        className="study-qa-block__delete-icon-btn"
+                      >
+                        <RiDeleteBinLine />
+                      </Button>
+                    </div>
                   </div>
+                  <p className="study-qa-block__answer">{pair.answer}</p>
                 </>
               )}
             </article>

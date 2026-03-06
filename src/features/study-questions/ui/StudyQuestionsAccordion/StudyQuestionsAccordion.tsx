@@ -1,3 +1,4 @@
+import { RiArrowDownSLine } from 'react-icons/ri';
 import type { StudyQuestionsAccordionProps } from '../StudyQuestionsAnswersBlock/StudyQuestionsAnswersBlock.types';
 import './StudyQuestionsAccordion.css';
 
@@ -10,7 +11,12 @@ export function StudyQuestionsAccordion({ pairs }: StudyQuestionsAccordionProps)
       <div className="study-qa-accordion__list">
         {pairs.map((pair) => (
           <details key={pair.id} className="study-qa-accordion__item">
-            <summary className="study-qa-accordion__question">{pair.question}</summary>
+            <summary className="study-qa-accordion__question">
+              <span className="study-qa-accordion__chevron" aria-hidden>
+                <RiArrowDownSLine />
+              </span>
+              {pair.question}
+            </summary>
             <p className="study-qa-accordion__answer">{pair.answer}</p>
           </details>
         ))}

@@ -145,3 +145,8 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.menu-trigger-btn {
+  min-width: 24px;
+  min-height: 24px;
+}

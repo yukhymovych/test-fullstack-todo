@@ -45,7 +45,7 @@ function BreadcrumbEllipsisDropdown({
             <Button
               variant="ghost"
               size="icon-sm"
-              className="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
+              className="menu-trigger-btn shrink-0 text-muted-foreground hover:text-foreground"
             >
               <BreadcrumbEllipsis />
               <span className="sr-only">Toggle menu</span>

@@ -18,8 +18,14 @@
 
 .sidebar-recents__chevron {
   margin-left: auto;
-  font-size: 10px;
-  opacity: 0.7;
+  display: inline-flex;
+  align-items: center;
+  color: #9ca3af;
+  transition: transform 0.2s ease;
+}
+
+.sidebar-recents__chevron--collapsed {
+  transform: rotate(-90deg);
 }
 
 .sidebar-recents__list {

@@ -22,8 +22,16 @@ export function errorHandler(
   }
 
   const statusCode = (err as ErrorWithStatusCode).statusCode;
+  if (statusCode === 400) {
+    res.status(400).json({ error: (err as Error).message });
+    return;
+  }
   if (statusCode === 404) {
     res.status(404).json({ error: (err as Error).message });
+    return;
+  }
+  if (statusCode === 403) {
+    res.status(403).json({ error: (err as Error).message });
     return;
   }
   if (statusCode === 401) {
