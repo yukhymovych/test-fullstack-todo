@@ -27,6 +27,9 @@ export function AppProviders({ children }: AppProvidersProps) {
       <Auth0Provider
         domain={AUTH0_DOMAIN}
         clientId={AUTH0_CLIENT_ID}
+        useRefreshTokens={true}
+        useRefreshTokensFallback={true}
+        cacheLocation="localstorage"
         authorizationParams={{
           redirect_uri: window.location.origin,
           audience: AUTH0_AUDIENCE,
