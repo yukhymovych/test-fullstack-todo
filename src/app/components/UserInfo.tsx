@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { decodeTokenPayload } from '@/shared/lib/auth';
 import {
   useDeleteFutureSessionsDebug,
   useDeleteTodayScopedSessionsDebug,
@@ -13,6 +12,7 @@ import { learningRoutes } from '@/features/learning/lib/routes';
 import {
   Avatar,
   AvatarFallback,
+  AvatarImage,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -22,19 +22,18 @@ import {
 import { FolderMinus, LogOut, Plus, RefreshCw, RotateCcw, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-function getInitials(username: string): string {
-  const parts = username.trim().split(/\s+/);
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/);
   if (parts.length >= 2) {
     return (parts[0][0] + parts[1][0]).toUpperCase();
   }
-  return username.slice(0, 2).toUpperCase();
+  return name.slice(0, 2).toUpperCase();
 }
 
 export function UserInfo() {
   const navigate = useNavigate();
-  const { token, logout } = useAuth();
-  const payload = token ? decodeTokenPayload(token) : null;
-  const username = payload?.username ?? 'User';
+  const { user, logout } = useAuth();
+  const displayName = user?.name ?? user?.email ?? 'User';
   const deleteFutureSessions = useDeleteFutureSessionsDebug();
   const deleteTodayScopedSessions = useDeleteTodayScopedSessionsDebug();
   const refreshAllGrades = useRefreshAllGradesDebug();
@@ -78,11 +77,12 @@ export function UserInfo() {
           )}
         >
           <Avatar className="h-8 w-8 shrink-0">
+            {user?.picture && <AvatarImage src={user.picture} alt={displayName} />}
             <AvatarFallback className="bg-muted text-xs">
-              {getInitials(username)}
+              {getInitials(displayName)}
             </AvatarFallback>
           </Avatar>
-          <span className="truncate text-sm font-medium">{username}</span>
+          <span className="truncate text-sm font-medium">{displayName}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-48">

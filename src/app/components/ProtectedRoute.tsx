@@ -1,4 +1,4 @@
-import { Navigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface ProtectedRouteProps {
@@ -6,11 +6,28 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthed } = useAuth();
-  const location = useLocation();
+  const { isAuthed, isLoading, login } = useAuth();
+
+  useEffect(() => {
+    if (!isAuthed && !isLoading) {
+      login();
+    }
+  }, [isAuthed, isLoading, login]);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-muted-foreground text-sm">Loading...</div>
+      </div>
+    );
+  }
 
   if (!isAuthed) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-muted-foreground text-sm">Redirecting to login...</div>
+      </div>
+    );
   }
 
   return <>{children}</>;

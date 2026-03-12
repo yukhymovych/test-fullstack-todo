@@ -1,37 +1,50 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import { auth } from 'express-oauth2-jwt-bearer';
+import * as authSQL from '../modules/auth/auth.sql.js';
 
-function getJwtSecret(): string {
-  const secret = process.env.JWT_SECRET;
-  if (!secret) {
-    throw new Error('JWT_SECRET environment variable is not set');
-  }
-  return secret;
+const AUTH0_DOMAIN = process.env.AUTH0_DOMAIN;
+const AUTH0_AUDIENCE = process.env.AUTH0_AUDIENCE;
+
+if (!AUTH0_DOMAIN) {
+  throw new Error('AUTH0_DOMAIN environment variable is not set');
 }
+if (!AUTH0_AUDIENCE) {
+  throw new Error('AUTH0_AUDIENCE environment variable is not set');
+}
+
+const checkJwt = auth({
+  issuerBaseURL: `https://${AUTH0_DOMAIN}`,
+  audience: AUTH0_AUDIENCE,
+});
 
 export function requireAuth(
   req: Request,
   res: Response,
   next: NextFunction
 ): void {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    res.status(401).json({ error: 'Missing or invalid authorization header' });
-    return;
-  }
+  checkJwt(req, res, (err?: unknown) => {
+    if (err) {
+      next(err);
+      return;
+    }
 
-  const token = authHeader.slice(7);
-  try {
-    const decoded = jwt.verify(token, getJwtSecret()) as jwt.JwtPayload & {
-      sub: string;
-      username?: string;
-    };
-    req.user = {
-      id: decoded.sub,
-      username: decoded.username,
-    };
-    next();
-  } catch {
-    res.status(401).json({ error: 'Invalid or expired token' });
-  }
+    const payload = req.auth?.payload;
+    if (!payload?.sub) {
+      res.status(401).json({ error: 'Missing subject in token' });
+      return;
+    }
+
+    const sub = payload.sub;
+    const email =
+      typeof payload.email === 'string' ? payload.email : null;
+    const name = typeof payload.name === 'string' ? payload.name : null;
+
+    authSQL
+      .findOrCreateByAuth0Sub(sub, email, name)
+      .then((user) => {
+        req.user = { id: user.id, email: user.email, name: user.name };
+        next();
+      })
+      .catch(next);
+  });
 }
