@@ -1,10 +1,9 @@
 import 'dotenv/config';
 import { app } from './app.js';
 
-const PORT = process.env.PORT || 4000;
-const HOST = process.env.HOST || '127.0.0.1';
+const PORT = Number(process.env.PORT) || 4000;
 
-app.listen(Number(PORT), HOST, () => {
-  console.log(`Server running on http://${HOST}:${PORT}`);
-  console.log(`Health check: http://localhost:${PORT}/health`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Health check: /health`);
 });
