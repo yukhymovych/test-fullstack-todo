@@ -25,6 +25,7 @@ const allowedOrigin = (
 
   const ok =
     origin === 'http://localhost:5173' ||
+    origin === 'https://rememo-fe.onrender.com' ||
     origin.startsWith('http://127.0.0.1:') ||
     origin.startsWith('http://192.168.') ||
     origin.startsWith('http://10.') ||
