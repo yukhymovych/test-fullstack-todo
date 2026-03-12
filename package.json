@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@auth0/auth0-react": "^2.15.0",
     "@blocknote/code-block": "^0.46.2",
     "@blocknote/core": "^0.46.2",
     "@blocknote/mantine": "^0.46.2",

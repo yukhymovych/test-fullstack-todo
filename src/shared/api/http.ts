@@ -1,12 +1,11 @@
 import { API_URL } from '../config/env';
-import { getToken, clearToken } from '../lib/auth';
 
-type LogoutCallback = () => void;
+type TokenProvider = () => Promise<string>;
 
-let logoutCallback: LogoutCallback | null = null;
+let tokenProvider: TokenProvider | null = null;
 
-export function setLogoutCallback(cb: LogoutCallback | null): void {
-  logoutCallback = cb;
+export function setTokenProvider(provider: TokenProvider | null): void {
+  tokenProvider = provider;
 }
 
 interface FetchOptions {
@@ -22,8 +21,8 @@ async function fetchJson<T>(endpoint: string, options: FetchOptions): Promise<T>
     'Content-Type': 'application/json',
   };
 
-  if (!skipAuth) {
-    const token = getToken();
+  if (!skipAuth && tokenProvider) {
+    const token = await tokenProvider();
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
@@ -36,8 +35,6 @@ async function fetchJson<T>(endpoint: string, options: FetchOptions): Promise<T>
   });
 
   if (response.status === 401) {
-    clearToken();
-    logoutCallback?.();
     const errorText = await response.text();
     throw new Error(errorText || 'Unauthorized');
   }
@@ -47,7 +44,6 @@ async function fetchJson<T>(endpoint: string, options: FetchOptions): Promise<T>
     throw new Error(errorText || `HTTP error! status: ${response.status}`);
   }
 
-  // Handle 204 No Content - no body to parse
   if (response.status === 204) {
     return undefined as T;
   }

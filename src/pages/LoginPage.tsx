@@ -1,10 +1,33 @@
-import { useRedirectIfAuthed } from '../features/auth/model/useRedirectIfAuthed';
-import { useLoginForm } from '../features/auth/model/useLoginForm';
-import { LoginForm } from '../features/auth/ui/LoginForm';
+import { useAuth } from '../app/contexts/AuthContext';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export function LoginPage() {
-  useRedirectIfAuthed();
-  const formProps = useLoginForm();
+  const { isAuthed, isLoading, login } = useAuth();
+  const navigate = useNavigate();
 
-  return <LoginForm {...formProps} />;
+  useEffect(() => {
+    if (isLoading) return;
+
+    if (isAuthed) {
+      navigate('/notes', { replace: true });
+      return;
+    }
+
+    login();
+  }, [isAuthed, isLoading, login, navigate]);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-muted-foreground text-sm">Loading authentication...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-screen items-center justify-center">
+      <div className="text-muted-foreground text-sm">Redirecting...</div>
+    </div>
+  );
 }

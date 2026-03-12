@@ -24,13 +24,13 @@ export function NotesListPageView({
   const [isDueTooltipOpen, setIsDueTooltipOpen] = useState(false);
 
   if (isLoading) {
-    return <div className="notes-list-page__container">Loading notes...</div>;
+    return <div className="notes-list-page__container">Loading data...</div>;
   }
 
   if (error) {
     return (
       <div className="notes-list-page__container notes-list-page__container--error">
-        Error loading notes: {error.message}
+        Error loading data: {error.message}
       </div>
     );
   }

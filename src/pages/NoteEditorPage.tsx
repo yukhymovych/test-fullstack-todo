@@ -36,7 +36,7 @@ export function NoteEditorPage() {
   const { data: studyItemStatus } = useStudyItemStatus(id ?? null);
 
   if (isLoading || !id) {
-    return <div className="note-editor-page note-editor-page--loading">Loading note...</div>;
+    return <div className="note-editor-page note-editor-page--loading">Loading data...</div>;
   }
 
   if (error || !note) {

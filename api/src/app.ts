@@ -6,8 +6,11 @@ import { learningRouter } from './modules/learning/learning.routes.js';
 import { studyQuestionsAnswersRouter } from './modules/studyQuestionsAnswers/studyQuestionsAnswers.routes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 
-if (!process.env.JWT_SECRET) {
-  throw new Error('JWT_SECRET environment variable is not set');
+if (!process.env.AUTH0_DOMAIN) {
+  throw new Error('AUTH0_DOMAIN environment variable is not set');
+}
+if (!process.env.AUTH0_AUDIENCE) {
+  throw new Error('AUTH0_AUDIENCE environment variable is not set');
 }
 
 export const app = express();

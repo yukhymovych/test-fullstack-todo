@@ -10,7 +10,16 @@ import { useAuth } from './app/contexts/AuthContext';
 import './App.css';
 
 function RootRedirect() {
-  const { isAuthed } = useAuth();
+  const { isAuthed, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-muted-foreground text-sm">Loading...</div>
+      </div>
+    );
+  }
+
   return <Navigate to={isAuthed ? '/notes' : '/login'} replace />;
 }
 
