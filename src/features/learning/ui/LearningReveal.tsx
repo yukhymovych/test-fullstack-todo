@@ -47,7 +47,7 @@ export function LearningReveal({
             onClick={() => setRevealed(true)}
             className="learning-reveal__show-btn"
           >
-            Show Answer
+            Show text
           </Button>
           <StudyQuestionsAccordion pairs={studyQuestions} />
         </>

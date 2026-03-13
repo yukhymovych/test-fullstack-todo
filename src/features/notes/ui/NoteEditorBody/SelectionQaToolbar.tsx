@@ -13,6 +13,7 @@ interface SelectionQaToolbarProps extends FormattingToolbarProps {
   onGenerateUpToFiveQuestionsFromSelection: (selectedText: string) => void;
   isGeneratingOneQuestionFromSelection: boolean;
   isGeneratingUpToFiveQuestionsFromSelection: boolean;
+  isStudyItemActive: boolean;
 }
 
 export function SelectionQaToolbar({
@@ -21,6 +22,7 @@ export function SelectionQaToolbar({
   onGenerateUpToFiveQuestionsFromSelection,
   isGeneratingOneQuestionFromSelection,
   isGeneratingUpToFiveQuestionsFromSelection,
+  isStudyItemActive,
 }: SelectionQaToolbarProps) {
   const editor = useBlockNoteEditor();
 
@@ -34,22 +36,24 @@ export function SelectionQaToolbar({
     isGeneratingOneQuestionFromSelection || isGeneratingUpToFiveQuestionsFromSelection;
 
   const items = getFormattingToolbarItems(blockTypeSelectItems);
-  items.push(
-    <SelectionQaToolbarButton
-      key="generateOneQuestionFromSelection"
-      label="Q1"
-      tooltip="Create 1 Q/A from selected text with AI"
-      onClick={() => runForSelection(onGenerateOneQuestionFromSelection)}
-      isDisabled={isBusy}
-    />,
-    <SelectionQaToolbarButton
-      key="generateUpToFiveQuestionsFromSelection"
-      label="Q5"
-      tooltip="Create up to 5 Q/A from selected text with AI"
-      onClick={() => runForSelection(onGenerateUpToFiveQuestionsFromSelection)}
-      isDisabled={isBusy}
-    />,
-  );
+  if (isStudyItemActive) {
+    items.push(
+      <SelectionQaToolbarButton
+        key="generateOneQuestionFromSelection"
+        label="Q1"
+        tooltip="Create 1 Q/A from selected text with AI"
+        onClick={() => runForSelection(onGenerateOneQuestionFromSelection)}
+        isDisabled={isBusy}
+      />,
+      <SelectionQaToolbarButton
+        key="generateUpToFiveQuestionsFromSelection"
+        label="Q5"
+        tooltip="Create up to 5 Q/A from selected text with AI"
+        onClick={() => runForSelection(onGenerateUpToFiveQuestionsFromSelection)}
+        isDisabled={isBusy}
+      />,
+    );
+  }
 
   return <FormattingToolbar blockTypeSelectItems={blockTypeSelectItems}>{items}</FormattingToolbar>;
 }

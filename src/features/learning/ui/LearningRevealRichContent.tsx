@@ -51,7 +51,7 @@ export function LearningRevealRichContent({
             onClick={onReveal}
             className="learning-reveal__show-btn"
           >
-            Show Answer
+            Show text
           </Button>
           <StudyQuestionsAccordion pairs={studyQuestions} />
         </>

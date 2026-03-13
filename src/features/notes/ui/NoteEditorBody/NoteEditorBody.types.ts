@@ -9,4 +9,5 @@ export interface NoteEditorBodyProps {
   onGenerateUpToFiveQuestionsFromSelection: (selectedText: string) => void;
   isGeneratingOneQuestionFromSelection: boolean;
   isGeneratingUpToFiveQuestionsFromSelection: boolean;
+  isStudyItemActive: boolean;
 }

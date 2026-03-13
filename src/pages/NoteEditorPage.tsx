@@ -70,6 +70,7 @@ export function NoteEditorPage() {
         onGenerateUpToFiveQuestionsFromSelection={handleGenerateUpToFiveQuestionsFromSelection}
         isGeneratingOneQuestionFromSelection={isGeneratingOneQuestionFromSelection}
         isGeneratingUpToFiveQuestionsFromSelection={isGeneratingUpToFiveQuestionsFromSelection}
+        isStudyItemActive={studyItemStatus?.status === 'active'}
       />
       {id && studyItemStatus?.status === 'active' ? (
         <StudyQuestionsAnswersBlock pageId={id} />
