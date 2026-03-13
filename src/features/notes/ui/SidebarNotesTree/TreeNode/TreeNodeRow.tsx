@@ -120,8 +120,6 @@ export function TreeNodeRow({
               variant="ghost"
               icon
               className="menu-trigger-btn"
-              onClick={(e) => e.stopPropagation()}
-              onPointerDown={(e) => e.stopPropagation()}
               title="Page options"
               style={{ opacity: 0.7 }}
             >

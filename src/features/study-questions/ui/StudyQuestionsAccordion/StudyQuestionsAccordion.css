@@ -1,12 +1,13 @@
 .study-qa-accordion {
-  margin-top: 14px;
+  margin-top: 50px;
   border-top: 1px solid #262b33;
   padding-top: 12px;
 }
 
 .study-qa-accordion__title {
   margin: 0 0 10px;
-  font-size: 24px;
+  font-size: 21px;
+  font-weight: 500;
   color: #e5e7eb;
 }
 
@@ -16,7 +17,7 @@
 }
 
 .study-qa-accordion__item {
-  padding: 8px 10px;
+  padding: 8px 0;
 }
 
 .study-qa-accordion__question {
@@ -51,6 +52,6 @@
 
 .study-qa-accordion__answer {
   margin: 8px 0 0;
-  color: #cbd5e1;
+  color: #b8b8b8b8;
   white-space: pre-wrap;
 }

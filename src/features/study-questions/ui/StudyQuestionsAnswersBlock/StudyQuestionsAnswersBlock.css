@@ -13,7 +13,8 @@
 
 .study-qa-block__title {
   margin: 0;
-  font-size: 24px;
+  font-size: 21px;
+  font-weight: bold;
   color: #f3f4f6;
 }
 
@@ -69,7 +70,7 @@
 
 .study-qa-block__answer {
   margin: 0 0 10px;
-  color: #cbd5e1;
+  color: #b8b8b8b8;
   white-space: pre-wrap;
 }
 

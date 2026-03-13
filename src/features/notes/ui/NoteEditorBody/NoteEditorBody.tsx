@@ -15,6 +15,7 @@ export function NoteEditorBody({
   onGenerateUpToFiveQuestionsFromSelection,
   isGeneratingOneQuestionFromSelection,
   isGeneratingUpToFiveQuestionsFromSelection,
+  isStudyItemActive,
 }: NoteEditorBodyProps) {
   return (
     <NoteTitlesContext.Provider value={noteTitlesMap}>
@@ -31,6 +32,7 @@ export function NoteEditorBody({
                 isGeneratingUpToFiveQuestionsFromSelection={
                   isGeneratingUpToFiveQuestionsFromSelection
                 }
+                isStudyItemActive={isStudyItemActive}
               />
             )}
           />

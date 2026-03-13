@@ -1,6 +1,7 @@
 import {
   DndContext,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   KeyboardSensor,
   useSensor,
   useSensors,
@@ -15,8 +16,14 @@ export interface DndContextWrapperProps {
 
 export function DndContextWrapper({ children, onDragEnd }: DndContextWrapperProps) {
   const sensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(MouseSensor, {
       activationConstraint: { distance: 5 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 180,
+        tolerance: 8,
+      },
     }),
     useSensor(KeyboardSensor)
   );
