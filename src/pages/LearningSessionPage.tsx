@@ -12,9 +12,12 @@ import { LearningSummary } from '../features/learning/ui/LearningSummary';
 import { LearningAnimatedSwitch } from '../features/learning/ui/LearningAnimatedSwitch';
 import type { Grade } from '../features/learning/domain/learning.types';
 import { useStudyQuestions } from '../features/study-questions/model/useStudyQuestions';
+import { usePageTitle } from '../shared/lib/usePageTitle';
 import '../features/learning/ui/LearningPage.css';
 
 export function LearningSessionPage() {
+  usePageTitle('Learning');
+
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('sessionId') ?? undefined;
   const todaySession = useTodayLearningSession();

@@ -7,6 +7,7 @@ import { NoteEditorBody } from '../features/notes/ui/NoteEditorBody';
 import { NoteEditorLearningGradeBar } from '../features/learning/ui/NoteEditorLearningGradeBar';
 import { useStudyItemStatus } from '../features/learning/model/useStudyItemStatus';
 import { StudyQuestionsAnswersBlock } from '../features/study-questions/ui';
+import { usePageTitle } from '../shared/lib/usePageTitle';
 import './NoteEditorPage.css';
 
 export function NoteEditorPage() {
@@ -34,6 +35,8 @@ export function NoteEditorPage() {
     isGeneratingUpToFiveQuestionsFromSelection,
   } = useNoteEditor(id);
   const { data: studyItemStatus } = useStudyItemStatus(id ?? null);
+  const resolvedTitle = title.trim() || note?.title || DEFAULT_NOTE_TITLE;
+  usePageTitle(resolvedTitle);
 
   if (isLoading || !id) {
     return <div className="note-editor-page note-editor-page--loading">Loading data...</div>;
@@ -52,7 +55,7 @@ export function NoteEditorPage() {
       <NoteEditorToolbar
         activeId={id}
         notes={notes}
-        currentTitle={title.trim() || note.title || DEFAULT_NOTE_TITLE}
+        currentTitle={resolvedTitle}
         saveStatus={saveStatus}
         isFavorite={isFavorite}
         onAddToFavorites={handleAddToFavorites}

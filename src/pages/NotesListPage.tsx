@@ -1,7 +1,10 @@
 import { useNotesListPage } from '../features/notes/model/useNotesListPage';
 import { NotesListPageView } from '../features/notes/ui/NotesListPage';
+import { usePageTitle } from '../shared/lib/usePageTitle';
 
 export function NotesListPage() {
+  usePageTitle('Notes');
+
   const {
     notes,
     recentNotes,
