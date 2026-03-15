@@ -486,3 +486,22 @@ export async function getStudyItemReviewLogs(
     next(error);
   }
 }
+
+export async function getTodayReviewLogs(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const timezoneParam = req.query.timezone;
+    const timezone = await learningService.resolveTimezone(
+      userId,
+      typeof timezoneParam === 'string' ? timezoneParam : undefined
+    );
+    const logs = await learningService.getTodayReviewLogs(userId, timezone);
+    res.json(logs);
+  } catch (error) {
+    next(error);
+  }
+}

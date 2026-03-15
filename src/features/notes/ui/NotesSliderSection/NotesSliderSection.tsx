@@ -14,6 +14,7 @@ export function NotesSliderSection({
   titleSuffix,
   notes,
   formattedTimes,
+  renderMeta,
   onNoteClick,
 }: NotesSliderSectionProps) {
   if (notes.length === 0) return null;
@@ -45,7 +46,7 @@ export function NotesSliderSection({
                   {note.title || 'Untitled'}
                 </div>
                 <div className="notes-slider-section__card-meta">
-                  {formattedTimes.get(note.id) ?? ''}
+                  {renderMeta ? renderMeta(note.id) : (formattedTimes.get(note.id) ?? '')}
                 </div>
               </button>
             </CarouselItem>

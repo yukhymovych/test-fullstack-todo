@@ -39,3 +39,4 @@ export {
   TooltipTrigger,
   TooltipContent,
 } from './tooltip';
+export { Badge } from './badge';

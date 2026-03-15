@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { BookOpen, CircleAlert, Clock } from 'lucide-react';
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui';
+import { BookOpen, CircleAlert, Clock, History } from 'lucide-react';
+import { Badge, Button, Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui';
+import { GRADE_BADGE_STYLES, GRADE_LABELS } from '@/features/learning/lib/gradePresentation';
 import { NotesSliderSection } from '../NotesSliderSection';
 import type { NotesListPageProps } from './NotesListPage.types';
 import './NotesListPage.css';
@@ -10,9 +11,11 @@ export function NotesListPageView({
   recentNotes,
   mainLearningSessionNotes,
   dueReadyNotes,
+  recentlyReviewedNotes,
   recentFormattedTimes,
   mainLearningSessionFormattedTimes,
   dueReadyFormattedTimes,
+  recentlyReviewedMeta,
   isLoading,
   error,
   createError,
@@ -95,6 +98,25 @@ export function NotesListPageView({
           }
           notes={dueReadyNotes}
           formattedTimes={dueReadyFormattedTimes}
+          onNoteClick={onNoteClick}
+        />
+        <NotesSliderSection
+          title="Recently reviewed"
+          icon={History}
+          notes={recentlyReviewedNotes}
+          formattedTimes={new Map()}
+          renderMeta={(noteId) => {
+            const meta = recentlyReviewedMeta.get(noteId);
+            if (!meta) return null;
+            return (
+              <span className="notes-list-page__reviewed-meta">
+                <Badge className={GRADE_BADGE_STYLES[meta.grade]}>
+                  {GRADE_LABELS[meta.grade]}
+                </Badge>
+                <span>{meta.reviewedAt}</span>
+              </span>
+            );
+          }}
           onNoteClick={onNoteClick}
         />
       </div>

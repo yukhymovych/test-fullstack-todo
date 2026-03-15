@@ -3,6 +3,7 @@ export { useTodayScopedSessions } from './useTodayScopedSessions';
 export { useLearningSessionById } from './useLearningSessionById';
 export { useDueStudyItemsCount } from './useDueStudyItemsCount';
 export { useDueStudyItems } from './useDueStudyItems';
+export { useTodayReviewLogs } from './useTodayReviewLogs';
 export {
   useStartLearningSession,
   useResetSessionDebug,

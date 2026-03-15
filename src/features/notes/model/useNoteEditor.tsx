@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateBlockNote, useEditorChange } from '@blocknote/react';
 import { filterSuggestionItems, insertOrUpdateBlockForSlashMenu } from '@blocknote/core/extensions';
-import { RiFileTextLine } from 'react-icons/ri';
+import { FaRegFileAlt } from "react-icons/fa";
 import {
   useNoteQuery,
   useUpdateNote,
@@ -95,7 +95,7 @@ export function useNoteEditor(id: string | undefined) {
   }, [id, note?.id]);
 
   const handleTitleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       setTitle(e.target.value);
       scheduleSave();
     },
@@ -176,7 +176,7 @@ export function useNoteEditor(id: string | undefined) {
             })
             .catch(() => {});
         },
-        icon: <RiFileTextLine size={18} />,
+        icon: <FaRegFileAlt size={18} />,
         key: 'embeddedPage' as const,
         aliases: ['embed', 'page', 'subpage'],
       };

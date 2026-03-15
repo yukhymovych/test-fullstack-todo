@@ -1000,3 +1000,34 @@ export async function getReviewLogsByUserAndNote(
   );
   return result.rows;
 }
+
+export async function getReviewLogsByUserAndDayKey(
+  userId: string,
+  dayKey: string
+): Promise<StudyItemReviewLog[]> {
+  const result = await pool.query(
+    `SELECT
+        id,
+        user_id,
+        note_id,
+        reviewed_at,
+        grade,
+        source,
+        session_id,
+        elapsed_days,
+        stability_before,
+        difficulty_before,
+        stability_after,
+        difficulty_after,
+        due_before,
+        due_after,
+        review_day_key,
+        is_undone,
+        undone_at
+     FROM review_logs
+     WHERE user_id = $1 AND review_day_key = $2 AND is_undone = false
+     ORDER BY reviewed_at DESC`,
+    [userId, dayKey]
+  );
+  return result.rows;
+}

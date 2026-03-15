@@ -29,6 +29,7 @@ export function LearningSidebarCard() {
   const totalCount = reviewableItems.length;
   const hasSession = !!session && totalCount > 0;
   const canContinue = hasSession && pendingCount > 0;
+  const isSessionCompleted = hasSession && pendingCount === 0;
   const hasItemsReady = !hasSession && dueCount > 0;
   const sessionCapacity = Math.min(dueCount, GLOBAL_DAILY_CAP);
   const queuedCount = Math.max(dueCount - sessionCapacity, 0);
@@ -88,20 +89,26 @@ export function LearningSidebarCard() {
           <span className="learning-sidebar-card__label">No items due</span>
         )}
       </div>
-      <Button
-        variant="ghost-muted"
-        fullWidth
-        onClick={handleStartOrContinue}
-        disabled={startSession.isPending}
-      >
-        {startSession.isPending
-          ? 'Starting...'
-          : canContinue
-            ? 'Continue'
-            : hasItemsReady
-              ? "Start today's session"
-              : 'Start Learning'}
-      </Button>
+      {isSessionCompleted ? (
+        <div className="learning-sidebar-card__completed">
+          Learnings session is completed
+        </div>
+      ) : (
+        <Button
+          variant="ghost-muted"
+          fullWidth
+          onClick={handleStartOrContinue}
+          disabled={startSession.isPending}
+        >
+          {startSession.isPending
+            ? 'Starting...'
+            : canContinue
+              ? 'Continue'
+              : hasItemsReady
+                ? "Start today's session"
+                : 'Start Learning'}
+        </Button>
+      )}
       {activeScopedSessions.length > 0 && (
         <div className="learning-sidebar-card__scoped">
           <span className="learning-sidebar-card__scoped-label">

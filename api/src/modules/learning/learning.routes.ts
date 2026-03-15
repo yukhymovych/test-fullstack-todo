@@ -37,6 +37,7 @@ learningRouter.post(
 );
 learningRouter.post('/session/grade-by-page', learningController.gradeByPage);
 learningRouter.post('/reviews/undo', learningController.undoReviewGrade);
+learningRouter.get('/reviews/today', learningController.getTodayReviewLogs);
 learningRouter.post('/study-items/activate', learningController.activateStudyItem);
 learningRouter.post(
   '/study-items/activate-scoped',

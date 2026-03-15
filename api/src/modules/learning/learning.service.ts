@@ -679,3 +679,8 @@ export async function getStudyItemStatus(
 export async function getStudyItemReviewLogs(userId: string, pageId: string) {
   return learningSQL.getReviewLogsByUserAndNote(userId, pageId);
 }
+
+export async function getTodayReviewLogs(userId: string, timezone: string) {
+  const dayKey = getDayKey(timezone);
+  return learningSQL.getReviewLogsByUserAndDayKey(userId, dayKey);
+}

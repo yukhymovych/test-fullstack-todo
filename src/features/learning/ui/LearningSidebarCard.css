@@ -50,6 +50,11 @@
   font-size: 12px;
 }
 
+.learning-sidebar-card__completed {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
 .learning-sidebar-card__scoped {
   margin-top: 12px;
   padding-top: 12px;

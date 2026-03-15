@@ -7,9 +7,11 @@ export function NotesListPage() {
     recentNotes,
     mainLearningSessionNotes,
     dueReadyNotes,
+    recentlyReviewedNotes,
     recentFormattedTimes,
     mainLearningSessionFormattedTimes,
     dueReadyFormattedTimes,
+    recentlyReviewedMeta,
     isLoading,
     error,
     createMutation,
@@ -24,9 +26,11 @@ export function NotesListPage() {
       recentNotes={recentNotes}
       mainLearningSessionNotes={mainLearningSessionNotes}
       dueReadyNotes={dueReadyNotes}
+      recentlyReviewedNotes={recentlyReviewedNotes}
       recentFormattedTimes={recentFormattedTimes}
       mainLearningSessionFormattedTimes={mainLearningSessionFormattedTimes}
       dueReadyFormattedTimes={dueReadyFormattedTimes}
+      recentlyReviewedMeta={recentlyReviewedMeta}
       isLoading={isLoading}
       error={error}
       createError={createMutation.error}

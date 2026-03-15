@@ -1,7 +1,7 @@
 import { createReactBlockSpec } from '@blocknote/react';
 import { createContext, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RiFileTextLine } from 'react-icons/ri';
+import { FaRegFileAlt } from "react-icons/fa";
 import { DEFAULT_NOTE_TITLE } from '../model/types';
 import { notesRoutes } from '../lib/routes';
 
@@ -41,8 +41,8 @@ function EmbeddedPageBlockRender({ block }: { block: { props: { noteId: string }
         maxWidth: '400px',
       }}
     >
-      <RiFileTextLine size={20} style={{ flexShrink: 0, color: 'white' }} />
-      <span style={{ fontSize: '14px', fontWeight: 500, color: 'white' }}>
+      <FaRegFileAlt size={18} style={{ flexShrink: 0, color: 'rgb(194, 197, 201)' }} />
+      <span style={{ fontSize: '15px', fontWeight: 500, color: 'white' }}>
         {title}
       </span>
     </div>

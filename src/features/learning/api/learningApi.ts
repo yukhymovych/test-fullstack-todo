@@ -198,3 +198,12 @@ export async function getStudyItemReviewLogs(
     `/learning/study-items/review-logs?pageId=${encodeURIComponent(pageId)}`
   );
 }
+
+export async function getTodayReviewLogs(
+  timezone?: string
+): Promise<StudyItemReviewLog[]> {
+  const tz = timezone ?? 'UTC';
+  return http.get<StudyItemReviewLog[]>(
+    `/learning/reviews/today?timezone=${encodeURIComponent(tz)}`
+  );
+}

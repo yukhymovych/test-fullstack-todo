@@ -8,5 +8,6 @@ export interface NotesSliderSectionProps {
   titleSuffix?: ReactNode;
   notes: NoteListItem[];
   formattedTimes: Map<string, string>;
+  renderMeta?: (noteId: string) => ReactNode;
   onNoteClick: (noteId: string) => void;
 }

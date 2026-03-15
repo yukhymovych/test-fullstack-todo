@@ -21,6 +21,7 @@ import {
 } from '@/shared/ui';
 import { FolderMinus, LogOut, Plus, RefreshCw, RotateCcw, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { DEBUG_ACTIONS } from '@/shared/config/env';
 
 function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/);
@@ -86,52 +87,56 @@ export function UserInfo() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-48">
-        <DropdownMenuItem
-          onClick={handleAddMore}
-          disabled={refillSession.isPending}
-          className="text-muted-foreground"
-        >
-          <Plus className="size-4" />
-          {refillSession.isPending ? 'Adding...' : 'Add more items (debug)'}
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={handleResetSession}
-          disabled={isResetting}
-          className="text-muted-foreground"
-        >
-          <RotateCcw className="size-4" />
-          {isResetting ? 'Resetting...' : 'Reset session (debug)'}
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => deleteFutureSessions.mutate(undefined)}
-          disabled={deleteFutureSessions.isPending}
-          className="text-muted-foreground"
-        >
-          <Trash2 className="size-4" />
-          {deleteFutureSessions.isPending
-            ? 'Deleting...'
-            : 'Delete future sessions (debug)'}
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => deleteTodayScopedSessions.mutate(undefined)}
-          disabled={deleteTodayScopedSessions.isPending}
-          className="text-muted-foreground"
-        >
-          <FolderMinus className="size-4" />
-          {deleteTodayScopedSessions.isPending
-            ? 'Deleting...'
-            : 'Delete today scoped sessions (debug)'}
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => refreshAllGrades.mutate(undefined)}
-          disabled={refreshAllGrades.isPending}
-          className="text-muted-foreground"
-        >
-          <RefreshCw className="size-4" />
-          {refreshAllGrades.isPending
-            ? 'Refreshing...'
-            : 'Refresh all grades (debug)'}
-        </DropdownMenuItem>
+        {DEBUG_ACTIONS && (
+          <>
+            <DropdownMenuItem
+              onClick={handleAddMore}
+              disabled={refillSession.isPending}
+              className="text-muted-foreground"
+            >
+              <Plus className="size-4" />
+              {refillSession.isPending ? 'Adding...' : 'Add more items (debug)'}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={handleResetSession}
+              disabled={isResetting}
+              className="text-muted-foreground"
+            >
+              <RotateCcw className="size-4" />
+              {isResetting ? 'Resetting...' : 'Reset session (debug)'}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => deleteFutureSessions.mutate(undefined)}
+              disabled={deleteFutureSessions.isPending}
+              className="text-muted-foreground"
+            >
+              <Trash2 className="size-4" />
+              {deleteFutureSessions.isPending
+                ? 'Deleting...'
+                : 'Delete future sessions (debug)'}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => deleteTodayScopedSessions.mutate(undefined)}
+              disabled={deleteTodayScopedSessions.isPending}
+              className="text-muted-foreground"
+            >
+              <FolderMinus className="size-4" />
+              {deleteTodayScopedSessions.isPending
+                ? 'Deleting...'
+                : 'Delete today scoped sessions (debug)'}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => refreshAllGrades.mutate(undefined)}
+              disabled={refreshAllGrades.isPending}
+              className="text-muted-foreground"
+            >
+              <RefreshCw className="size-4" />
+              {refreshAllGrades.isPending
+                ? 'Refreshing...'
+                : 'Refresh all grades (debug)'}
+            </DropdownMenuItem>
+          </>
+        )}
         <DropdownMenuItem variant="destructive" onClick={logout}>
           <LogOut className="size-4" />
           Logout

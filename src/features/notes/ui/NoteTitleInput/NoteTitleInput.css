@@ -4,7 +4,15 @@
   padding: 12px 16px;
   font-size: 40px;
   font-weight: 700;
+  line-height: 1.2;
   margin-bottom: 16px;
+  border: 0;
+  outline: none;
+  resize: none;
+  overflow: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: transparent;
 }
 
 @media (max-width: 767px) {

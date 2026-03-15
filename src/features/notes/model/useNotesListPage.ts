@@ -2,16 +2,25 @@ import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNotesQuery, useCreateNote } from './useNotes';
 import { notesRoutes } from '../lib/routes';
-import { formatRelativeTime, formatTodayOrPastDate } from '../domain/formatDate';
+import {
+  formatRelativeTime,
+  formatTodayOrPastDate,
+} from '../domain/formatDate';
 import { getRecentNotes } from '../lib/recents';
-import { useDueStudyItems, useTodayLearningSession } from '@/features/learning/model';
+import {
+  useDueStudyItems,
+  useTodayLearningSession,
+  useTodayReviewLogs,
+} from '@/features/learning/model';
 import { learningRoutes } from '@/features/learning/lib/routes';
+import type { Grade } from '@/features/learning/domain/learning.types';
 
 export function useNotesListPage() {
   const navigate = useNavigate();
   const { data: notes, isLoading, error } = useNotesQuery();
   const { data: todayLearningSession } = useTodayLearningSession();
   const { data: dueStudyItems = [] } = useDueStudyItems();
+  const { data: todayReviewLogs = [] } = useTodayReviewLogs();
   const createMutation = useCreateNote();
 
   const recentNotes = useMemo(() => getRecentNotes(notes), [notes]);
@@ -42,6 +51,25 @@ export function useNotesListPage() {
       .map((noteId) => byId.get(noteId))
       .filter((note): note is NonNullable<typeof note> => !!note);
   }, [notes, dueStudyItems]);
+
+  const recentlyReviewedNotes = useMemo(() => {
+    if (!notes || todayReviewLogs.length === 0) return [];
+
+    const byId = new Map(notes.map((n) => [n.id, n]));
+    const latestReviewedByNoteId = new Map<string, string>();
+
+    todayReviewLogs.forEach((log) => {
+      if (!log.grade) return;
+      if (!latestReviewedByNoteId.has(log.note_id)) {
+        latestReviewedByNoteId.set(log.note_id, log.reviewed_at);
+      }
+    });
+
+    return [...latestReviewedByNoteId.entries()]
+      .sort((a, b) => new Date(b[1]).getTime() - new Date(a[1]).getTime())
+      .map(([noteId]) => byId.get(noteId))
+      .filter((note): note is NonNullable<typeof note> => !!note);
+  }, [notes, todayReviewLogs]);
 
   const recentFormattedTimes = useMemo(() => {
     const map = new Map<string, string>();
@@ -75,6 +103,18 @@ export function useNotesListPage() {
     return map;
   }, [dueReadyNotes, dueStudyItems]);
 
+  const recentlyReviewedMeta = useMemo(() => {
+    const map = new Map<string, { grade: Grade; reviewedAt: string }>();
+    todayReviewLogs.forEach((log) => {
+      if (!log.grade || map.has(log.note_id)) return;
+      map.set(log.note_id, {
+        grade: log.grade,
+        reviewedAt: formatRelativeTime(log.reviewed_at),
+      });
+    });
+    return map;
+  }, [todayReviewLogs]);
+
   const handleNewNote = async () => {
     const note = await createMutation.mutateAsync({});
     navigate(notesRoutes.editor(note.id));
@@ -93,9 +133,11 @@ export function useNotesListPage() {
     recentNotes,
     mainLearningSessionNotes,
     dueReadyNotes,
+    recentlyReviewedNotes,
     recentFormattedTimes,
     mainLearningSessionFormattedTimes,
     dueReadyFormattedTimes,
+    recentlyReviewedMeta,
     isLoading,
     error,
     createMutation,
