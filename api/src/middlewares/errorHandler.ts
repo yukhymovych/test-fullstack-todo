@@ -3,6 +3,8 @@ import { ZodError } from 'zod';
 
 interface ErrorWithStatusCode extends Error {
   statusCode?: number;
+  status?: number;
+  type?: string;
 }
 
 export function errorHandler(
@@ -48,6 +50,14 @@ export function errorHandler(
   }
   if (statusCode === 502) {
     res.status(502).json({ error: (err as Error).message });
+    return;
+  }
+
+  const bodyParserError = err as ErrorWithStatusCode;
+  if (bodyParserError.status === 413 || bodyParserError.type === 'entity.too.large') {
+    res.status(413).json({
+      error: 'Request body is too large. Reduce rich content size or increase API_JSON_LIMIT.',
+    });
     return;
   }
 

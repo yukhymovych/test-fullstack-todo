@@ -7,6 +7,7 @@ import { studyQuestionsAnswersRouter } from './modules/studyQuestionsAnswers/stu
 import { errorHandler } from './middlewares/errorHandler.js';
 
 const webOrigin = process.env.CLIENT_ORIGIN;
+const jsonBodyLimit = process.env.API_JSON_LIMIT ?? '2mb';
 
 if (!process.env.AUTH0_DOMAIN) {
   throw new Error('AUTH0_DOMAIN environment variable is not set');
@@ -40,7 +41,8 @@ app.use(
   })
 );
 
-app.use(express.json());
+app.use(express.json({ limit: jsonBodyLimit }));
+app.use(express.urlencoded({ extended: true, limit: jsonBodyLimit }));
 
 app.get('/health', (_req, res) => {
   res.json({ ok: true });
