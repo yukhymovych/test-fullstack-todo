@@ -65,6 +65,7 @@ export function NoteEditorToolbar({
   onCreateChild,
   onDelete,
   isDeleting,
+  importExport,
 }: NoteEditorToolbarProps) {
   const [isWhyTodayTooltipOpen, setIsWhyTodayTooltipOpen] = useState(false);
   const { data: studyStatus } = useStudyItemStatus(activeId);
@@ -89,6 +90,7 @@ export function NoteEditorToolbar({
         <div className="note-editor-toolbar__right">
           <span className="note-editor-toolbar__save-status" style={{ color: SAVE_STATUS_COLOR[saveStatus] }}>
             {SAVE_STATUS_LABEL[saveStatus]}
+            {importExport.pendingLabel ? ` ${importExport.pendingLabel}` : null}
           </span>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -112,6 +114,7 @@ export function NoteEditorToolbar({
               onCreateChild={onCreateChild}
               onDelete={onDelete}
               isDeleting={isDeleting}
+              importExport={importExport}
             />
           </DropdownMenu>
         </div>

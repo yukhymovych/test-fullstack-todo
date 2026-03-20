@@ -25,6 +25,7 @@ import { useDebouncedCallback } from '@/shared/lib/useDebouncedCallback';
 import { useGenerateStudyQuestions } from '@/features/study-questions/model/useStudyQuestions';
 import type { GenerateStudyQuestionsMode } from '@/features/study-questions/domain/studyQuestions.types';
 import { showToast } from '@/shared/lib/toast';
+import { useNoteImportExport } from './useNoteImportExport';
 
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 const MIN_SELECTION_TEXT_LENGTH = 30;
@@ -97,6 +98,7 @@ export function useNoteEditor(id: string | undefined) {
   const chromeTitle =
     title.trim() ||
     (userEditedTitle ? DEFAULT_NOTE_TITLE : (note?.title || DEFAULT_NOTE_TITLE));
+  const hasChildren = notes?.some((n) => n.parent_id === id) ?? false;
 
   const lastVisitedIdRef = useRef<string | null>(null);
   useEffect(() => {
@@ -219,6 +221,15 @@ export function useNoteEditor(id: string | undefined) {
     [id, generateOneQuestionFromSelection, generateUpToFiveQuestionsFromSelection],
   );
 
+  const importExport = useNoteImportExport({
+    editor,
+    noteId: id,
+    noteTitle: chromeTitle,
+    notes,
+    noteTitlesById: noteTitlesMap,
+    hasChildren,
+  });
+
   return {
     note,
     isLoading,
@@ -237,6 +248,7 @@ export function useNoteEditor(id: string | undefined) {
     isDeleting: deleteMutation.isPending,
     isFavorite: notes?.find((n) => n.id === id)?.is_favorite ?? false,
     noteTitlesMap,
+    importExport,
     getSlashMenuItems,
     handleGenerateOneQuestionFromSelection: (selectedText: string) =>
       handleGenerateQuestionsFromSelection(selectedText, 'one'),

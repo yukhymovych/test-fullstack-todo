@@ -1,6 +1,7 @@
 import {
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
@@ -17,6 +18,7 @@ import {
 } from '@/features/learning/model';
 import { learningRoutes } from '@/features/learning/lib/routes';
 import type { NotePageActionsMenuProps } from './NotePageActionsMenu.types';
+import { NoteImportExportMenuSection } from './NoteImportExportMenuSection';
 
 export function NotePageActionsMenu({
   noteId,
@@ -28,6 +30,7 @@ export function NotePageActionsMenu({
   onCreateChild,
   onDelete,
   isDeleting,
+  importExport,
 }: NotePageActionsMenuProps) {
   const navigate = useNavigate();
   const { data: studyStatus } = useStudyItemStatus(noteId);
@@ -36,6 +39,7 @@ export function NotePageActionsMenu({
   const activateLearningDescendantsOnly = useActivateLearningPageDescendantsOnly();
   const deactivateLearning = useDeactivateLearningPage();
   const startScopedSession = useStartScopedLearningSession();
+  const isBusy = importExport?.isBusy ?? false;
 
   const isLearningActive = studyStatus?.status === 'active';
 
@@ -143,13 +147,15 @@ export function NotePageActionsMenu({
           </DropdownMenuSubContent>
         </DropdownMenuSub>
       )}
+      <NoteImportExportMenuSection importExport={importExport} />
+      {importExport ? <DropdownMenuSeparator /> : null}
       <DropdownMenuItem onClick={() => onCreateChild(noteId)}>
         Add new page
       </DropdownMenuItem>
       <DropdownMenuItem
         variant="destructive"
         onClick={() => onDelete(noteId)}
-        disabled={isDeleting}
+        disabled={isDeleting || isBusy}
       >
         Delete page
       </DropdownMenuItem>

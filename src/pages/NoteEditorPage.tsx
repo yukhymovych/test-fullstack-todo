@@ -28,6 +28,7 @@ export function NoteEditorPage() {
     isDeleting,
     isFavorite,
     noteTitlesMap,
+    importExport,
     getSlashMenuItems,
     handleGenerateOneQuestionFromSelection,
     handleGenerateUpToFiveQuestionsFromSelection,
@@ -62,6 +63,7 @@ export function NoteEditorPage() {
         onCreateChild={handleCreateChild}
         onDelete={handleDelete}
         isDeleting={isDeleting}
+        importExport={importExport}
       />
       <NoteTitleInput value={title} onChange={handleTitleChange} />
       <NoteEditorBody

@@ -1,5 +1,6 @@
 import type { NoteListItem } from '../../model/types';
 import type { SaveStatus } from '../../model/useNoteEditor';
+import type { UseNoteImportExportResult } from '../../model/useNoteImportExport';
 
 export interface NoteEditorToolbarProps {
   activeId: string;
@@ -12,4 +13,5 @@ export interface NoteEditorToolbarProps {
   onCreateChild: (parentId: string) => void;
   onDelete: (noteId: string) => void;
   isDeleting: boolean;
+  importExport: UseNoteImportExportResult;
 }

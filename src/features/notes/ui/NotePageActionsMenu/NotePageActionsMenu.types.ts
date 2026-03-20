@@ -1,3 +1,5 @@
+import type { UseNoteImportExportResult } from '../../model/useNoteImportExport';
+
 export interface NotePageActionsMenuProps {
   noteId: string;
   isFavorite: boolean;
@@ -9,4 +11,5 @@ export interface NotePageActionsMenuProps {
   onCreateChild: (parentId: string) => void;
   onDelete: (noteId: string) => void;
   isDeleting: boolean;
+  importExport?: UseNoteImportExportResult;
 }
