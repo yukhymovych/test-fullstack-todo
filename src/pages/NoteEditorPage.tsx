@@ -1,6 +1,5 @@
 import { useParams } from 'react-router-dom';
 import { useNoteEditor } from '../features/notes/model/useNoteEditor';
-import { DEFAULT_NOTE_TITLE } from '../features/notes/model/types';
 import { NoteEditorToolbar } from '../features/notes/ui/NoteEditorToolbar';
 import { NoteTitleInput } from '../features/notes/ui/NoteTitleInput';
 import { NoteEditorBody } from '../features/notes/ui/NoteEditorBody';
@@ -19,6 +18,7 @@ export function NoteEditorPage() {
     notes,
     editor,
     title,
+    chromeTitle,
     handleTitleChange,
     saveStatus,
     handleDelete,
@@ -35,8 +35,7 @@ export function NoteEditorPage() {
     isGeneratingUpToFiveQuestionsFromSelection,
   } = useNoteEditor(id);
   const { data: studyItemStatus } = useStudyItemStatus(id ?? null);
-  const resolvedTitle = title.trim() || note?.title || DEFAULT_NOTE_TITLE;
-  usePageTitle(resolvedTitle);
+  usePageTitle(chromeTitle);
 
   if (isLoading || !id) {
     return <div className="note-editor-page note-editor-page--loading">Loading data...</div>;
@@ -55,7 +54,7 @@ export function NoteEditorPage() {
       <NoteEditorToolbar
         activeId={id}
         notes={notes}
-        currentTitle={resolvedTitle}
+        currentTitle={chromeTitle}
         saveStatus={saveStatus}
         isFavorite={isFavorite}
         onAddToFavorites={handleAddToFavorites}
