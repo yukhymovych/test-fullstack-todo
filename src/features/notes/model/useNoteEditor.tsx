@@ -44,6 +44,7 @@ export function useNoteEditor(id: string | undefined) {
   const generateUpToFiveQuestionsFromSelection = useGenerateStudyQuestions(id ?? '');
 
   const [title, setTitle] = useState('');
+  const [userEditedTitle, setUserEditedTitle] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
 
   const noteTitlesMap = useMemo(() => {
@@ -83,8 +84,19 @@ export function useNoteEditor(id: string | undefined) {
   }, editor);
 
   useEffect(() => {
-    if (note) setTitle(note.title || '');
+    setUserEditedTitle(false);
+  }, [id]);
+
+  useEffect(() => {
+    if (!note) return;
+    const displayTitle =
+      note.title === DEFAULT_NOTE_TITLE || !note.title ? '' : note.title;
+    setTitle(displayTitle);
   }, [note]);
+
+  const chromeTitle =
+    title.trim() ||
+    (userEditedTitle ? DEFAULT_NOTE_TITLE : (note?.title || DEFAULT_NOTE_TITLE));
 
   const lastVisitedIdRef = useRef<string | null>(null);
   useEffect(() => {
@@ -96,6 +108,7 @@ export function useNoteEditor(id: string | undefined) {
 
   const handleTitleChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setUserEditedTitle(true);
       setTitle(e.target.value);
       scheduleSave();
     },
@@ -215,6 +228,7 @@ export function useNoteEditor(id: string | undefined) {
     editor,
     title,
     handleTitleChange,
+    chromeTitle,
     saveStatus,
     handleDelete,
     handleAddToFavorites,
