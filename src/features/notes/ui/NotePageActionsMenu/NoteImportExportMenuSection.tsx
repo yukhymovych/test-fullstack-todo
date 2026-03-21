@@ -2,6 +2,9 @@ import { useRef } from 'react';
 import {
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from '@/shared/ui';
 import type { UseNoteImportExportResult } from '../../model/useNoteImportExport';
 
@@ -33,39 +36,44 @@ export function NoteImportExportMenuSection({
     <>
       <DropdownMenuSeparator />
       {importExport.canExport ? (
-        <>
-          <DropdownMenuItem
-            disabled={actionDisabled}
-            onClick={() => void importExport.handleExport('html')}
-          >
-            Export as HTML
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            disabled={actionDisabled}
-            onClick={() => void importExport.handleExport('txt')}
-          >
-            Export as TXT
-          </DropdownMenuItem>
-          {importExport.canExportPdf ? (
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger disabled={actionDisabled}>
+            Export
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
             <DropdownMenuItem
               disabled={actionDisabled}
-              onClick={() => void importExport.handleExport('pdf')}
+              onClick={() => void importExport.handleExport('html')}
             >
-              Export as PDF
+              As HTML
             </DropdownMenuItem>
-          ) : null}
-          {shouldShowTreeExport
-            ? importExport.treeExportFormats.map((format) => (
-                <DropdownMenuItem
-                  key={format}
-                  disabled={actionDisabled}
-                  onClick={() => void importExport.handleExportTree(format)}
-                >
-                  {`Export tree as ${format.toUpperCase()}`}
-                </DropdownMenuItem>
-              ))
-            : null}
-        </>
+            <DropdownMenuItem
+              disabled={actionDisabled}
+              onClick={() => void importExport.handleExport('txt')}
+            >
+              As TXT
+            </DropdownMenuItem>
+            {importExport.canExportPdf ? (
+              <DropdownMenuItem
+                disabled={actionDisabled}
+                onClick={() => void importExport.handleExport('pdf')}
+              >
+                As PDF
+              </DropdownMenuItem>
+            ) : null}
+            {shouldShowTreeExport
+              ? importExport.treeExportFormats.map((format) => (
+                  <DropdownMenuItem
+                    key={format}
+                    disabled={actionDisabled}
+                    onClick={() => void importExport.handleExportTree(format)}
+                  >
+                    {`Tree as ${format.toUpperCase()}`}
+                  </DropdownMenuItem>
+                ))
+              : null}
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
       ) : null}
       <DropdownMenuItem
         disabled={actionDisabled || !importExport.canImport}
