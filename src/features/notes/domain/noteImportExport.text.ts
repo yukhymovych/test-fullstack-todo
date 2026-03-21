@@ -1,5 +1,15 @@
 export function normalizeExportText(text: string): string {
-  return text.replace(/\r\n/g, '\n').trimEnd();
+  return text
+    .replace(/\r\n/g, '\n')
+    .replace(
+      /^\[([^\]]+)\]\(\/notes\/([^)]+)\)\s*$/gm,
+      (_match: string, title: string) => title.trim()
+    )
+    .replace(
+      /^\[Embedded page:\s*(.+?)\]\s+\(note:\s*([^)]+)\)\s*$/gm,
+      (_match: string, title: string) => title.trim()
+    )
+    .trimEnd();
 }
 
 function escapeHtml(value: string): string {
@@ -21,7 +31,7 @@ function applyInlineMarkdown(text: string): string {
   });
 
   html = html.replace(
-    /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+    /\[([^\]]+)\]\(((?:https?:\/\/|\/)[^\s)]+)\)/g,
     (_, label: string, href: string) => `<a href="${href}">${label}</a>`
   );
   html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
@@ -57,6 +67,18 @@ function tryParseListItem(line: string): MarkdownListItem | null {
     indent: getIndentSize(match[1]),
     type: /\d+\./.test(match[2]) ? 'ol' : 'ul',
     content: match[3],
+  };
+}
+
+function tryParseEmbeddedPagePlaceholder(line: string) {
+  const match = line.match(/^\[Embedded page:\s*(.+?)\]\s+\(note:\s*([^)]+)\)\s*$/);
+  if (!match) {
+    return null;
+  }
+
+  return {
+    title: match[1].trim(),
+    noteId: match[2].trim(),
   };
 }
 
@@ -162,6 +184,17 @@ export function convertTextToImportHtml(text: string): string {
 
     if (line.trim() === '') {
       flushParagraph();
+      continue;
+    }
+
+    const embeddedPagePlaceholder = tryParseEmbeddedPagePlaceholder(line);
+    if (embeddedPagePlaceholder) {
+      flushParagraph();
+      parts.push(
+        `<p><a href="/notes/${escapeHtml(embeddedPagePlaceholder.noteId)}">${escapeHtml(
+          embeddedPagePlaceholder.title
+        )}</a></p>`
+      );
       continue;
     }
 

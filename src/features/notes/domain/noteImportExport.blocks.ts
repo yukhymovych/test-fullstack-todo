@@ -17,8 +17,19 @@ type ImportBlock = {
   children?: ImportBlock[];
 };
 
+type ImportInlineContent = {
+  type?: string;
+  text?: string;
+  href?: string;
+  content?: ImportInlineContent[];
+};
+
 function toTextInlineContent(text: string) {
   return [{ type: 'text', text, styles: {} }];
+}
+
+function toLinkedInlineContent(text: string, href: string) {
+  return [{ type: 'link', href, content: toTextInlineContent(text) }];
 }
 
 function normalizeEmbeddedPageBlock(
@@ -33,9 +44,7 @@ function normalizeEmbeddedPageBlock(
 
   return {
     type: 'paragraph',
-    content: toTextInlineContent(
-      noteId ? `[Embedded page: ${title}] (note: ${noteId})` : `[Embedded page: ${title}]`
-    ),
+    content: noteId ? toLinkedInlineContent(title, `/notes/${noteId}`) : toTextInlineContent(title),
   };
 }
 
@@ -72,9 +81,31 @@ function getInlineText(content: unknown[] | undefined): string {
       if (item && typeof item === 'object' && 'text' in item) {
         return typeof item.text === 'string' ? item.text : '';
       }
+      if (item && typeof item === 'object' && 'content' in item && Array.isArray(item.content)) {
+        return getInlineText(item.content);
+      }
       return '';
     })
     .join('');
+}
+
+function getEmbeddedPageNoteIdFromLink(content: unknown[] | undefined): string | null {
+  if (!Array.isArray(content) || content.length !== 1) {
+    return null;
+  }
+
+  const item = content[0] as ImportInlineContent;
+  if (!item || item.type !== 'link' || typeof item.href !== 'string') {
+    return null;
+  }
+
+  const href = item.href.trim();
+  const routeMatch = href.match(/\/notes\/([^/?#]+)$/);
+  if (routeMatch) {
+    return routeMatch[1];
+  }
+
+  return null;
 }
 
 function restoreSingleImportBlock(block: ImportBlock): ImportBlock {
@@ -88,6 +119,15 @@ function restoreSingleImportBlock(block: ImportBlock): ImportBlock {
   }
 
   const text = getInlineText(nextBlock.content).trim();
+  const linkedNoteId = getEmbeddedPageNoteIdFromLink(nextBlock.content);
+  if (linkedNoteId) {
+    return {
+      type: 'embeddedPage',
+      props: { noteId: linkedNoteId },
+      content: [],
+    };
+  }
+
   const embeddedMatch = text.match(/^\[Embedded page:\s*(.+?)\]\s+\(note:\s*([^)]+)\)$/);
   if (!embeddedMatch) {
     return nextBlock;
