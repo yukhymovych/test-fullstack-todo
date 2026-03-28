@@ -2,13 +2,13 @@ import type { NoteListItem } from '../../model/types';
 
 export type NoteItem = NoteListItem;
 
-export interface TreeMaps {
-  byId: Map<string, NoteItem>;
+export interface TreeMaps<T extends NoteItem = NoteItem> {
+  byId: Map<string, T>;
   childrenByParent: Map<string | null, string[]>;
 }
 
-export function buildMaps(notes: NoteItem[]): TreeMaps {
-  const byId = new Map<string, NoteItem>();
+export function buildMaps<T extends NoteItem>(notes: T[]): TreeMaps<T> {
+  const byId = new Map<string, T>();
   const childrenByParent = new Map<string | null, string[]>();
 
   for (const n of notes) {

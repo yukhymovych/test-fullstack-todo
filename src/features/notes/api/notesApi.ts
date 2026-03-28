@@ -1,12 +1,21 @@
 import { http } from '../../../shared/api/http';
 import type { Note, NoteListItem } from '../model/types';
+import type { TrashNote, TrashNoteListItem } from '../model/trash.types';
 
 export async function getNotes(): Promise<NoteListItem[]> {
   return http.get<NoteListItem[]>('/notes');
 }
 
+export async function getTrashNotes(): Promise<TrashNoteListItem[]> {
+  return http.get<TrashNoteListItem[]>('/notes/trash');
+}
+
 export async function getNote(id: string): Promise<Note> {
   return http.get<Note>(`/notes/${id}`);
+}
+
+export async function getTrashNote(id: string): Promise<TrashNote> {
+  return http.get<TrashNote>(`/notes/trash/${id}`);
 }
 
 export async function createNote(payload: {
@@ -28,8 +37,16 @@ export async function updateNote(
   return http.put<Note>(`/notes/${id}`, payload);
 }
 
-export async function deleteNote(id: string): Promise<void> {
-  return http.delete<void>(`/notes/${id}`);
+export async function trashNote(id: string): Promise<void> {
+  return http.patch<void>(`/notes/${id}/trash`);
+}
+
+export async function restoreNote(id: string): Promise<Note> {
+  return http.patch<Note>(`/notes/${id}/restore`);
+}
+
+export async function permanentlyDeleteNote(id: string): Promise<void> {
+  return http.delete<void>(`/notes/${id}/permanent`);
 }
 
 export async function setNoteFavorite(

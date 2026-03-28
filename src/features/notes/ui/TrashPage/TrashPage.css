@@ -1,0 +1,140 @@
+.trash-page {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  min-height: 100%;
+  color: #f3f4f6;
+}
+
+.trash-page--status,
+.trash-page__placeholder,
+.trash-page__empty {
+  padding: 24px;
+  color: #9ca3af;
+}
+
+.trash-page__sidebar {
+  border-right: 1px solid #262626;
+  background: #141414;
+}
+
+.trash-page__sidebar-header,
+.trash-page__content-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #262626;
+}
+
+.trash-page__sidebar-header h1,
+.trash-page__content-header h2 {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.trash-page__sidebar-header p,
+.trash-page__content-header p {
+  margin: 0;
+  color: #9ca3af;
+  font-size: 0.95rem;
+}
+
+.trash-page__tree {
+  padding: 12px 8px 24px;
+}
+
+.trash-page__content {
+  min-width: 0;
+}
+
+.trash-page__content-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.trash-page__preview-body {
+  padding: 24px;
+}
+
+.trash-tree__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  border-radius: 10px;
+}
+
+.trash-tree__row--selected {
+  background: rgba(59, 130, 246, 0.16);
+}
+
+.trash-tree__row--selected-branch {
+  box-shadow: inset 2px 0 0 #3b82f6;
+}
+
+.trash-tree__expand,
+.trash-tree__title {
+  border: 0;
+  background: transparent;
+  color: inherit;
+}
+
+.trash-tree__expand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: #9ca3af;
+  cursor: pointer;
+}
+
+.trash-tree__expand:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.trash-tree__chevron {
+  display: inline-flex;
+  transition: transform 0.2s ease;
+}
+
+.trash-tree__chevron--collapsed {
+  transform: rotate(-90deg);
+}
+
+.trash-tree__title {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  cursor: pointer;
+  padding: 6px 0;
+}
+
+.trash-tree__title-text {
+  font-size: 0.95rem;
+}
+
+.trash-tree__meta {
+  color: #9ca3af;
+  font-size: 0.75rem;
+}
+
+.trash-tree__actions {
+  display: flex;
+  align-items: center;
+  opacity: 0.75;
+}
+
+@media (max-width: 900px) {
+  .trash-page {
+    grid-template-columns: 1fr;
+  }
+
+  .trash-page__sidebar {
+    border-right: 0;
+    border-bottom: 1px solid #262626;
+  }
+}
