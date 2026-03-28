@@ -20,7 +20,6 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui';
 import { FolderMinus, LogOut, Plus, RefreshCw, RotateCcw, Trash2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { DEBUG_ACTIONS } from '@/shared/config/env';
 
 function getInitials(name: string): string {
