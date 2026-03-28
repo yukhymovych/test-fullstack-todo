@@ -6,41 +6,55 @@ import {
   useExtension,
 } from '@blocknote/react';
 import { ChevronDown, ChevronUp, Trash2, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { MouseEventHandler } from 'react';
 import './MobileBlockToolbar.css';
 
 type MobileBlockToolbarProps = {
   isMobile: boolean;
+  interactionVersion: number;
 };
 
-export function MobileBlockToolbar({ isMobile }: MobileBlockToolbarProps) {
+export function MobileBlockToolbar({
+  isMobile,
+  interactionVersion,
+}: MobileBlockToolbarProps) {
   const editor = useBlockNoteEditor();
   const suggestionMenu = useExtension(SuggestionMenu, { editor });
 
   const [anchorTop, setAnchorTop] = useState<number>();
   const [currentBlockId, setCurrentBlockId] = useState<string>();
-  const [isDismissed, setIsDismissed] = useState(false);
+  const [dismissedAtInteractionVersion, setDismissedAtInteractionVersion] = useState<number | null>(
+    null,
+  );
+  const isDismissed = dismissedAtInteractionVersion === interactionVersion;
 
-  const syncToolbarState = () => {
+  const syncToolbarState = useCallback(() => {
     const cursorPosition = editor.getTextCursorPosition();
     const selectionBox = editor.getSelectionBoundingBox();
     setAnchorTop(selectionBox ? selectionBox.bottom + 8 : undefined);
     setCurrentBlockId(cursorPosition.block.id);
-  };
+  }, [editor]);
 
   useEffect(() => {
-    syncToolbarState();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editor.document.length]);
+    if (!isMobile || interactionVersion === 0) return;
+    const frameId = window.requestAnimationFrame(syncToolbarState);
+    return () => window.cancelAnimationFrame(frameId);
+  }, [interactionVersion, isMobile, syncToolbarState]);
 
   useEditorSelectionChange(() => {
-    setIsDismissed(false);
+    if (!isMobile || interactionVersion === 0) return;
     syncToolbarState();
   }, editor);
 
   useEffect(() => {
-    if (!isMobile || isDismissed) return;
+    if (!isMobile || interactionVersion === 0 || isDismissed) return;
+    const frameId = window.requestAnimationFrame(syncToolbarState);
+    return () => window.cancelAnimationFrame(frameId);
+  }, [editor.document.length, interactionVersion, isDismissed, isMobile, syncToolbarState]);
+
+  useEffect(() => {
+    if (!isMobile || interactionVersion === 0 || isDismissed) return;
     const syncPosition = () => {
       const selectionBox = editor.getSelectionBoundingBox();
       setAnchorTop(selectionBox ? selectionBox.bottom + 8 : undefined);
@@ -52,7 +66,7 @@ export function MobileBlockToolbar({ isMobile }: MobileBlockToolbarProps) {
       window.removeEventListener('resize', syncPosition);
       document.removeEventListener('scroll', syncPosition, true);
     };
-  }, [editor, isDismissed, isMobile]);
+  }, [editor, interactionVersion, isDismissed, isMobile]);
 
   const currentBlock = currentBlockId ? editor.getBlock(currentBlockId) : undefined;
 
@@ -96,10 +110,17 @@ export function MobileBlockToolbar({ isMobile }: MobileBlockToolbarProps) {
 
   const handleCloseToolbar: MouseEventHandler<HTMLButtonElement> = (event) => {
     event.preventDefault();
-    setIsDismissed(true);
+    setDismissedAtInteractionVersion(interactionVersion);
   };
 
-  if (!isMobile || !currentBlock || !anchorTop || !editor.isEditable || isDismissed) {
+  if (
+    !isMobile ||
+    interactionVersion === 0 ||
+    !currentBlock ||
+    !anchorTop ||
+    !editor.isEditable ||
+    isDismissed
+  ) {
     return null;
   }
 

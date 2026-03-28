@@ -70,13 +70,7 @@ export function UserInfo() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className={cn(
-            'w-full justify-start gap-2 rounded-md px-2 py-1.5',
-            'bg-white/5 text-[#d1d5db] hover:bg-white/10'
-          )}
-        >
+        <Button variant="ghost" size='sm'>
           <Avatar className="h-8 w-8 shrink-0">
             {user?.picture && <AvatarImage src={user.picture} alt={displayName} />}
             <AvatarFallback className="bg-muted text-xs">

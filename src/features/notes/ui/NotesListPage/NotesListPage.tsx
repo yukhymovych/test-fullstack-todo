@@ -20,7 +20,11 @@ export function NotesListPageView({
   error,
   createError,
   createPending,
+  showLearningSessionButton,
+  learningSessionButtonLabel,
+  learningSessionButtonDisabled,
   onNewNote,
+  onLearningSessionClick,
   onNoteClick,
   onMainLearningSessionClick,
 }: NotesListPageProps) {
@@ -44,11 +48,22 @@ export function NotesListPageView({
         <div className="notes-list-page__toolbar-actions">
           <Button
             variant="primary"
+            size='sm'
             onClick={onNewNote}
             disabled={createPending}
           >
             {createPending ? 'Creating...' : 'New page'}
           </Button>
+          {showLearningSessionButton && (
+            <Button
+              variant="ghost-muted"
+              size='sm'
+              onClick={onLearningSessionClick}
+              disabled={learningSessionButtonDisabled}
+            >
+              {learningSessionButtonLabel}
+            </Button>
+          )}
         </div>
       </div>
 

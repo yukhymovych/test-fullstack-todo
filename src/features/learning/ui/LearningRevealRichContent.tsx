@@ -3,7 +3,7 @@ import { BlockNoteView } from '@blocknote/mantine';
 import { useCreateBlockNote } from '@blocknote/react';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/mantine/style.css';
-import { NoteTitlesContext } from '@/features/notes/blocks/EmbeddedPageBlock';
+import { NoteTitlesContext } from '@/features/notes/blocks/embeddedPage.context';
 import { createNoteEditorSchema } from '@/features/notes/lib/noteEditorSchema';
 import { ensureBlocksArray } from '@/features/notes/lib/blocks';
 import { Button } from '@/shared/ui';

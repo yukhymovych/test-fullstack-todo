@@ -7,6 +7,7 @@ import {
   useUpdateStudyQuestion,
   useDeleteStudyQuestion,
   useGenerateStudyQuestions,
+  useIsGeneratingStudyQuestions,
 } from '../../model/useStudyQuestions';
 import type { StudyQuestionAnswer } from '../../domain/studyQuestions.types';
 import type { StudyQuestionsAnswersBlockProps } from './StudyQuestionsAnswersBlock.types';
@@ -26,6 +27,7 @@ export function StudyQuestionsAnswersBlock({ pageId }: StudyQuestionsAnswersBloc
   const updateMutation = useUpdateStudyQuestion(pageId);
   const deleteMutation = useDeleteStudyQuestion(pageId);
   const generateMutation = useGenerateStudyQuestions(pageId);
+  const isGenerating = useIsGeneratingStudyQuestions(pageId);
 
   const [newDraft, setNewDraft] = useState<DraftState>(EMPTY_DRAFT);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -35,7 +37,7 @@ export function StudyQuestionsAnswersBlock({ pageId }: StudyQuestionsAnswersBloc
     createMutation.isPending ||
     updateMutation.isPending ||
     deleteMutation.isPending ||
-    generateMutation.isPending;
+    isGenerating;
 
   const sortedPairs = useMemo(
     () =>
@@ -108,39 +110,46 @@ export function StudyQuestionsAnswersBlock({ pageId }: StudyQuestionsAnswersBloc
           onClick={generateForPage}
           disabled={isBusy}
         >
-          Create up to 5 Q/A with AI
+          {isGenerating ? 'Creating new Q/A' : 'Create up to 5 Q/A with AI'}
         </Button>
       </div>
 
       {isLoading ? <p className="study-qa-block__hint">Loading questions...</p> : null}
 
-      <div className="study-qa-block__create">
-        <input
-          className="study-qa-block__input"
-          placeholder="Question"
-          value={newDraft.question}
-          onChange={(event) =>
-            setNewDraft((prev) => ({ ...prev, question: event.target.value }))
-          }
-        />
-        <textarea
-          className="study-qa-block__textarea"
-          placeholder="Answer"
-          value={newDraft.answer}
-          onChange={(event) =>
-            setNewDraft((prev) => ({ ...prev, answer: event.target.value }))
-          }
-          rows={3}
-        />
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={submitNew}
-          disabled={isBusy}
-        >
-          Create new Q/A
-        </Button>
-      </div>
+      {isGenerating ? (
+        <div className="study-qa-block__loader" role="status" aria-live="polite">
+          <span className="study-qa-block__loader-spinner" aria-hidden="true" />
+          <p className="study-qa-block__loader-text">Creating new Q/A...</p>
+        </div>
+      ) : (
+        <div className="study-qa-block__create">
+          <input
+            className="study-qa-block__input"
+            placeholder="Question"
+            value={newDraft.question}
+            onChange={(event) =>
+              setNewDraft((prev) => ({ ...prev, question: event.target.value }))
+            }
+          />
+          <textarea
+            className="study-qa-block__textarea"
+            placeholder="Answer"
+            value={newDraft.answer}
+            onChange={(event) =>
+              setNewDraft((prev) => ({ ...prev, answer: event.target.value }))
+            }
+            rows={3}
+          />
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={submitNew}
+            disabled={isBusy}
+          >
+            Create new Q/A
+          </Button>
+        </div>
+      )}
 
       <div className="study-qa-block__list">
         {sortedPairs.map((pair) => {

@@ -28,7 +28,7 @@ export function SidebarRecentsList({
   return (
     <div className="sidebar-recents">
       <Button
-        variant="ghost-muted"
+        variant="ghost"
         fullWidth
         onClick={onToggleExpand}
         className="sidebar-recents__header"

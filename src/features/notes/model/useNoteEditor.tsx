@@ -6,7 +6,7 @@ import { FaRegFileAlt } from "react-icons/fa";
 import {
   useNoteQuery,
   useUpdateNote,
-  useDeleteNote,
+  useTrashNote,
   useCreateNote,
   useNotesQuery,
   useNoteEmbeds,
@@ -37,7 +37,7 @@ export function useNoteEditor(id: string | undefined) {
   const { data: notes } = useNotesQuery();
   const { data: embeds } = useNoteEmbeds(id, !!id);
   const updateMutation = useUpdateNote();
-  const deleteMutation = useDeleteNote();
+  const trashMutation = useTrashNote();
   const createMutation = useCreateNote();
   const setNoteFavorite = useSetNoteFavorite();
   const updateLastVisited = useUpdateNoteLastVisited();
@@ -121,11 +121,11 @@ export function useNoteEditor(id: string | undefined) {
     async (noteId?: string) => {
       const targetId = noteId ?? id;
       if (!targetId) return;
-      if (!window.confirm('Delete this note?')) return;
-      await deleteMutation.mutateAsync(targetId);
+      if (!window.confirm('Move this page and its child pages to trash?')) return;
+      await trashMutation.mutateAsync(targetId);
       navigate(notesRoutes.list());
     },
-    [id, deleteMutation, navigate]
+    [id, trashMutation, navigate]
   );
 
   const handleAddToFavorites = useCallback(
@@ -245,7 +245,7 @@ export function useNoteEditor(id: string | undefined) {
     handleAddToFavorites,
     handleRemoveFromFavorites,
     handleCreateChild,
-    isDeleting: deleteMutation.isPending,
+    isDeleting: trashMutation.isPending,
     isFavorite: notes?.find((n) => n.id === id)?.is_favorite ?? false,
     noteTitlesMap,
     importExport,

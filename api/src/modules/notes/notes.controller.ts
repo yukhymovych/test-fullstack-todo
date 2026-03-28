@@ -24,6 +24,20 @@ export async function getNotes(
   }
 }
 
+export async function getTrashNotes(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const notes = await notesService.getAllTrashedNotes(userId);
+    res.json(notes);
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function getNote(
   req: Request,
   res: Response,
@@ -36,6 +50,27 @@ export async function getNote(
 
     if (!note) {
       res.status(404).json({ error: 'Note not found' });
+      return;
+    }
+
+    res.json(note);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getTrashNote(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const id = noteIdSchema.parse(req.params.id);
+    const note = await notesService.getTrashNoteById(id, userId);
+
+    if (!note) {
+      res.status(404).json({ error: 'Trash note not found' });
       return;
     }
 
@@ -135,6 +170,48 @@ export async function deleteNote(
 
     if (!deleted) {
       res.status(404).json({ error: 'Note not found' });
+      return;
+    }
+
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function restoreNote(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const id = noteIdSchema.parse(req.params.id);
+    const restored = await notesService.restoreNote(id, userId);
+
+    if (!restored) {
+      res.status(404).json({ error: 'Trash note not found' });
+      return;
+    }
+
+    res.json(restored);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function permanentlyDeleteNote(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const id = noteIdSchema.parse(req.params.id);
+    const deleted = await notesService.permanentlyDeleteNote(id, userId);
+
+    if (!deleted) {
+      res.status(404).json({ error: 'Trash note not found' });
       return;
     }
 

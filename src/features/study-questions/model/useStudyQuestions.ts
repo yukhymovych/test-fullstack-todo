@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as studyQuestionsApi from '../api/studyQuestionsApi';
 import type {
   CreateStudyQuestionBody,
@@ -56,6 +56,7 @@ export function useDeleteStudyQuestion(pageId: string) {
 export function useGenerateStudyQuestions(pageId: string) {
   const queryClient = useQueryClient();
   return useMutation({
+    mutationKey: STUDY_QUESTIONS_KEYS.generateByPage(pageId),
     mutationFn: (body?: GenerateStudyQuestionsBody) =>
       studyQuestionsApi.generateStudyQuestions(pageId, body),
     onSuccess: () => {
@@ -64,4 +65,12 @@ export function useGenerateStudyQuestions(pageId: string) {
       });
     },
   });
+}
+
+export function useIsGeneratingStudyQuestions(pageId: string | undefined) {
+  return (
+    useIsMutating({
+      mutationKey: STUDY_QUESTIONS_KEYS.generateByPage(pageId ?? ''),
+    }) > 0
+  );
 }

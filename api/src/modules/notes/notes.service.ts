@@ -1,6 +1,11 @@
 import * as notesSQL from './notes.sql.js';
 import * as noteEmbedsSQL from './noteEmbeds.sql.js';
 import { CreateNoteInput, UpdateNoteInput, MoveNoteInput, SetFavoriteInput } from './notes.schemas.js';
+import {
+  buildTrashSubtreeNoteIds,
+  getTrashExpiryCutoff,
+  resolveRestoreParentId,
+} from './trash.logic.js';
 
 type BlockLike = { type?: string; props?: { noteId?: string }; content?: unknown[] };
 
@@ -64,12 +69,32 @@ function extractContentText(richContent: unknown): string {
   return texts.join(' ').trim();
 }
 
+async function purgeExpiredTrashIfNeeded(userId: string): Promise<void> {
+  const expireBefore = getTrashExpiryCutoff(
+    new Date(),
+    notesSQL.TRASH_RETENTION_DAYS
+  );
+  await notesSQL.purgeExpiredTrash(userId, expireBefore);
+}
+
 export async function getAllNotes(userId: string) {
+  await purgeExpiredTrashIfNeeded(userId);
   return notesSQL.getAllNotes(userId);
 }
 
 export async function getNoteById(id: string, userId: string) {
+  await purgeExpiredTrashIfNeeded(userId);
   return notesSQL.getNoteById(id, userId);
+}
+
+export async function getAllTrashedNotes(userId: string) {
+  await purgeExpiredTrashIfNeeded(userId);
+  return notesSQL.getAllTrashedNotes(userId);
+}
+
+export async function getTrashNoteById(id: string, userId: string) {
+  await purgeExpiredTrashIfNeeded(userId);
+  return notesSQL.getTrashNoteById(id, userId);
 }
 
 export async function createNote(userId: string, input: CreateNoteInput) {
@@ -124,8 +149,44 @@ export async function updateNote(
 
 export async function deleteNote(id: string, userId: string) {
   const learningSQL = await import('../learning/learning.sql.js');
-  await learningSQL.markSessionItemsUnavailableByNoteId(id);
-  return notesSQL.deleteNote(id, userId);
+  const note = await notesSQL.getNoteById(id, userId);
+  if (!note) {
+    return false;
+  }
+
+  const descendantIds = await notesSQL.getDescendantIds(id, userId);
+  const subtreeIds = buildTrashSubtreeNoteIds(id, descendantIds);
+  await learningSQL.markSessionItemsUnavailableByNoteIds(subtreeIds);
+
+  const trashedIds = await notesSQL.trashSubtree(id, userId, new Date());
+  return trashedIds.length > 0;
+}
+
+export async function restoreNote(id: string, userId: string) {
+  const note = await notesSQL.getTrashNoteById(id, userId);
+  if (!note) {
+    return null;
+  }
+
+  const parent = note.parent_id
+    ? await notesSQL.getNoteByIdIncludingTrashed(note.parent_id, userId)
+    : null;
+  const restoredParentId = resolveRestoreParentId(note.parent_id, parent);
+  const nextSortOrder = await notesSQL.getNextSortOrder(userId, restoredParentId);
+  const restoredIds = await notesSQL.restoreTrashedSubtree(
+    id,
+    userId,
+    restoredParentId,
+    nextSortOrder
+  );
+
+  return restoredIds.length > 0
+    ? await notesSQL.getNoteById(id, userId)
+    : null;
+}
+
+export async function permanentlyDeleteNote(id: string, userId: string) {
+  return notesSQL.permanentlyDeleteTrashedSubtree(id, userId);
 }
 
 export async function setNoteFavorite(
@@ -271,13 +332,13 @@ export async function moveNote(
 
     await client.query(
       `UPDATE notes SET parent_id = $1, sort_order = $2, updated_at = NOW()
-       WHERE id = $3 AND user_id = $4`,
+       WHERE id = $3 AND user_id = $4 AND trashed_at IS NULL`,
       [newParentId, position, noteId, userId]
     );
 
     if (oldParentId) {
       const oldResult = await client.query(
-        'SELECT title, rich_content FROM notes WHERE id = $1 AND user_id = $2',
+        'SELECT title, rich_content FROM notes WHERE id = $1 AND user_id = $2 AND trashed_at IS NULL',
         [oldParentId, userId]
       );
       const oldParent = oldResult.rows[0];
@@ -288,7 +349,7 @@ export async function moveNote(
         );
         const contentText = extractContentText(blocks);
         await client.query(
-          'UPDATE notes SET rich_content = $1::jsonb, content_text = $2, updated_at = NOW() WHERE id = $3 AND user_id = $4',
+          'UPDATE notes SET rich_content = $1::jsonb, content_text = $2, updated_at = NOW() WHERE id = $3 AND user_id = $4 AND trashed_at IS NULL',
           [JSON.stringify(blocks), contentText, oldParentId, userId]
         );
         const embeddedIds = extractEmbeddedNoteIds(blocks);
@@ -307,7 +368,7 @@ export async function moveNote(
 
     if (newParentId) {
       const newResult = await client.query(
-        'SELECT title, rich_content FROM notes WHERE id = $1 AND user_id = $2',
+        'SELECT title, rich_content FROM notes WHERE id = $1 AND user_id = $2 AND trashed_at IS NULL',
         [newParentId, userId]
       );
       const newParent = newResult.rows[0];
@@ -319,7 +380,7 @@ export async function moveNote(
         );
         const contentText = extractContentText(blocks);
         await client.query(
-          'UPDATE notes SET rich_content = $1::jsonb, content_text = $2, updated_at = NOW() WHERE id = $3 AND user_id = $4',
+          'UPDATE notes SET rich_content = $1::jsonb, content_text = $2, updated_at = NOW() WHERE id = $3 AND user_id = $4 AND trashed_at IS NULL',
           [JSON.stringify(blocks), contentText, newParentId, userId]
         );
         const embeddedIds = extractEmbeddedNoteIds(blocks);
@@ -336,13 +397,13 @@ export async function moveNote(
       }
 
       const childrenResult = await client.query(
-        'SELECT id FROM notes WHERE user_id = $1 AND parent_id = $2 ORDER BY sort_order ASC, updated_at DESC',
+        'SELECT id FROM notes WHERE user_id = $1 AND parent_id = $2 AND trashed_at IS NULL ORDER BY sort_order ASC, updated_at DESC',
         [userId, newParentId]
       );
       const childIds = childrenResult.rows.map((r) => r.id);
       for (let i = 0; i < childIds.length; i++) {
         await client.query(
-          'UPDATE notes SET sort_order = $1 WHERE id = $2 AND user_id = $3',
+          'UPDATE notes SET sort_order = $1 WHERE id = $2 AND user_id = $3 AND trashed_at IS NULL',
           [i, childIds[i], userId]
         );
       }

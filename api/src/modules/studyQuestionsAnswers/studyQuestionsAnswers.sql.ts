@@ -27,7 +27,7 @@ export async function noteExistsForUser(
   userId: string
 ): Promise<boolean> {
   const result = await pool.query(
-    'SELECT 1 FROM notes WHERE id = $1 AND user_id = $2',
+    'SELECT 1 FROM notes WHERE id = $1 AND user_id = $2 AND trashed_at IS NULL',
     [pageId, userId]
   );
   return (result.rowCount ?? 0) > 0;
@@ -42,7 +42,7 @@ export async function listByPage(
             sqa.question_normalized, sqa.answer_normalized, sqa.created_at, sqa.updated_at
      FROM study_questions_answers sqa
      JOIN notes n ON n.id = sqa.page_id
-     WHERE sqa.page_id = $1 AND n.user_id = $2
+     WHERE sqa.page_id = $1 AND n.user_id = $2 AND n.trashed_at IS NULL
      ORDER BY sqa.created_at ASC, sqa.id ASC`,
     [pageId, userId]
   );
@@ -65,7 +65,7 @@ export async function createOne(
      )
      SELECT $1, $2, $3, $4, $5, $6
      FROM notes
-     WHERE id = $1 AND user_id = $7
+     WHERE id = $1 AND user_id = $7 AND trashed_at IS NULL
      ON CONFLICT (page_id, question_normalized, answer_normalized) DO NOTHING
      RETURNING id, page_id, question, answer, source, question_normalized, answer_normalized, created_at, updated_at`,
     [
@@ -90,7 +90,7 @@ export async function getByIdForUser(
             sqa.question_normalized, sqa.answer_normalized, sqa.created_at, sqa.updated_at
      FROM study_questions_answers sqa
      JOIN notes n ON n.id = sqa.page_id
-     WHERE sqa.id = $1 AND n.user_id = $2`,
+     WHERE sqa.id = $1 AND n.user_id = $2 AND n.trashed_at IS NULL`,
     [id, userId]
   );
   return result.rows[0] ?? null;
@@ -117,6 +117,7 @@ export async function updateOne(
      WHERE sqa.id = $5
        AND n.id = sqa.page_id
        AND n.user_id = $6
+       AND n.trashed_at IS NULL
      RETURNING sqa.id, sqa.page_id, sqa.question, sqa.answer, sqa.source,
                sqa.question_normalized, sqa.answer_normalized, sqa.created_at, sqa.updated_at`,
     [
@@ -137,7 +138,8 @@ export async function deleteOne(id: string, userId: string): Promise<boolean> {
      USING notes n
      WHERE sqa.id = $1
        AND n.id = sqa.page_id
-       AND n.user_id = $2`,
+       AND n.user_id = $2
+       AND n.trashed_at IS NULL`,
     [id, userId]
   );
   return (result.rowCount ?? 0) > 0;

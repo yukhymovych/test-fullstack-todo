@@ -11,6 +11,8 @@ export interface NoteListItem {
   sort_order?: number;
   is_favorite?: boolean;
   last_visited_at?: string | null;
+  trashed_at?: string | null;
+  trashed_root_id?: string | null;
 }
 
 export interface Note {
@@ -21,6 +23,8 @@ export interface Note {
   content_text: string;
   created_at: string;
   updated_at: string;
+  trashed_at?: string | null;
+  trashed_root_id?: string | null;
 }
 
 /** Block format for embedded page: { type: "embeddedPage", props: { noteId: "<uuid>" }, content: [] } */

@@ -43,7 +43,7 @@ export function SidebarFavoritesList({
   return (
     <div className="sidebar-favorites">
       <Button
-        variant="ghost-muted"
+        variant="ghost"
         fullWidth
         onClick={onToggleExpand}
         className="sidebar-favorites__header"

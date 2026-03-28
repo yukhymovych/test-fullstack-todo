@@ -5,7 +5,7 @@ import {
   useNotesQuery,
   useCreateNote,
   useUpdateNote,
-  useDeleteNote,
+  useTrashNote,
   useMoveNote,
   useSetNoteFavorite,
   NOTE_KEY,
@@ -124,7 +124,7 @@ export function useNotesTree() {
   const { data: notes, isLoading, error } = useNotesQuery();
   const createNote = useCreateNote();
   const updateNote = useUpdateNote();
-  const deleteNote = useDeleteNote();
+  const trashNote = useTrashNote();
   const moveNote = useMoveNote();
   const setNoteFavorite = useSetNoteFavorite();
 
@@ -317,13 +317,13 @@ export function useNotesTree() {
 
   const handleDeletePage = useCallback(
     async (pageId: string) => {
-      if (!window.confirm('Delete this page?')) return;
-      await deleteNote.mutateAsync(pageId);
+      if (!window.confirm('Move this page and its child pages to trash?')) return;
+      await trashNote.mutateAsync(pageId);
       if (activeId === pageId) {
         navigate(notesRoutes.list());
       }
     },
-    [deleteNote, activeId, navigate]
+    [trashNote, activeId, navigate]
   );
 
   const handleAddToFavorites = useCallback(
@@ -369,7 +369,7 @@ export function useNotesTree() {
     handleRemoveFromFavorites,
     activeId,
     createNote,
-    deleteNote,
+    deleteNote: trashNote,
     moveNote,
     setNoteFavorite,
   };

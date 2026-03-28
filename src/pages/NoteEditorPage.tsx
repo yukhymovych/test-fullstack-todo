@@ -67,6 +67,7 @@ export function NoteEditorPage() {
       />
       <NoteTitleInput value={title} onChange={handleTitleChange} />
       <NoteEditorBody
+        key={id}
         editor={editor}
         noteTitlesMap={noteTitlesMap}
         getSlashMenuItems={getSlashMenuItems}

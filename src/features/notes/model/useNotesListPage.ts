@@ -9,6 +9,7 @@ import {
 import { getRecentNotes } from '../lib/recents';
 import {
   useDueStudyItems,
+  useStartLearningSession,
   useTodayLearningSession,
   useTodayReviewLogs,
 } from '@/features/learning/model';
@@ -18,10 +19,15 @@ import type { Grade } from '@/features/learning/domain/learning.types';
 export function useNotesListPage() {
   const navigate = useNavigate();
   const { data: notes, isLoading, error } = useNotesQuery();
-  const { data: todayLearningSession } = useTodayLearningSession();
-  const { data: dueStudyItems = [] } = useDueStudyItems();
+  const {
+    data: todayLearningSession,
+    isLoading: isTodayLearningSessionLoading,
+  } = useTodayLearningSession();
+  const { data: dueStudyItems = [], isLoading: isDueStudyItemsLoading } =
+    useDueStudyItems();
   const { data: todayReviewLogs = [] } = useTodayReviewLogs();
   const createMutation = useCreateNote();
+  const startLearningSession = useStartLearningSession();
 
   const recentNotes = useMemo(() => getRecentNotes(notes), [notes]);
 
@@ -128,6 +134,42 @@ export function useNotesListPage() {
     navigate(learningRoutes.session());
   };
 
+  const reviewableSessionItems =
+    todayLearningSession?.items.filter((item) => item.state !== 'unavailable') ?? [];
+  const pendingSessionItems = reviewableSessionItems.filter(
+    (item) => item.state === 'pending'
+  );
+  const hasActiveTodayLearningSession = pendingSessionItems.length > 0;
+  const hasItemsToLearnToday = dueStudyItems.length > 0;
+  const shouldShowLearningSessionButton = hasActiveTodayLearningSession
+    || (!todayLearningSession && !isDueStudyItemsLoading && hasItemsToLearnToday);
+  const learningSessionButtonLabel = hasActiveTodayLearningSession
+    ? 'Continue learning session'
+    : 'Start learning session';
+
+  const handleLearningSessionClick = () => {
+    if (
+      isTodayLearningSessionLoading
+      || isDueStudyItemsLoading
+      || startLearningSession.isPending
+    ) {
+      return;
+    }
+
+    if (hasActiveTodayLearningSession) {
+      navigate(learningRoutes.session());
+      return;
+    }
+
+    startLearningSession.mutate(undefined, {
+      onSuccess: (session) => {
+        if (session) {
+          navigate(learningRoutes.session());
+        }
+      },
+    });
+  };
+
   return {
     notes,
     recentNotes,
@@ -141,7 +183,14 @@ export function useNotesListPage() {
     isLoading,
     error,
     createMutation,
+    shouldShowLearningSessionButton,
+    learningSessionButtonLabel,
+    isLearningSessionButtonDisabled:
+      isTodayLearningSessionLoading
+      || isDueStudyItemsLoading
+      || startLearningSession.isPending,
     handleNewNote,
+    handleLearningSessionClick,
     handleNoteClick,
     handleMainLearningSessionClick,
   };

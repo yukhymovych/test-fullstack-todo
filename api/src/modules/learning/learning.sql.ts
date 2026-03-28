@@ -189,6 +189,7 @@ export async function getDueStudyItems(
       `SELECT si.id, si.user_id, si.note_id, si.is_active, si.due_at, si.last_reviewed_at,
               si.stability_days, si.difficulty
        FROM study_items si
+       JOIN notes n ON n.id = si.note_id AND n.user_id = si.user_id AND n.trashed_at IS NULL
        WHERE si.user_id = $1 AND si.is_active = true AND si.due_at <= NOW()
          AND si.note_id = ANY($2::uuid[])
        ORDER BY si.due_at ASC, si.last_reviewed_at NULLS FIRST, si.note_id ASC
@@ -198,10 +199,11 @@ export async function getDueStudyItems(
     return result.rows;
   }
   const result = await pool.query(
-    `SELECT id, user_id, note_id, is_active, due_at, last_reviewed_at,
-            stability_days, difficulty
-     FROM study_items
-     WHERE user_id = $1 AND is_active = true AND due_at <= NOW()
+    `SELECT si.id, si.user_id, si.note_id, si.is_active, si.due_at, si.last_reviewed_at,
+            si.stability_days, si.difficulty
+     FROM study_items si
+     JOIN notes n ON n.id = si.note_id AND n.user_id = si.user_id AND n.trashed_at IS NULL
+     WHERE si.user_id = $1 AND si.is_active = true AND si.due_at <= NOW()
      ORDER BY due_at ASC, last_reviewed_at NULLS FIRST, note_id ASC
      LIMIT $2`,
     [userId, limit]
@@ -259,7 +261,7 @@ export async function getSessionWithItems(
     `SELECT lsi.id, lsi.session_id, lsi.note_id, lsi.position, lsi.state, lsi.grade, lsi.reviewed_at, lsi.is_retry,
             n.title
      FROM learning_session_items lsi
-     LEFT JOIN notes n ON n.id = lsi.note_id AND n.user_id = $1
+     LEFT JOIN notes n ON n.id = lsi.note_id AND n.user_id = $1 AND n.trashed_at IS NULL
      WHERE lsi.session_id = $2
      ORDER BY lsi.position ASC`,
     [userId, sessionId]
@@ -270,7 +272,7 @@ export async function getSessionWithItems(
     session_id: row.session_id as string,
     note_id: row.note_id as string | null,
     position: row.position as number,
-    state: (row.note_id === null ? 'unavailable' : row.state) as string,
+    state: (row.note_id === null || row.title === null ? 'unavailable' : row.state) as string,
     grade: row.grade as string | null,
     reviewed_at: row.reviewed_at as Date | null,
     is_retry: row.is_retry as boolean,
@@ -458,8 +460,9 @@ export async function getDueStudyItemsCount(
 ): Promise<number> {
   const result = await pool.query(
     `SELECT COUNT(*)::int AS cnt
-     FROM study_items
-     WHERE user_id = $1 AND is_active = true AND due_at <= NOW()`,
+     FROM study_items si
+     JOIN notes n ON n.id = si.note_id AND n.user_id = si.user_id AND n.trashed_at IS NULL
+     WHERE si.user_id = $1 AND si.is_active = true AND si.due_at <= NOW()`,
     [userId]
   );
   return result.rows[0]?.cnt ?? 0;
@@ -470,8 +473,9 @@ export async function getDueStudyItemsAll(
 ): Promise<Array<{ note_id: string; due_at: Date }>> {
   const result = await pool.query(
     `SELECT note_id, due_at
-     FROM study_items
-     WHERE user_id = $1 AND is_active = true AND due_at <= NOW()
+     FROM study_items si
+     JOIN notes n ON n.id = si.note_id AND n.user_id = si.user_id AND n.trashed_at IS NULL
+     WHERE si.user_id = $1 AND si.is_active = true AND si.due_at <= NOW()
      ORDER BY due_at ASC, last_reviewed_at NULLS FIRST, note_id ASC`,
     [userId]
   );
@@ -491,6 +495,7 @@ export async function getActiveStudyItemsForRefill(
     `SELECT si.id, si.user_id, si.note_id, si.is_active, si.due_at, si.last_reviewed_at,
             si.stability_days, si.difficulty
      FROM study_items si
+     JOIN notes n ON n.id = si.note_id AND n.user_id = si.user_id AND n.trashed_at IS NULL
      WHERE si.user_id = $1 AND si.is_active = true
        AND si.note_id NOT IN (
          SELECT note_id FROM learning_session_items
@@ -541,10 +546,20 @@ export async function markSessionItemUnavailable(
 export async function markSessionItemsUnavailableByNoteId(
   noteId: string
 ): Promise<number> {
+  return markSessionItemsUnavailableByNoteIds([noteId]);
+}
+
+export async function markSessionItemsUnavailableByNoteIds(
+  noteIds: string[]
+): Promise<number> {
+  if (noteIds.length === 0) {
+    return 0;
+  }
+
   const result = await pool.query(
     `UPDATE learning_session_items SET state = 'unavailable'
-     WHERE note_id = $1 AND state = 'pending'`,
-    [noteId]
+     WHERE note_id = ANY($1::uuid[]) AND state = 'pending'`,
+    [noteIds]
   );
   return result.rowCount ?? 0;
 }
@@ -611,7 +626,7 @@ export async function noteExistsForUser(
   userId: string
 ): Promise<boolean> {
   const result = await client.query(
-    'SELECT 1 FROM notes WHERE id = $1 AND user_id = $2',
+    'SELECT 1 FROM notes WHERE id = $1 AND user_id = $2 AND trashed_at IS NULL',
     [noteId, userId]
   );
   return (result.rowCount ?? 0) > 0;
@@ -917,10 +932,11 @@ export async function getDescendantsWithLearningCount(
 ): Promise<number> {
   const result = await pool.query(
     `WITH RECURSIVE descendants AS (
-       SELECT id FROM notes WHERE parent_id = $1 AND user_id = $2
+       SELECT id FROM notes WHERE parent_id = $1 AND user_id = $2 AND trashed_at IS NULL
        UNION ALL
        SELECT n.id FROM notes n
-       JOIN descendants d ON n.parent_id = d.id AND n.user_id = $2
+       JOIN descendants d ON n.parent_id = d.id
+       WHERE n.user_id = $2 AND n.trashed_at IS NULL
      )
      SELECT COUNT(*)::int AS cnt
      FROM descendants d
@@ -936,10 +952,11 @@ export async function getStudyItemsByNoteIds(
 ): Promise<StudyItem[]> {
   if (noteIds.length === 0) return [];
   const result = await pool.query(
-    `SELECT id, user_id, note_id, is_active, due_at, last_reviewed_at,
-            stability_days, difficulty
-     FROM study_items
-     WHERE user_id = $1 AND note_id = ANY($2::uuid[])`,
+    `SELECT si.id, si.user_id, si.note_id, si.is_active, si.due_at, si.last_reviewed_at,
+            si.stability_days, si.difficulty
+     FROM study_items si
+     JOIN notes n ON n.id = si.note_id AND n.user_id = si.user_id AND n.trashed_at IS NULL
+     WHERE si.user_id = $1 AND si.note_id = ANY($2::uuid[])`,
     [userId, noteIds]
   );
   return result.rows;
@@ -954,7 +971,7 @@ export async function listTodayScopedSessions(
             COUNT(lsi.id) FILTER (WHERE lsi.state = 'done') AS done,
             COUNT(lsi.id) AS total
      FROM learning_sessions ls
-     LEFT JOIN notes n ON n.id = ls.root_note_id AND n.user_id = ls.user_id
+     LEFT JOIN notes n ON n.id = ls.root_note_id AND n.user_id = ls.user_id AND n.trashed_at IS NULL
      LEFT JOIN learning_session_items lsi ON lsi.session_id = ls.id
      WHERE ls.user_id = $1 AND ls.day_key = $2 AND ls.kind = 'scoped' AND ls.status = 'active'
      GROUP BY ls.id, ls.root_note_id, ls.scoped_mode, n.title`,

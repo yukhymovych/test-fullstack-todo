@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
-import { FileStack } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { FileStack, Trash2 } from 'lucide-react';
 import { RiArrowDownSLine } from 'react-icons/ri';
 import { useNotesTree } from '../../model/useNotesTree';
 import { TreeNode } from './TreeNode';
@@ -10,6 +11,7 @@ import { SidebarFavoritesList } from '../SidebarFavoritesList/SidebarFavoritesLi
 import { LearningSidebarCard } from '@/features/learning/ui/LearningSidebarCard';
 import { Button } from '@/shared/ui';
 import { UserInfo } from '@/app/components/UserInfo';
+import { notesRoutes } from '../../lib/routes';
 import './SidebarNotesTree.css';
 
 export interface SidebarNotesTreeProps {
@@ -17,6 +19,7 @@ export interface SidebarNotesTreeProps {
 }
 
 export function SidebarNotesTree({ onNavigate }: SidebarNotesTreeProps) {
+  const location = useLocation();
   const {
     isLoading,
     error,
@@ -95,87 +98,120 @@ export function SidebarNotesTree({ onNavigate }: SidebarNotesTreeProps) {
     return <div className="sidebar-error">Error: {error.message}</div>;
   }
 
+  const isTrashActive = location.pathname.startsWith(notesRoutes.trash());
+
   return (
     <div className="sidebar-container">
-      <div className="sidebar-user-info">
-        <UserInfo />
-      </div>
-      <Button
-        variant="ghost-muted"
-        fullWidth
-        onClick={handleCreateRoot}
-        disabled={createNote.isPending}
-      >
-        {createNote.isPending ? 'Creating...' : 'New page'}
-      </Button>
-      <LearningSidebarCard />
-      <SidebarRecentsList
-        recentIds={recentIds}
-        byId={byId}
-        recentFormattedTimes={recentFormattedTimes}
-        isExpanded={recentsExpanded}
-        onToggleExpand={toggleRecentsExpand}
-        navigate={handleNavigateAndClose}
-        activeId={activeId}
-      />
-      <SidebarFavoritesList
-        favoriteIds={favoriteIds}
-        byId={byId}
-        childrenByParent={childrenByParent}
-        expandedSet={favoritesTreeExpanded}
-        toggleExpand={toggleFavoritesTreeExpand}
-        isExpanded={favoritesExpanded}
-        onToggleExpand={toggleFavoritesExpand}
-        onAddToFavorites={handleAddToFavorites}
-        onRemoveFromFavorites={handleRemoveFromFavorites}
-        onCreateChild={handleCreateChild}
-        onDeletePage={handleDeletePage}
-        isDeleting={deleteNote.isPending}
-        navigate={handleNavigateAndClose}
-        activeId={activeId}
-      />
-      <div className="sidebar-all-pages">
-        <Button
-          variant="ghost-muted"
-          fullWidth
-          onClick={toggleAllPagesExpand}
-          className="sidebar-all-pages__header"
-        >
-          <FileStack className="sidebar-all-pages__icon size-4" />
-          <span>All pages</span>
-          <span
-            className={`sidebar-all-pages__chevron ${!allPagesExpanded ? 'sidebar-all-pages__chevron--collapsed' : ''}`}
-            aria-hidden
+      <div className="sidebar-content">
+        <div className="sidebar-header">
+          <div className="sidebar-brand">
+            <Link
+              to="/"
+              className="sidebar-brand__link"
+              aria-label="Go to home page"
+              onClick={onNavigate}
+            >
+              <img src="/logo.png" alt="Rememo" className="sidebar-brand__logo" />
+            </Link>
+          </div>
+          <div className="sidebar-user-info">
+            <UserInfo />
+          </div>
+        </div>
+        <div className="sidebar-new-page-button">
+          <Button
+            variant="ghost"
+            className="sidebar-new-page-button"
+            size='sm'
+            fullWidth
+            onClick={handleCreateRoot}
+            disabled={createNote.isPending}
           >
-            <RiArrowDownSLine />
-          </span>
+            {createNote.isPending ? 'Creating...' : 'New page'}
+          </Button>
+        </div>
+        <LearningSidebarCard />
+        <SidebarRecentsList
+          recentIds={recentIds}
+          byId={byId}
+          recentFormattedTimes={recentFormattedTimes}
+          isExpanded={recentsExpanded}
+          onToggleExpand={toggleRecentsExpand}
+          navigate={handleNavigateAndClose}
+          activeId={activeId}
+        />
+        <SidebarFavoritesList
+          favoriteIds={favoriteIds}
+          byId={byId}
+          childrenByParent={childrenByParent}
+          expandedSet={favoritesTreeExpanded}
+          toggleExpand={toggleFavoritesTreeExpand}
+          isExpanded={favoritesExpanded}
+          onToggleExpand={toggleFavoritesExpand}
+          onAddToFavorites={handleAddToFavorites}
+          onRemoveFromFavorites={handleRemoveFromFavorites}
+          onCreateChild={handleCreateChild}
+          onDeletePage={handleDeletePage}
+          isDeleting={deleteNote.isPending}
+          navigate={handleNavigateAndClose}
+          activeId={activeId}
+        />
+        <div className="sidebar-all-pages">
+          <Button
+            variant="ghost"
+            fullWidth
+            onClick={toggleAllPagesExpand}
+            className="sidebar-all-pages__header"
+          >
+            <FileStack className="sidebar-all-pages__icon size-4" />
+            <span>All pages</span>
+            <span
+              className={`sidebar-all-pages__chevron ${!allPagesExpanded ? 'sidebar-all-pages__chevron--collapsed' : ''}`}
+              aria-hidden
+            >
+              <RiArrowDownSLine />
+            </span>
+          </Button>
+          {allPagesExpanded && (
+            <DndContextWrapper onDragEnd={handleDragEnd}>
+              <div className="sidebar-tree">
+                {rootIds.map((nodeId) => (
+                  <TreeNode
+                    key={nodeId}
+                    nodeId={nodeId}
+                    depth={0}
+                    byId={byId}
+                    childrenByParent={childrenByParent}
+                    expandedSet={expanded}
+                    toggleExpand={toggleExpand}
+                    onCreateChild={handleCreateChild}
+                    onDeletePage={handleDeletePage}
+                    onMoveNote={handleMoveNote}
+                    onAddToFavorites={handleAddToFavorites}
+                    onRemoveFromFavorites={handleRemoveFromFavorites}
+                    isDeleting={deleteNote.isPending}
+                    navigate={handleNavigateAndClose}
+                    activeId={activeId}
+                  />
+                ))}
+                <DropZone id="root-end" variant="between" className="sidebar-root-end" />
+              </div>
+            </DndContextWrapper>
+          )}
+        </div>
+      </div>
+      <div className="sidebar-footer">
+        <Button
+          variant="ghost"
+          fullWidth
+          asChild
+          className={isTrashActive ? 'sidebar-trash-link sidebar-trash-link--active' : 'sidebar-trash-link'}
+        >
+          <Link to={notesRoutes.trash()} onClick={onNavigate}>
+            <Trash2 className="size-4" />
+            <span>Trash</span>
+          </Link>
         </Button>
-        {allPagesExpanded && (
-          <DndContextWrapper onDragEnd={handleDragEnd}>
-            <div className="sidebar-tree">
-              {rootIds.map((nodeId) => (
-                <TreeNode
-                  key={nodeId}
-                  nodeId={nodeId}
-                  depth={0}
-                  byId={byId}
-                  childrenByParent={childrenByParent}
-                  expandedSet={expanded}
-                  toggleExpand={toggleExpand}
-                  onCreateChild={handleCreateChild}
-                  onDeletePage={handleDeletePage}
-                  onMoveNote={handleMoveNote}
-                  onAddToFavorites={handleAddToFavorites}
-                  onRemoveFromFavorites={handleRemoveFromFavorites}
-                  isDeleting={deleteNote.isPending}
-                  navigate={handleNavigateAndClose}
-                  activeId={activeId}
-                />
-              ))}
-              <DropZone id="root-end" variant="between" className="sidebar-root-end" />
-            </div>
-          </DndContextWrapper>
-        )}
       </div>
     </div>
   );

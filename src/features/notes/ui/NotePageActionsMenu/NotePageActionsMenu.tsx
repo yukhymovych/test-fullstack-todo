@@ -157,7 +157,7 @@ export function NotePageActionsMenu({
         onClick={() => onDelete(noteId)}
         disabled={isDeleting || isBusy}
       >
-        Delete page
+        Move to trash
       </DropdownMenuItem>
     </DropdownMenuContent>
   );

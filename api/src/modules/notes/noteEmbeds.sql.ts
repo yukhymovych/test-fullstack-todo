@@ -17,7 +17,7 @@ export async function filterValidEmbeddedIds(
   );
   if (uniqueIds.length === 0) return [];
   const result = await pool.query(
-    'SELECT id FROM notes WHERE user_id = $1 AND id = ANY($2)',
+    'SELECT id FROM notes WHERE user_id = $1 AND id = ANY($2) AND trashed_at IS NULL',
     [userId, uniqueIds]
   );
   return result.rows.map((r) => r.id);
@@ -88,7 +88,10 @@ export async function getNoteEmbeds(
   const result = await pool.query(
     `SELECT n.id, n.title, n.updated_at
      FROM note_embeds ne
-     JOIN notes n ON n.id = ne.embedded_note_id AND n.user_id = ne.user_id
+     JOIN notes n
+       ON n.id = ne.embedded_note_id
+      AND n.user_id = ne.user_id
+      AND n.trashed_at IS NULL
      WHERE ne.user_id = $1 AND ne.host_note_id = $2
      ORDER BY ne.created_at ASC`,
     [userId, hostNoteId]

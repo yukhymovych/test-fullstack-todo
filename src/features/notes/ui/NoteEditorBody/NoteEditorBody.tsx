@@ -1,9 +1,10 @@
+import { useCallback, useState } from 'react';
 import { BlockNoteView } from '@blocknote/mantine';
 import { FormattingToolbarController, SuggestionMenuController } from '@blocknote/react';
 import { useMediaQuery } from '@mantine/hooks';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/mantine/style.css';
-import { NoteTitlesContext } from '../../blocks/EmbeddedPageBlock';
+import { NoteTitlesContext } from '../../blocks/embeddedPage.context';
 import type { NoteEditorBodyProps } from './NoteEditorBody.types';
 import { MobileBlockToolbar } from './MobileBlockToolbar';
 import { SelectionQaToolbar } from './SelectionQaToolbar';
@@ -20,10 +21,15 @@ export function NoteEditorBody({
   isStudyItemActive,
 }: NoteEditorBodyProps) {
   const isMobile = useMediaQuery('(max-width: 767px)');
+  const [interactionVersion, setInteractionVersion] = useState(0);
+
+  const handleEditorPointerDown = useCallback(() => {
+    setInteractionVersion((current) => current + 1);
+  }, []);
 
   return (
     <NoteTitlesContext.Provider value={noteTitlesMap}>
-      <div className="note-editor-body">
+      <div className="note-editor-body" onPointerDownCapture={handleEditorPointerDown}>
         <BlockNoteView
           editor={editor}
           slashMenu={false}
@@ -31,7 +37,10 @@ export function NoteEditorBody({
           sideMenu={!isMobile}
         >
           <SuggestionMenuController triggerCharacter="/" getItems={getSlashMenuItems} />
-          <MobileBlockToolbar isMobile={!!isMobile} />
+          <MobileBlockToolbar
+            isMobile={!!isMobile}
+            interactionVersion={interactionVersion}
+          />
           <FormattingToolbarController
             formattingToolbar={(props) => (
               <SelectionQaToolbar
