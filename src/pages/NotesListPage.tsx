@@ -18,7 +18,11 @@ export function NotesListPage() {
     isLoading,
     error,
     createMutation,
+    shouldShowLearningSessionButton,
+    learningSessionButtonLabel,
+    isLearningSessionButtonDisabled,
     handleNewNote,
+    handleLearningSessionClick,
     handleNoteClick,
     handleMainLearningSessionClick,
   } = useNotesListPage();
@@ -38,7 +42,11 @@ export function NotesListPage() {
       error={error}
       createError={createMutation.error}
       createPending={createMutation.isPending}
+      showLearningSessionButton={shouldShowLearningSessionButton}
+      learningSessionButtonLabel={learningSessionButtonLabel}
+      learningSessionButtonDisabled={isLearningSessionButtonDisabled}
       onNewNote={handleNewNote}
+      onLearningSessionClick={handleLearningSessionClick}
       onNoteClick={handleNoteClick}
       onMainLearningSessionClick={handleMainLearningSessionClick}
     />

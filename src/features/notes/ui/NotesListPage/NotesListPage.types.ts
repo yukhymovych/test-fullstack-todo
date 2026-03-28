@@ -20,7 +20,11 @@ export interface NotesListPageProps {
   error: Error | null;
   createError: Error | null;
   createPending: boolean;
+  showLearningSessionButton: boolean;
+  learningSessionButtonLabel: string;
+  learningSessionButtonDisabled: boolean;
   onNewNote: () => void;
+  onLearningSessionClick: () => void;
   onNoteClick: (noteId: string) => void;
   onMainLearningSessionClick: () => void;
 }
