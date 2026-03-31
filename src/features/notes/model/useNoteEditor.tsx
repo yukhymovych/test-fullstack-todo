@@ -29,7 +29,7 @@ import { useNoteImportExport } from './useNoteImportExport';
 
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 const MIN_SELECTION_TEXT_LENGTH = 30;
-const HIDDEN_SLASH_MENU_ITEM_KEYS = new Set(['image', 'video', 'audio', 'file', 'emoji']);
+const HIDDEN_SLASH_MENU_ITEM_TITLES = new Set(['image', 'video', 'audio', 'file', 'emoji']);
 
 export function useNoteEditor(id: string | undefined) {
   const navigate = useNavigate();
@@ -193,7 +193,7 @@ export function useNoteEditor(id: string | undefined) {
     async (query: string) => {
       const { getDefaultReactSlashMenuItems } = await import('@blocknote/react');
       const defaultItems = getDefaultReactSlashMenuItems(editor!).filter(
-        (item) => !HIDDEN_SLASH_MENU_ITEM_KEYS.has(String(item.key))
+        (item) => !HIDDEN_SLASH_MENU_ITEM_TITLES.has(item.title.toLowerCase())
       );
       const pageItem = {
         title: 'Page',
