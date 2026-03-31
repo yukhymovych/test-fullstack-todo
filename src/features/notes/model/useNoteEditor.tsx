@@ -29,6 +29,7 @@ import { useNoteImportExport } from './useNoteImportExport';
 
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 const MIN_SELECTION_TEXT_LENGTH = 30;
+const HIDDEN_SLASH_MENU_ITEM_KEYS = new Set(['image', 'video', 'audio', 'file', 'emoji']);
 
 export function useNoteEditor(id: string | undefined) {
   const navigate = useNavigate();
@@ -94,6 +95,28 @@ export function useNoteEditor(id: string | undefined) {
       note.title === DEFAULT_NOTE_TITLE || !note.title ? '' : note.title;
     setTitle(displayTitle);
   }, [note]);
+
+  useEffect(() => {
+    if (!note || !editor) return;
+
+    const nextBlocks = ensureBlocksArray(note.rich_content);
+    const nextSerialized = JSON.stringify(nextBlocks);
+    const currentSerialized = JSON.stringify(editor.document);
+
+    if (currentSerialized === nextSerialized) {
+      return;
+    }
+
+    const currentBlockIds = editor.document.map((block) => block.id);
+    if (currentBlockIds.length === 0) {
+      return;
+    }
+
+    // Keep the editor in sync when the page changes remotely, such as
+    // when drag-and-drop rewrites embedded child blocks on a parent page.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    editor.replaceBlocks(currentBlockIds, nextBlocks as any);
+  }, [editor, note]);
 
   const chromeTitle =
     title.trim() ||
@@ -169,7 +192,9 @@ export function useNoteEditor(id: string | undefined) {
   const getSlashMenuItems = useCallback(
     async (query: string) => {
       const { getDefaultReactSlashMenuItems } = await import('@blocknote/react');
-      const defaultItems = getDefaultReactSlashMenuItems(editor!);
+      const defaultItems = getDefaultReactSlashMenuItems(editor!).filter(
+        (item) => !HIDDEN_SLASH_MENU_ITEM_KEYS.has(String(item.key))
+      );
       const pageItem = {
         title: 'Page',
         subtext: 'Embed a new page',

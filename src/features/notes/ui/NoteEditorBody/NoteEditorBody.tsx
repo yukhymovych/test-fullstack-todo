@@ -23,13 +23,13 @@ export function NoteEditorBody({
   const isMobile = useMediaQuery('(max-width: 767px)');
   const [interactionVersion, setInteractionVersion] = useState(0);
 
-  const handleEditorPointerDown = useCallback(() => {
+  const handleEditorClick = useCallback(() => {
     setInteractionVersion((current) => current + 1);
   }, []);
 
   return (
     <NoteTitlesContext.Provider value={noteTitlesMap}>
-      <div className="note-editor-body" onPointerDownCapture={handleEditorPointerDown}>
+      <div className="note-editor-body" onClickCapture={handleEditorClick}>
         <BlockNoteView
           editor={editor}
           slashMenu={false}

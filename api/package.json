@@ -5,6 +5,7 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "test": "tsx --test src/modules/learning/learning.undo.test.ts src/modules/notes/trash.logic.test.ts",
+    "simulate:fsrs": "tsx src/modules/learning/fsrsLight.simulation.cli.ts",
     "start": "node dist/server.js",
     "migrate:up": "node-pg-migrate up",
     "migrate:down": "node-pg-migrate down",

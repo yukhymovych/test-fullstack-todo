@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import * as notesApi from '../api/notesApi';
 import { LEARNING_KEYS } from '@/features/learning/model/learning.queries';
+import type { Note, NoteListItem } from './types';
 
 const NOTES_KEY = ['notes'];
 export const NOTE_KEY = (id: string) => ['notes', id];
@@ -12,6 +13,34 @@ function invalidateNoteCollections(queryClient: QueryClient) {
   queryClient.invalidateQueries({ queryKey: NOTES_KEY });
   queryClient.invalidateQueries({ queryKey: TRASH_KEY });
   queryClient.invalidateQueries({ queryKey: LEARNING_KEYS.all });
+}
+
+function invalidateNotePage(
+  queryClient: QueryClient,
+  noteId: string | null | undefined
+) {
+  if (!noteId) return;
+
+  queryClient.invalidateQueries({ queryKey: NOTE_KEY(noteId) });
+  queryClient.invalidateQueries({ queryKey: NOTE_EMBEDS_KEY(noteId) });
+}
+
+function getCachedParentId(
+  queryClient: QueryClient,
+  noteId: string
+): string | null | undefined {
+  const cachedNote = queryClient.getQueryData<Pick<Note, 'parent_id'>>(NOTE_KEY(noteId));
+  if (cachedNote?.parent_id !== undefined) {
+    return cachedNote.parent_id ?? null;
+  }
+
+  const cachedNotes = queryClient.getQueryData<NoteListItem[]>(NOTES_KEY);
+  const cachedListItem = cachedNotes?.find((note) => note.id === noteId);
+  if (cachedListItem) {
+    return cachedListItem.parent_id ?? null;
+  }
+
+  return undefined;
 }
 
 export function useNotesQuery() {
@@ -50,9 +79,7 @@ export function useCreateNote() {
     mutationFn: notesApi.createNote,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: NOTES_KEY });
-      if (variables.parent_id) {
-        queryClient.invalidateQueries({ queryKey: NOTE_EMBEDS_KEY(variables.parent_id) });
-      }
+      invalidateNotePage(queryClient, variables.parent_id);
     },
   });
 }
@@ -79,9 +106,11 @@ export function useTrashNote() {
   return useMutation({
     mutationFn: notesApi.trashNote,
     onSuccess: (_, noteId) => {
+      const parentId = getCachedParentId(queryClient, noteId);
       invalidateNoteCollections(queryClient);
       queryClient.invalidateQueries({ queryKey: NOTE_KEY(noteId) });
       queryClient.invalidateQueries({ queryKey: TRASH_NOTE_KEY(noteId) });
+      invalidateNotePage(queryClient, parentId);
     },
   });
 }
@@ -94,6 +123,7 @@ export function useRestoreNote() {
       invalidateNoteCollections(queryClient);
       queryClient.invalidateQueries({ queryKey: NOTE_KEY(note.id) });
       queryClient.invalidateQueries({ queryKey: TRASH_NOTE_KEY(note.id) });
+      invalidateNotePage(queryClient, note.parent_id);
     },
   });
 }
@@ -146,16 +176,8 @@ export function useMoveNote() {
     onSuccess: (_, variables: MoveNoteVariables) => {
       queryClient.invalidateQueries({ queryKey: NOTES_KEY });
       queryClient.invalidateQueries({ queryKey: NOTE_KEY(variables.id) });
-      if (variables.payload.new_parent_id) {
-        queryClient.invalidateQueries({
-          queryKey: NOTE_EMBEDS_KEY(variables.payload.new_parent_id),
-        });
-      }
-      if (variables.oldParentId) {
-        queryClient.invalidateQueries({
-          queryKey: NOTE_EMBEDS_KEY(variables.oldParentId),
-        });
-      }
+      invalidateNotePage(queryClient, variables.payload.new_parent_id);
+      invalidateNotePage(queryClient, variables.oldParentId);
     },
   });
 }

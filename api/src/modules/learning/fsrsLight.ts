@@ -14,8 +14,8 @@ const INTERVAL_MAX_DAYS = 180;
 const STABILITY_MULTIPLIERS: Record<Grade, number> = {
   again: 0.55,
   hard: 1,
-  good: 1.2,
-  easy: 1.45,
+  good: 1.25,
+  easy: 1.5,
 };
 
 const DIFFICULTY_DELTAS: Record<Grade, number> = {

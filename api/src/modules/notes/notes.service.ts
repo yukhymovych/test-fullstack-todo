@@ -159,6 +159,30 @@ export async function deleteNote(id: string, userId: string) {
   await learningSQL.markSessionItemsUnavailableByNoteIds(subtreeIds);
 
   const trashedIds = await notesSQL.trashSubtree(id, userId, new Date());
+  if (trashedIds.length > 0 && note.parent_id) {
+    const parentNote = await notesSQL.getNoteById(note.parent_id, userId);
+    if (parentNote && Array.isArray(parentNote.rich_content)) {
+      const updatedBlocks = removeEmbeddedBlock(
+        parentNote.rich_content as BlockLike[],
+        id
+      );
+      const contentText = extractContentText(updatedBlocks);
+      await notesSQL.updateNote(
+        note.parent_id,
+        userId,
+        parentNote.title,
+        updatedBlocks,
+        contentText,
+        undefined
+      );
+      const embeddedIds = extractEmbeddedNoteIds(updatedBlocks);
+      const validIds = await noteEmbedsSQL.filterValidEmbeddedIds(
+        userId,
+        embeddedIds
+      );
+      await noteEmbedsSQL.replaceNoteEmbeds(userId, note.parent_id, validIds);
+    }
+  }
   return trashedIds.length > 0;
 }
 
@@ -179,6 +203,32 @@ export async function restoreNote(id: string, userId: string) {
     restoredParentId,
     nextSortOrder
   );
+
+  if (restoredIds.length > 0 && restoredParentId) {
+    const parentNote = await notesSQL.getNoteById(restoredParentId, userId);
+    if (parentNote && Array.isArray(parentNote.rich_content)) {
+      const updatedBlocks = insertEmbeddedBlockAt(
+        parentNote.rich_content as BlockLike[],
+        id,
+        nextSortOrder
+      );
+      const contentText = extractContentText(updatedBlocks);
+      await notesSQL.updateNote(
+        restoredParentId,
+        userId,
+        parentNote.title,
+        updatedBlocks,
+        contentText,
+        undefined
+      );
+      const embeddedIds = extractEmbeddedNoteIds(updatedBlocks);
+      const validIds = await noteEmbedsSQL.filterValidEmbeddedIds(
+        userId,
+        embeddedIds
+      );
+      await noteEmbedsSQL.replaceNoteEmbeds(userId, restoredParentId, validIds);
+    }
+  }
 
   return restoredIds.length > 0
     ? await notesSQL.getNoteById(id, userId)
