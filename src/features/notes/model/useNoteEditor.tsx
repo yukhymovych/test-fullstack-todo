@@ -30,6 +30,10 @@ import { useNoteImportExport } from './useNoteImportExport';
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 const MIN_SELECTION_TEXT_LENGTH = 30;
 const HIDDEN_SLASH_MENU_ITEM_TITLES = new Set(['image', 'video', 'audio', 'file', 'emoji']);
+type LocalSaveVersion = {
+  id: string;
+  updatedAt: string;
+};
 
 export function useNoteEditor(id: string | undefined) {
   const navigate = useNavigate();
@@ -48,6 +52,7 @@ export function useNoteEditor(id: string | undefined) {
   const [title, setTitle] = useState('');
   const [userEditedTitle, setUserEditedTitle] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  const lastLocalSaveVersionRef = useRef<LocalSaveVersion | null>(null);
 
   const noteTitlesMap = useMemo(() => {
     const map = new Map<string, string>();
@@ -68,10 +73,14 @@ export function useNoteEditor(id: string | undefined) {
     setSaveStatus('saving');
     try {
       const richContent = JSON.parse(JSON.stringify(editor.document));
-      await updateMutation.mutateAsync({
+      const savedNote = await updateMutation.mutateAsync({
         id,
         payload: { title: title.trim() || DEFAULT_NOTE_TITLE, rich_content: richContent },
       });
+      lastLocalSaveVersionRef.current = {
+        id: savedNote.id,
+        updatedAt: savedNote.updated_at,
+      };
       setSaveStatus('saved');
       setTimeout(() => setSaveStatus('idle'), 2000);
     } catch {
@@ -87,6 +96,7 @@ export function useNoteEditor(id: string | undefined) {
 
   useEffect(() => {
     setUserEditedTitle(false);
+    lastLocalSaveVersionRef.current = null;
   }, [id]);
 
   useEffect(() => {
@@ -98,6 +108,15 @@ export function useNoteEditor(id: string | undefined) {
 
   useEffect(() => {
     if (!note || !editor) return;
+
+    const lastLocalSaveVersion = lastLocalSaveVersionRef.current;
+    if (
+      lastLocalSaveVersion &&
+      lastLocalSaveVersion.id === note.id &&
+      lastLocalSaveVersion.updatedAt === note.updated_at
+    ) {
+      return;
+    }
 
     const nextBlocks = ensureBlocksArray(note.rich_content);
     const nextSerialized = JSON.stringify(nextBlocks);

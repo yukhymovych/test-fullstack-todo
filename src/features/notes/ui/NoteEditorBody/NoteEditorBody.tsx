@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, type MouseEvent as ReactMouseEvent } from 'react';
 import { BlockNoteView } from '@blocknote/mantine';
 import { FormattingToolbarController, SuggestionMenuController } from '@blocknote/react';
 import { useMediaQuery } from '@mantine/hooks';
@@ -23,7 +23,22 @@ export function NoteEditorBody({
   const isMobile = useMediaQuery('(max-width: 767px)');
   const [interactionVersion, setInteractionVersion] = useState(0);
 
-  const handleEditorClick = useCallback(() => {
+  const handleEditorClick = useCallback((event: ReactMouseEvent<HTMLDivElement>) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+
+    // Ignore clicks coming from floating editor controls so they can handle
+    // the interaction without being remounted mid-click.
+    if (
+      target.closest('.bn-toolbar') ||
+      target.closest('.bn-menu-dropdown') ||
+      target.closest('.mobile-block-toolbar-wrap')
+    ) {
+      return;
+    }
+
     setInteractionVersion((current) => current + 1);
   }, []);
 
