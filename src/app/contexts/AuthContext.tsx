@@ -2,6 +2,7 @@ import {
   createContext,
   useContext,
   useEffect,
+  useState,
   type ReactNode,
 } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -10,6 +11,7 @@ import { setTokenProvider } from '../../shared/api/http';
 interface AuthContextValue {
   isAuthed: boolean;
   isLoading: boolean;
+  isApiReady: boolean;
   user: { email?: string; name?: string; picture?: string } | null;
   login: () => void;
   logout: () => void;
@@ -26,15 +28,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     logout: auth0Logout,
     getAccessTokenSilently,
   } = useAuth0();
+  const [isApiReady, setIsApiReady] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      setTokenProvider(() => getAccessTokenSilently());
-    } else {
-      setTokenProvider(null);
+    let isCancelled = false;
+
+    async function syncTokenProvider() {
+      if (isLoading) {
+        setIsApiReady(false);
+        return;
+      }
+
+      if (!isAuthenticated) {
+        setTokenProvider(null);
+        setIsApiReady(true);
+        return;
+      }
+
+      const provider = () => getAccessTokenSilently();
+      setTokenProvider(provider);
+      setIsApiReady(false);
+
+      try {
+        await provider();
+        if (isCancelled) {
+          return;
+        }
+      } catch {
+        if (isCancelled) {
+          return;
+        }
+      }
+
+      if (!isCancelled) {
+        setIsApiReady(true);
+      }
     }
-    return () => setTokenProvider(null);
-  }, [isAuthenticated, getAccessTokenSilently]);
+
+    void syncTokenProvider();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [isAuthenticated, isLoading, getAccessTokenSilently]);
 
   const login = () => {
     loginWithRedirect();
@@ -47,6 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value: AuthContextValue = {
     isAuthed: isAuthenticated,
     isLoading,
+    isApiReady,
     user: user ? { email: user.email, name: user.name, picture: user.picture } : null,
     login,
     logout,

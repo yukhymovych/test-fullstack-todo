@@ -11,9 +11,9 @@ import { useAuth } from './app/contexts/AuthContext';
 import './App.css';
 
 function RootRedirect() {
-  const { isAuthed, isLoading } = useAuth();
+  const { isAuthed, isLoading, isApiReady } = useAuth();
 
-  if (isLoading) {
+  if (isLoading || (isAuthed && !isApiReady)) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="text-muted-foreground text-sm">Loading...</div>

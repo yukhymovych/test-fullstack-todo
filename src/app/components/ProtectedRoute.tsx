@@ -6,15 +6,15 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthed, isLoading, login } = useAuth();
+  const { isAuthed, isLoading, isApiReady, login } = useAuth();
 
   useEffect(() => {
-    if (!isAuthed && !isLoading) {
+    if (!isAuthed && !isLoading && isApiReady) {
       login();
     }
-  }, [isAuthed, isLoading, login]);
+  }, [isAuthed, isLoading, isApiReady, login]);
 
-  if (isLoading) {
+  if (isLoading || (isAuthed && !isApiReady)) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="text-muted-foreground text-sm">Loading...</div>
