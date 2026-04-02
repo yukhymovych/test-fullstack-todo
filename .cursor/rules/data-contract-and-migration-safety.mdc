@@ -1,8 +1,7 @@
 ---
 description: Protect persistence shape, API contracts, data transformations, and deletion semantics
-alwaysApply: true
+alwaysApply: false
 ---
-
 # Data Contract and Migration Safety
 
 Use these rules whenever a change touches persistence, API boundaries, mapping, or deletion flows.

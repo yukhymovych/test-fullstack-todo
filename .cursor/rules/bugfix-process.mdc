@@ -1,8 +1,7 @@
 ---
 description: Enforce root-cause-first bug fixing with regression containment and minimal-change discipline
-alwaysApply: true
+alwaysApply: false
 ---
-
 # Bug Fix Process
 
 Use this process for any bug fix, regression fix, or behavior correction.

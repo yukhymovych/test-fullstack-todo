@@ -1,8 +1,6 @@
 ---
-description: Supplemental frontend rules for layering, exhaustive state handling, and implementation discipline
-alwaysApply: true
+alwaysApply: false
 ---
-
 # Frontend Architecture Supplement
 
 This file adds constraints that must be enforced alongside the main architecture rules.

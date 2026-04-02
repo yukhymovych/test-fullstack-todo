@@ -1,8 +1,7 @@
 ---
 description: Enforce safer query-key, invalidation, cache, and test discipline for Rememo
-alwaysApply: true
+alwaysApply: false
 ---
-
 # React Query, Cache, and Testing Safety
 
 ## 1) Query Key Discipline

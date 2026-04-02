@@ -1,8 +1,7 @@
 ---
 description: Require impact analysis, minimal diffs, regression checks, and verification before considering a task done
-alwaysApply: true
+alwaysApply: false
 ---
-
 # Change Safety and Regression Rules
 
 Use these rules for all feature work, refactors, and bug fixes.

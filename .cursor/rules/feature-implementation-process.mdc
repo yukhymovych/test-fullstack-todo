@@ -1,8 +1,6 @@
 ---
-description: Enforce phased delivery for new features with safety gates, verification, and minimal change scope
-alwaysApply: true
+alwaysApply: false
 ---
-
 # New Feature Delivery Process
 
 Use this process for any new feature, feature extension, or meaningful behavior change.
