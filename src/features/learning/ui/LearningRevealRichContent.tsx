@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { BlockNoteView } from '@blocknote/mantine';
 import { useCreateBlockNote } from '@blocknote/react';
+import { useTranslation } from 'react-i18next';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/mantine/style.css';
 import { NoteTitlesContext } from '@/features/notes/blocks/embeddedPage.context';
@@ -29,6 +30,7 @@ export function LearningRevealRichContent({
   contentKey = '',
   studyQuestions = [],
 }: LearningRevealRichContentProps) {
+  const { t } = useTranslation('learning');
   const schema = useMemo(() => createNoteEditorSchema(), []);
   const initialContent = useMemo(
     () => ensureBlocksArray(richContent),
@@ -51,7 +53,7 @@ export function LearningRevealRichContent({
             onClick={onReveal}
             className="learning-reveal__show-btn"
           >
-            Show text
+            {t('reveal.showText', { defaultValue: 'Show text' })}
           </Button>
           <StudyQuestionsAccordion pairs={studyQuestions} />
         </>

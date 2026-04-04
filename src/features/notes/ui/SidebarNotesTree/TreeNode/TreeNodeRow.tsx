@@ -2,6 +2,7 @@ import type { NoteItem } from '../treeUtils';
 import { DEFAULT_NOTE_TITLE } from '../../../model/types';
 import { NotePageActionsMenu } from '../../NotePageActionsMenu';
 import { useDescendantsWithLearningCount } from '@/features/learning/model/useDescendantsWithLearningCount';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   DropdownMenu,
@@ -50,6 +51,7 @@ export function TreeNodeRow({
   rowRef,
   rowStyle,
 }: TreeNodeRowProps) {
+  const { t } = useTranslation('notes');
   const paddingLeft = 12 + depth * 14;
   const { data: descendantsWithLearning } = useDescendantsWithLearningCount(
     hasChildren ? nodeId : undefined
@@ -120,7 +122,7 @@ export function TreeNodeRow({
               variant="ghost"
               icon
               className="menu-trigger-btn"
-              title="Page options"
+              title={t('editor.pageOptions')}
               style={{ opacity: 0.7 }}
             >
               <MoreVertical className="size-4" />

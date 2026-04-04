@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   DropdownMenuItem,
   DropdownMenuSeparator,
@@ -15,6 +16,8 @@ interface NoteImportExportMenuSectionProps {
 export function NoteImportExportMenuSection({
   importExport,
 }: NoteImportExportMenuSectionProps) {
+  const { t } = useTranslation('notes');
+
   if (!importExport) {
     return null;
   }
@@ -38,27 +41,27 @@ export function NoteImportExportMenuSection({
       {importExport.canExport ? (
         <DropdownMenuSub>
           <DropdownMenuSubTrigger disabled={actionDisabled}>
-            Export
+            {t('menu.export')}
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
             <DropdownMenuItem
               disabled={actionDisabled}
               onClick={() => void importExport.handleExport('html')}
             >
-              As HTML
+              {t('menu.exportAsHtml')}
             </DropdownMenuItem>
             <DropdownMenuItem
               disabled={actionDisabled}
               onClick={() => void importExport.handleExport('txt')}
             >
-              As TXT
+              {t('menu.exportAsTxt')}
             </DropdownMenuItem>
             {importExport.canExportPdf ? (
               <DropdownMenuItem
                 disabled={actionDisabled}
                 onClick={() => void importExport.handleExport('pdf')}
               >
-                As PDF
+                {t('menu.exportAsPdf')}
               </DropdownMenuItem>
             ) : null}
             {shouldShowTreeExport
@@ -68,7 +71,7 @@ export function NoteImportExportMenuSection({
                     disabled={actionDisabled}
                     onClick={() => void importExport.handleExportTree(format)}
                   >
-                    {`Tree as ${format.toUpperCase()}`}
+                    {t('menu.treeAsFormat', { format: format.toUpperCase() })}
                   </DropdownMenuItem>
                 ))
               : null}
@@ -82,7 +85,7 @@ export function NoteImportExportMenuSection({
           handleOpenFilePicker();
         }}
       >
-        Import HTML/TXT/DOCX
+        {t('menu.importHtmlTxtDocx')}
       </DropdownMenuItem>
       <input
         ref={fileInputRef}

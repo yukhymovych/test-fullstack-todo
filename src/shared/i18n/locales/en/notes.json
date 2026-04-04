@@ -7,6 +7,54 @@
     "favorites": "Favorites",
     "recentlyVisited": "Recently visited"
   },
+  "editor": {
+    "saveStatus": {
+      "saving": "Saving...",
+      "saved": "Saved",
+      "error": "Error saving",
+      "idle": "\u00a0"
+    },
+    "pageOptions": "Page options",
+    "nextReview": "Next review: {{relative}} ({{date}})",
+    "whyToday": "Why today?",
+    "whyTodayAria": "Why review is due today",
+    "lastReview": "Last review: {{value}}",
+    "stability": "Stability: {{value}} days",
+    "difficulty": "Difficulty: {{value}} / 10",
+    "lastGrade": "Last grade: {{value}}",
+    "scheduledInterval": "Scheduled interval: {{value}}",
+    "notAvailable": "N/A",
+    "today": "Today",
+    "daysAgo_one": "{{count}} day ago",
+    "daysAgo_other": "{{count}} days ago",
+    "intervalDays_one": "{{count}} day",
+    "intervalDays_other": "{{count}} days"
+  },
+  "menu": {
+    "addToFavorites": "Add to Favorites",
+    "removeFromFavorites": "Remove from Favorites",
+    "removeFromLearning": "Remove from learning",
+    "setAsLearningPage": "Set as learning page",
+    "setLearningThisPageOnly": "Add this page only",
+    "setLearningThisPageAndDescendants": "Add this page and descendants",
+    "setLearningDescendantsOnly": "Add only all descendants",
+    "startScopedLearningSession": "Start scoped learning session",
+    "starting": "Starting...",
+    "deepDiveAllChildren": "Deep dive (all children)",
+    "dueOnlyTodaysReview": "Due only (today's review)",
+    "addNewPage": "Add new page",
+    "moveToTrash": "Move to trash",
+    "export": "Export",
+    "exportAsHtml": "As HTML",
+    "exportAsTxt": "As TXT",
+    "exportAsPdf": "As PDF",
+    "treeAsFormat": "Tree as {{format}}",
+    "importHtmlTxtDocx": "Import HTML/TXT/DOCX",
+    "toasts": {
+      "noEligiblePages": "No eligible pages to learn. All child pages have already been studied today.",
+      "noDueChildPages": "No due child pages to learn right now."
+    }
+  },
   "list": {
     "loading": "Loading data...",
     "errorLoading": "Error loading data: {{message}}",
@@ -22,7 +70,48 @@
     "startLearningSession": "Start learning session"
   },
   "confirm": {
-    "trashPage": "Move this page and its child pages to trash?"
+    "trashPage": "Move this page and its child pages to trash?",
+    "restorePage": "Restore this page and its child pages?",
+    "deletePagePermanently": "Permanently delete this page and its child pages?"
+  },
+  "trash": {
+    "title": "Trash",
+    "titleWithNote": "Trash: {{title}}",
+    "subtitle": "Pages stay here for 10 days before permanent deletion.",
+    "empty": "Trash is empty.",
+    "placeholder": "Open a trashed page to preview, restore, or permanently delete it.",
+    "loading": "Loading trash...",
+    "loadingPreview": "Loading page preview...",
+    "daysLeft_one": "{{count}} day left",
+    "daysLeft_other": "{{count}} days left",
+    "deleteInDays_one": "Will be permanently deleted in {{count}} day.",
+    "deleteInDays_other": "Will be permanently deleted in {{count}} days.",
+    "restore": "Restore",
+    "deletePermanently": "Delete permanently",
+    "restoreAria": "Restore page",
+    "deletePermanentlyAria": "Permanently delete page",
+    "expandSubtree": "Expand subtree",
+    "collapseSubtree": "Collapse subtree",
+    "noChildren": "No children"
+  },
+  "importExport": {
+    "openBeforeExporting": "Open a page before exporting.",
+    "openBeforeImporting": "Open a page before importing.",
+    "preparingPdf": "Preparing PDF...",
+    "exporting": "Exporting...",
+    "exportingTree": "Exporting tree...",
+    "openedPrintDialog": "Opened the browser print dialog.",
+    "exportedFile": "Exported {{fileName}}",
+    "exportedFileWithErrors_one": "Exported {{fileName}} with {{count}} error.",
+    "exportedFileWithErrors_other": "Exported {{fileName}} with {{count}} errors.",
+    "couldNotExportPage": "Could not export this page.",
+    "noChildPagesToExport": "This page has no child pages to export.",
+    "couldNotExportTree": "Could not export this page tree.",
+    "importing": "Importing...",
+    "nothingImportable": "Nothing importable was found.",
+    "importedBlocks_one": "Imported {{count}} block.",
+    "importedBlocks_other": "Imported {{count}} blocks.",
+    "couldNotImportFile": "Could not import this file."
   },
   "untitled": "Untitled"
 }

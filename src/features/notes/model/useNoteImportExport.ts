@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { BlockNoteEditor } from '@blocknote/core';
+import i18n from '@/shared/i18n/i18n';
 import * as notesApi from '../api/notesApi';
 import { NOTE_KEY } from './useNotes';
 import {
@@ -72,17 +73,21 @@ export function useNoteImportExport({
     async (format: ExportFormat) => {
       if (isBusy) return;
       if (!canExport || !noteId) {
-        showToast('Open a page before exporting.');
+        showToast(i18n.t('importExport.openBeforeExporting', { ns: 'notes' }));
         return;
       }
       const activeEditor = editor;
       if (!activeEditor) {
-        showToast('Open a page before exporting.');
+        showToast(i18n.t('importExport.openBeforeExporting', { ns: 'notes' }));
         return;
       }
 
       setIsExporting(true);
-      setPendingLabel(format === 'pdf' ? 'Preparing PDF...' : 'Exporting...');
+      setPendingLabel(
+        format === 'pdf'
+          ? i18n.t('importExport.preparingPdf', { ns: 'notes' })
+          : i18n.t('importExport.exporting', { ns: 'notes' })
+      );
       try {
         if (format === 'pdf') {
           const printWindow = window.open('', '_blank');
@@ -102,7 +107,7 @@ export function useNoteImportExport({
             title: artifact.title,
             printWindow,
           });
-          showToast('Opened the browser print dialog.');
+          showToast(i18n.t('importExport.openedPrintDialog', { ns: 'notes' }));
           return;
         }
 
@@ -126,10 +131,12 @@ export function useNoteImportExport({
           mimeType: artifact.mimeType,
           content: artifact.content,
         });
-        showToast(`Exported ${artifact.fileName}`);
+        showToast(i18n.t('importExport.exportedFile', { ns: 'notes', fileName: artifact.fileName }));
       } catch (error) {
         showToast(
-          error instanceof Error ? error.message : 'Could not export this page.'
+          error instanceof Error
+            ? error.message
+            : i18n.t('importExport.couldNotExportPage', { ns: 'notes' })
         );
       } finally {
         setIsExporting(false);
@@ -143,12 +150,12 @@ export function useNoteImportExport({
     async (format: 'html' | 'txt') => {
       if (isBusy) return;
       if (!noteId || !notes || !canExportTree) {
-        showToast('This page has no child pages to export.');
+        showToast(i18n.t('importExport.noChildPagesToExport', { ns: 'notes' }));
         return;
       }
 
       setIsExporting(true);
-      setPendingLabel('Exporting tree...');
+      setPendingLabel(i18n.t('importExport.exportingTree', { ns: 'notes' }));
       try {
         const artifact = await exportSubtreeAsZip({
           rootNoteId: noteId,
@@ -173,14 +180,20 @@ export function useNoteImportExport({
 
         if (artifact.failures.length > 0) {
           showToast(
-            `Exported ${artifact.fileName} with ${artifact.failures.length} error${artifact.failures.length === 1 ? '' : 's'}.`
+            i18n.t('importExport.exportedFileWithErrors', {
+              ns: 'notes',
+              fileName: artifact.fileName,
+              count: artifact.failures.length,
+            })
           );
         } else {
-          showToast(`Exported ${artifact.fileName}`);
+          showToast(i18n.t('importExport.exportedFile', { ns: 'notes', fileName: artifact.fileName }));
         }
       } catch (error) {
         showToast(
-          error instanceof Error ? error.message : 'Could not export this page tree.'
+          error instanceof Error
+            ? error.message
+            : i18n.t('importExport.couldNotExportTree', { ns: 'notes' })
         );
       } finally {
         setIsExporting(false);
@@ -195,12 +208,12 @@ export function useNoteImportExport({
       if (!file) return;
       if (isBusy) return;
       if (!canImport || !editor) {
-        showToast('Open a page before importing.');
+        showToast(i18n.t('importExport.openBeforeImporting', { ns: 'notes' }));
         return;
       }
 
       setIsImporting(true);
-      setPendingLabel('Importing...');
+      setPendingLabel(i18n.t('importExport.importing', { ns: 'notes' }));
       try {
         const result = await importFileIntoEditor({
           editor,
@@ -209,13 +222,20 @@ export function useNoteImportExport({
         });
 
         if (result.appendedBlockCount === 0) {
-          showToast('Nothing importable was found.');
+          showToast(i18n.t('importExport.nothingImportable', { ns: 'notes' }));
         } else {
-          showToast(`Imported ${result.appendedBlockCount} block${result.appendedBlockCount === 1 ? '' : 's'}.`);
+          showToast(
+            i18n.t('importExport.importedBlocks', {
+              ns: 'notes',
+              count: result.appendedBlockCount,
+            })
+          );
         }
       } catch (error) {
         showToast(
-          error instanceof Error ? error.message : 'Could not import this file.'
+          error instanceof Error
+            ? error.message
+            : i18n.t('importExport.couldNotImportFile', { ns: 'notes' })
         );
       } finally {
         setIsImporting(false);

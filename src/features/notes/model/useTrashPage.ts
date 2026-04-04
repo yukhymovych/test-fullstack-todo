@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   usePermanentDeleteNote,
   useRestoreNote,
@@ -15,6 +16,7 @@ const TRASH_RETENTION_DAYS = 10;
 
 export function useTrashPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation('notes');
   const { id: selectedId } = useParams<{ id: string }>();
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const { data: trashedNotes = [], isLoading, error } = useTrashNotesQuery();
@@ -89,19 +91,19 @@ export function useTrashPage() {
 
   const handleRestore = useCallback(
     async (noteId: string) => {
-      if (!window.confirm('Restore this page and its child pages?')) {
+      if (!window.confirm(t('confirm.restorePage'))) {
         return;
       }
 
       const restored = await restoreNote.mutateAsync(noteId);
       navigate(notesRoutes.editor(restored.id));
     },
-    [navigate, restoreNote]
+    [navigate, restoreNote, t]
   );
 
   const handlePermanentDelete = useCallback(
     async (noteId: string) => {
-      if (!window.confirm('Permanently delete this page and its child pages?')) {
+      if (!window.confirm(t('confirm.deletePagePermanently'))) {
         return;
       }
 
@@ -111,7 +113,7 @@ export function useTrashPage() {
         navigate(notesRoutes.trash(), { replace: true });
       }
     },
-    [childrenByParent, navigate, permanentlyDeleteNote, selectedId]
+    [childrenByParent, navigate, permanentlyDeleteNote, selectedId, t]
   );
 
   const selectedRootId = useMemo(() => {

@@ -1,0 +1,21 @@
+{
+  "sectionTitle": "Questions and Answers",
+  "createWithAi": "Create up to 5 Q/A with AI",
+  "creating": "Creating new Q/A",
+  "creatingLoader": "Creating new Q/A...",
+  "loading": "Loading questions...",
+  "questionPlaceholder": "Question",
+  "answerPlaceholder": "Answer",
+  "createManual": "Create new Q/A",
+  "save": "Save",
+  "cancel": "Cancel",
+  "editAria": "Edit question and answer",
+  "editTitle": "Edit",
+  "deleteAria": "Delete question and answer",
+  "deleteTitle": "Delete",
+  "confirmDelete": "Delete this question-answer pair?",
+  "toasts": {
+    "started": "Q/A creation has started",
+    "completed": "Q/A creation completed"
+  }
+}

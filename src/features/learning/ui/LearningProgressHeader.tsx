@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/shared/ui';
+import { useTranslation } from 'react-i18next';
 import type { LearningSessionItem } from '../domain/learning.types';
+import { notesRoutes } from '@/features/notes/lib/routes';
 
 export interface LearningProgressHeaderProps {
   items: LearningSessionItem[];
@@ -12,11 +14,12 @@ export function LearningProgressHeader({
   currentIndex,
 }: LearningProgressHeaderProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation('learning');
   const reviewableItems = items.filter((i) => i.state !== 'unavailable');
   const totalCount = reviewableItems.length;
 
   const handleStop = () => {
-    navigate('/notes');
+    navigate(notesRoutes.list());
   };
 
   return (
@@ -30,7 +33,7 @@ export function LearningProgressHeader({
         onClick={handleStop}
         className="learning-progress-header__stop"
       >
-        Stop Learning
+        {t('progress.stopLearning')}
       </Button>
     </header>
   );

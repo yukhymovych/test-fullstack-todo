@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { NoteBreadcrumbs } from '../NoteBreadcrumbs';
 import { NotePageActionsMenu } from '../NotePageActionsMenu';
 import { useStudyItemStatus } from '@/features/learning/model/useStudyItemStatus';
@@ -16,6 +17,7 @@ import {
 import { CircleAlert, MoreVertical } from 'lucide-react';
 import type { SaveStatus } from '../../model/useNoteEditor';
 import type { NoteEditorToolbarProps } from './NoteEditorToolbar.types';
+import { getGradeLabel } from '@/features/learning/lib/gradePresentation';
 import './NoteEditorToolbar.css';
 
 const SAVE_STATUS_COLOR: Record<SaveStatus, string> = {
@@ -25,33 +27,48 @@ const SAVE_STATUS_COLOR: Record<SaveStatus, string> = {
   idle: '#6b7280',
 };
 
-const SAVE_STATUS_LABEL: Record<SaveStatus, string> = {
-  saving: 'Saving...',
-  saved: 'Saved',
-  error: 'Error saving',
-  idle: '\u00A0',
-};
-
-function getDaysAgoLabel(iso: string | null | undefined): string {
-  if (!iso) return 'N/A';
+function getDaysAgoLabel(
+  iso: string | null | undefined,
+  t: (key: string, options?: Record<string, unknown>) => string
+): string {
+  if (!iso) return t('editor.notAvailable');
   const now = Date.now();
   const reviewedAt = new Date(iso).getTime();
-  if (Number.isNaN(reviewedAt)) return 'N/A';
+  if (Number.isNaN(reviewedAt)) return t('editor.notAvailable');
   const diffMs = Math.max(0, now - reviewedAt);
   const days = Math.floor(diffMs / (24 * 60 * 60 * 1000));
-  return days === 0 ? 'Today' : `${days} day${days === 1 ? '' : 's'} ago`;
+  return days === 0 ? t('editor.today') : t('editor.daysAgo', { count: days });
 }
 
 function getScheduledIntervalLabel(
   lastReviewedAt: string | null | undefined,
-  dueAt: string | undefined
+  dueAt: string | undefined,
+  t: (key: string, options?: Record<string, unknown>) => string
 ): string {
-  if (!lastReviewedAt || !dueAt) return 'N/A';
+  if (!lastReviewedAt || !dueAt) return t('editor.notAvailable');
   const fromMs = new Date(lastReviewedAt).getTime();
   const toMs = new Date(dueAt).getTime();
-  if (Number.isNaN(fromMs) || Number.isNaN(toMs)) return 'N/A';
+  if (Number.isNaN(fromMs) || Number.isNaN(toMs)) return t('editor.notAvailable');
   const interval = Math.max(0, (toMs - fromMs) / (24 * 60 * 60 * 1000));
-  return `${interval.toFixed(1)} day${interval >= 1.5 ? 's' : ''}`;
+  return t('editor.intervalDays', { count: Number(interval.toFixed(1)) });
+}
+
+function isSameDay(iso: string | undefined): boolean {
+  if (!iso) {
+    return false;
+  }
+
+  const target = new Date(iso);
+  if (Number.isNaN(target.getTime())) {
+    return false;
+  }
+
+  const now = new Date();
+  return (
+    target.getFullYear() === now.getFullYear()
+    && target.getMonth() === now.getMonth()
+    && target.getDate() === now.getDate()
+  );
 }
 
 export function NoteEditorToolbar({
@@ -67,10 +84,19 @@ export function NoteEditorToolbar({
   isDeleting,
   importExport,
 }: NoteEditorToolbarProps) {
+  const { t, i18n } = useTranslation('notes');
   const [isWhyTodayTooltipOpen, setIsWhyTodayTooltipOpen] = useState(false);
   const { data: studyStatus } = useStudyItemStatus(activeId);
-  const dueLabel = studyStatus?.dueAt ? formatDueDate(studyStatus.dueAt) : null;
-  const isDueToday = dueLabel === 'Today';
+  const saveStatusLabel: Record<SaveStatus, string> = {
+    saving: t('editor.saveStatus.saving'),
+    saved: t('editor.saveStatus.saved'),
+    error: t('editor.saveStatus.error'),
+    idle: t('editor.saveStatus.idle'),
+  };
+  const dueLabel = studyStatus?.dueAt
+    ? formatDueDate(studyStatus.dueAt, i18n.resolvedLanguage)
+    : null;
+  const isDueToday = isSameDay(studyStatus?.dueAt);
   const { data: reviewLogs } = useStudyItemReviewLogs(activeId, isDueToday);
   const latestReviewLog = reviewLogs?.[0];
   const hasChildren = notes?.some((n) => n.parent_id === activeId) ?? false;
@@ -89,7 +115,7 @@ export function NoteEditorToolbar({
         </div>
         <div className="note-editor-toolbar__right">
           <span className="note-editor-toolbar__save-status" style={{ color: SAVE_STATUS_COLOR[saveStatus] }}>
-            {SAVE_STATUS_LABEL[saveStatus]}
+            {saveStatusLabel[saveStatus]}
             {importExport.pendingLabel ? ` ${importExport.pendingLabel}` : null}
           </span>
           <DropdownMenu>
@@ -98,7 +124,7 @@ export function NoteEditorToolbar({
                 variant="ghost"
                 icon
                 className="menu-trigger-btn"
-                title="Page options"
+                title={t('editor.pageOptions')}
                 style={{ opacity: 0.7 }}
               >
                 <MoreVertical className="size-4" />
@@ -123,56 +149,68 @@ export function NoteEditorToolbar({
         <span className="note-editor-toolbar__due">
           {!isDueToday && (
             <>
-              Next review: {dueLabel} (
-              {new Date(studyStatus.dueAt!).toLocaleDateString(undefined, {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric',
+              {t('editor.nextReview', {
+                relative: dueLabel,
+                date: new Date(studyStatus.dueAt!).toLocaleDateString(i18n.resolvedLanguage, {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                }),
               })}
-              )
             </>
           )}
           {isDueToday && (
             <span className="note-editor-toolbar__due-today">
               <span>
-                Next review: {dueLabel} (
-                {new Date(studyStatus.dueAt!).toLocaleDateString(undefined, {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
+                {t('editor.nextReview', {
+                  relative: dueLabel,
+                  date: new Date(studyStatus.dueAt!).toLocaleDateString(i18n.resolvedLanguage, {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  }),
                 })}
-                )
               </span>
               <Tooltip open={isWhyTodayTooltipOpen} onOpenChange={setIsWhyTodayTooltipOpen}>
                 <TooltipTrigger asChild>
                   <button
                     type="button"
-                    aria-label="Why review is due today"
+                    aria-label={t('editor.whyTodayAria')}
                     className="note-editor-toolbar__why-today"
                     onClick={() => setIsWhyTodayTooltipOpen((prev) => !prev)}
                   >
-                    Why today?
+                    {t('editor.whyToday')}
                     <CircleAlert className="size-4" />
                   </button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" align="start">
                   <div className="note-editor-toolbar__tooltip-grid">
-                    <div>Last review: {getDaysAgoLabel(studyStatus.lastReviewedAt)}</div>
                     <div>
-                      Stability: {studyStatus.stabilityDays?.toFixed(1) ?? 'N/A'} days
+                      {t('editor.lastReview', {
+                        value: getDaysAgoLabel(studyStatus.lastReviewedAt, t),
+                      })}
                     </div>
                     <div>
-                      Difficulty: {studyStatus.difficulty?.toFixed(1) ?? 'N/A'} / 10
+                      {t('editor.stability', {
+                        value: studyStatus.stabilityDays?.toFixed(1) ?? t('editor.notAvailable'),
+                      })}
                     </div>
                     <div>
-                      Last grade:{' '}
-                      {latestReviewLog?.grade
-                        ? latestReviewLog.grade[0].toUpperCase() + latestReviewLog.grade.slice(1)
-                        : 'N/A'}
+                      {t('editor.difficulty', {
+                        value: studyStatus.difficulty?.toFixed(1) ?? t('editor.notAvailable'),
+                      })}
                     </div>
                     <div>
-                      Scheduled interval:{' '}
-                      {getScheduledIntervalLabel(studyStatus.lastReviewedAt, studyStatus.dueAt)}
+                      {t('editor.lastGrade', {
+                        value: latestReviewLog?.grade
+                          ? getGradeLabel(t, latestReviewLog.grade)
+                          : t('editor.notAvailable'),
+                      })}
+                    </div>
+                    <div>
+                      {t('editor.scheduledInterval', {
+                        value: getScheduledIntervalLabel(studyStatus.lastReviewedAt, studyStatus.dueAt, t),
+                      })}
                     </div>
                   </div>
                 </TooltipContent>

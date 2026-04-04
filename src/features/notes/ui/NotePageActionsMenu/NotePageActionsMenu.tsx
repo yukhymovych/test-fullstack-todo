@@ -7,6 +7,7 @@ import {
   DropdownMenuSubTrigger,
 } from '@/shared/ui';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { showToast } from '@/shared/lib/toast';
 import {
   useStudyItemStatus,
@@ -33,6 +34,7 @@ export function NotePageActionsMenu({
   importExport,
 }: NotePageActionsMenuProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation('notes');
   const { data: studyStatus } = useStudyItemStatus(noteId);
   const activateLearning = useActivateLearningPage();
   const activateLearningScoped = useActivateLearningPageScoped();
@@ -49,7 +51,7 @@ export function NotePageActionsMenu({
         if ('reason' in result) {
           if (result.reason === 'NO_ELIGIBLE_PAGES') {
             showToast(
-              'No eligible pages to learn. All child pages have already been studied today.'
+              t('menu.toasts.noEligiblePages')
             );
           }
           return;
@@ -65,7 +67,7 @@ export function NotePageActionsMenu({
         if ('reason' in result) {
           if (result.reason === 'NO_ELIGIBLE_PAGES') {
             showToast(
-              'No due child pages to learn right now.'
+              t('menu.toasts.noDueChildPages')
             );
           }
           return;
@@ -95,54 +97,54 @@ export function NotePageActionsMenu({
     <DropdownMenuContent align="end">
       {isFavorite ? (
         <DropdownMenuItem onClick={() => onRemoveFromFavorites?.(noteId)}>
-          Remove from Favorites
+          {t('menu.removeFromFavorites')}
         </DropdownMenuItem>
       ) : (
         <DropdownMenuItem onClick={() => onAddToFavorites?.(noteId)}>
-          Add to Favorites
+          {t('menu.addToFavorites')}
         </DropdownMenuItem>
       )}
       {isLearningActive ? (
         <DropdownMenuItem onClick={handleRemoveFromLearning}>
-          Remove from learning
+          {t('menu.removeFromLearning')}
         </DropdownMenuItem>
       ) : (
         hasChildren ? (
           <DropdownMenuSub>
-            <DropdownMenuSubTrigger>Set as learning page</DropdownMenuSubTrigger>
+            <DropdownMenuSubTrigger>{t('menu.setAsLearningPage')}</DropdownMenuSubTrigger>
             <DropdownMenuSubContent>
               <DropdownMenuItem onClick={handleSetAsLearning}>
-                Add this page only
+                {t('menu.setLearningThisPageOnly')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleSetAsLearningScoped}>
-                Add this page and descendants
+                {t('menu.setLearningThisPageAndDescendants')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleSetAsLearningDescendantsOnly}>
-                Add only all descendants
+                {t('menu.setLearningDescendantsOnly')}
               </DropdownMenuItem>
             </DropdownMenuSubContent>
           </DropdownMenuSub>
         ) : (
           <DropdownMenuItem onClick={handleSetAsLearning}>
-            Set as learning page
+            {t('menu.setAsLearningPage')}
           </DropdownMenuItem>
         )
       )}
       {hasChildren && hasDescendantsInGlobal && (
         <DropdownMenuSub>
-          <DropdownMenuSubTrigger>Start scoped learning session</DropdownMenuSubTrigger>
+          <DropdownMenuSubTrigger>{t('menu.startScopedLearningSession')}</DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
             <DropdownMenuItem
               onClick={handleLearnAllChildren}
               disabled={startScopedSession.isPending}
             >
-              {startScopedSession.isPending ? 'Starting...' : 'Deep dive (all children)'}
+              {startScopedSession.isPending ? t('menu.starting') : t('menu.deepDiveAllChildren')}
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={handleLearnDueChildren}
               disabled={startScopedSession.isPending}
             >
-              {startScopedSession.isPending ? 'Starting...' : 'Due only (todays review)'}
+              {startScopedSession.isPending ? t('menu.starting') : t('menu.dueOnlyTodaysReview')}
             </DropdownMenuItem>
           </DropdownMenuSubContent>
         </DropdownMenuSub>
@@ -150,14 +152,14 @@ export function NotePageActionsMenu({
       <NoteImportExportMenuSection importExport={importExport} />
       {importExport ? <DropdownMenuSeparator /> : null}
       <DropdownMenuItem onClick={() => onCreateChild(noteId)}>
-        Add new page
+        {t('menu.addNewPage')}
       </DropdownMenuItem>
       <DropdownMenuItem
         variant="destructive"
         onClick={() => onDelete(noteId)}
         disabled={isDeleting || isBusy}
       >
-        Move to trash
+        {t('menu.moveToTrash')}
       </DropdownMenuItem>
     </DropdownMenuContent>
   );

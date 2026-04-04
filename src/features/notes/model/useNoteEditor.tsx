@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateBlockNote, useEditorChange } from '@blocknote/react';
 import { filterSuggestionItems, insertOrUpdateBlockForSlashMenu } from '@blocknote/core/extensions';
+import i18n from '@/shared/i18n/i18n';
 import { FaRegFileAlt } from "react-icons/fa";
 import {
   useNoteQuery,
@@ -163,7 +164,7 @@ export function useNoteEditor(id: string | undefined) {
     async (noteId?: string) => {
       const targetId = noteId ?? id;
       if (!targetId) return;
-      if (!window.confirm('Move this page and its child pages to trash?')) return;
+      if (!window.confirm(i18n.t('confirm.trashPage', { ns: 'notes' }))) return;
       await trashMutation.mutateAsync(targetId);
       navigate(notesRoutes.list());
     },
@@ -249,14 +250,14 @@ export function useNoteEditor(id: string | undefined) {
       if (!id) return;
       const text = selectedText.trim();
       if (text.length < MIN_SELECTION_TEXT_LENGTH) return;
-      showToast('Q/A creation has started');
+      showToast(i18n.t('toasts.started', { ns: 'study' }));
 
       const run = async () => {
         const mutation =
           mode === 'one' ? generateOneQuestionFromSelection : generateUpToFiveQuestionsFromSelection;
         const created = await mutation.mutateAsync({ text, mode });
         if (created.length > 0) {
-          showToast('Q/A creation completed');
+          showToast(i18n.t('toasts.completed', { ns: 'study' }));
         }
       };
 

@@ -1018,9 +1018,9 @@ export async function getReviewLogsByUserAndNote(
   return result.rows;
 }
 
-export async function getReviewLogsByUserAndDayKey(
+export async function getReviewLogsByUserTodayInTimezone(
   userId: string,
-  dayKey: string
+  timezone: string
 ): Promise<StudyItemReviewLog[]> {
   const result = await pool.query(
     `SELECT
@@ -1042,9 +1042,11 @@ export async function getReviewLogsByUserAndDayKey(
         is_undone,
         undone_at
      FROM review_logs
-     WHERE user_id = $1 AND review_day_key = $2 AND is_undone = false
+     WHERE user_id = $1
+       AND is_undone = false
+       AND (reviewed_at AT TIME ZONE $2)::date = (NOW() AT TIME ZONE $2)::date
      ORDER BY reviewed_at DESC`,
-    [userId, dayKey]
+    [userId, timezone]
   );
   return result.rows;
 }

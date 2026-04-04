@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { useRef, type MutableRefObject } from 'react';
+import i18n from '@/shared/i18n/i18n';
 import * as learningApi from '../api/learningApi';
 import type { Grade, GradeSubmitResponse } from '../domain/learning.types';
 import { LEARNING_KEYS, getBrowserTimezone } from './learning.queries';
@@ -68,10 +69,10 @@ function showUndoGradeToast(params: {
   const reviewLogId = response.reviewLogId;
   const undoToken = response.undoToken;
   showToast({
-    message: 'Grade saved · Undo (10s)',
+    message: i18n.t('toasts.gradeSavedUndo', { ns: 'learning' }),
     durationMs: UNDO_DURATION_MS,
     action: {
-      label: 'Undo',
+      label: i18n.t('toasts.undo', { ns: 'learning' }),
       showCountdown: true,
       onClick: async () => {
         if (undoInFlightRef.current) return;
@@ -82,10 +83,10 @@ function showUndoGradeToast(params: {
             undoToken,
           });
           queryClient.invalidateQueries({ queryKey: LEARNING_KEYS.all });
-          showToast('Grade undone');
+          showToast(i18n.t('toasts.gradeUndone', { ns: 'learning' }));
           await logReviewHistoryForPage(pageId);
         } catch {
-          showToast('Undo failed. Grade was already finalized.');
+          showToast(i18n.t('toasts.undoFailed', { ns: 'learning' }));
         } finally {
           undoInFlightRef.current = false;
         }

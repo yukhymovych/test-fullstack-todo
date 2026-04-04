@@ -11,6 +11,12 @@
     "noPendingItems": "No pending items.",
     "untitled": "(Untitled)"
   },
+  "progress": {
+    "stopLearning": "Stop learning"
+  },
+  "reveal": {
+    "showText": "Show text"
+  },
   "summary": {
     "title": "Session complete",
     "stats": "You reviewed {{doneCount}} of {{totalCount}} items.",
@@ -34,5 +40,11 @@
       "deep_dive": "Deep dive",
       "due_only": "Due only"
     }
+  },
+  "toasts": {
+    "gradeSavedUndo": "Grade saved \u00b7 Undo (10s)",
+    "undo": "Undo",
+    "gradeUndone": "Grade undone",
+    "undoFailed": "Undo failed. Grade was already finalized."
   }
 }

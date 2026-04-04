@@ -1,5 +1,6 @@
 import { RotateCcw, Trash2 } from 'lucide-react';
 import { RiArrowDownSLine } from 'react-icons/ri';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/ui';
 import type { TrashNoteListItem } from '../../model/trash.types';
 
@@ -34,6 +35,7 @@ export function TrashTree({
   onPermanentDelete,
   isActionPending,
 }: TrashTreeProps) {
+  const { t } = useTranslation('notes');
   const note = byId.get(nodeId);
   if (!note) {
     return null;
@@ -56,7 +58,11 @@ export function TrashTree({
           type="button"
           className="trash-tree__expand"
           onClick={() => hasChildren && onToggleExpand(nodeId)}
-          aria-label={hasChildren ? (isExpanded ? 'Collapse subtree' : 'Expand subtree') : 'No children'}
+          aria-label={
+            hasChildren
+              ? (isExpanded ? t('trash.collapseSubtree') : t('trash.expandSubtree'))
+              : t('trash.noChildren')
+          }
           disabled={!hasChildren}
         >
           {hasChildren ? (
@@ -73,14 +79,14 @@ export function TrashTree({
           className="trash-tree__title"
           onClick={() => onOpen(nodeId)}
         >
-          <span className="trash-tree__title-text">{note.title || 'Untitled'}</span>
-          <span className="trash-tree__meta">{daysRemaining} day(s) left</span>
+          <span className="trash-tree__title-text">{note.title || t('untitled')}</span>
+          <span className="trash-tree__meta">{t('trash.daysLeft', { count: daysRemaining })}</span>
         </button>
         <div className="trash-tree__actions">
           <Button
             variant="ghost"
             size="icon-sm"
-            aria-label="Restore page"
+            aria-label={t('trash.restoreAria')}
             onClick={() => onRestore(nodeId)}
             disabled={isActionPending}
           >
@@ -89,7 +95,7 @@ export function TrashTree({
           <Button
             variant="ghost"
             size="icon-sm"
-            aria-label="Permanently delete page"
+            aria-label={t('trash.deletePermanentlyAria')}
             onClick={() => onPermanentDelete(nodeId)}
             disabled={isActionPending}
           >

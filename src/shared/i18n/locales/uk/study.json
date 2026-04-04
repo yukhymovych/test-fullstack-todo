@@ -1,0 +1,21 @@
+{
+  "sectionTitle": "Запитання та відповіді",
+  "createWithAi": "Створити до 5 Q/A за допомогою AI",
+  "creating": "Створення нового Q/A",
+  "creatingLoader": "Створення нового Q/A...",
+  "loading": "Завантаження запитань...",
+  "questionPlaceholder": "Запитання",
+  "answerPlaceholder": "Відповідь",
+  "createManual": "Створити нове Q/A",
+  "save": "Зберегти",
+  "cancel": "Скасувати",
+  "editAria": "Редагувати запитання та відповідь",
+  "editTitle": "Редагувати",
+  "deleteAria": "Видалити запитання та відповідь",
+  "deleteTitle": "Видалити",
+  "confirmDelete": "Видалити цю пару запитання-відповідь?",
+  "toasts": {
+    "started": "Створення Q/A розпочато",
+    "completed": "Створення Q/A завершено"
+  }
+}

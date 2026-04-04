@@ -5,10 +5,12 @@ import commonEn from './locales/en/common.json';
 import settingsEn from './locales/en/settings.json';
 import learningEn from './locales/en/learning.json';
 import notesEn from './locales/en/notes.json';
+import studyEn from './locales/en/study.json';
 import commonUk from './locales/uk/common.json';
 import settingsUk from './locales/uk/settings.json';
 import learningUk from './locales/uk/learning.json';
 import notesUk from './locales/uk/notes.json';
+import studyUk from './locales/uk/study.json';
 import {
   defaultLanguage,
   normalizeLanguage,
@@ -34,12 +36,14 @@ const resources = {
     settings: settingsEn,
     learning: learningEn,
     notes: notesEn,
+    study: studyEn,
   },
   uk: {
     common: commonUk,
     settings: settingsUk,
     learning: learningUk,
     notes: notesUk,
+    study: studyUk,
   },
 } as const;
 
@@ -60,7 +64,7 @@ if (!i18n.isInitialized) {
       fallbackLng: defaultLanguage,
       supportedLngs: [...supportedLanguages],
       defaultNS: 'common',
-      ns: ['common', 'settings', 'learning', 'notes'],
+      ns: ['common', 'settings', 'learning', 'notes', 'study'],
       detection: {
         order: ['rememoPreference', 'navigator'],
         caches: [],

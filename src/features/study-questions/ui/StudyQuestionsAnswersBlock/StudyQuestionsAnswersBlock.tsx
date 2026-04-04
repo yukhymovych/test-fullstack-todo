@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/ui';
 import { RiDeleteBinLine, RiPencilLine } from 'react-icons/ri';
 import {
@@ -22,6 +23,7 @@ interface DraftState {
 const EMPTY_DRAFT: DraftState = { question: '', answer: '' };
 
 export function StudyQuestionsAnswersBlock({ pageId }: StudyQuestionsAnswersBlockProps) {
+  const { t } = useTranslation('study');
   const { data: pairs = [], isLoading } = useStudyQuestions(pageId);
   const createMutation = useCreateStudyQuestion(pageId);
   const updateMutation = useUpdateStudyQuestion(pageId);
@@ -84,16 +86,16 @@ export function StudyQuestionsAnswersBlock({ pageId }: StudyQuestionsAnswersBloc
   };
 
   const removePair = async (id: string) => {
-    if (!window.confirm('Delete this question-answer pair?')) return;
+    if (!window.confirm(t('confirmDelete'))) return;
     await deleteMutation.mutateAsync(id);
   };
 
   const generateForPage = async () => {
-    showToast('Q/A creation has started');
+    showToast(t('toasts.started'));
     try {
       const created = await generateMutation.mutateAsync({});
       if (created.length > 0) {
-        showToast('Q/A creation completed');
+        showToast(t('toasts.completed'));
       }
     } catch {
       // handled by generic error boundaries/toasts in app
@@ -103,29 +105,29 @@ export function StudyQuestionsAnswersBlock({ pageId }: StudyQuestionsAnswersBloc
   return (
     <section className="study-qa-block">
       <div className="study-qa-block__header">
-        <h3 className="study-qa-block__title">Questions and Answers</h3>
+        <h3 className="study-qa-block__title">{t('sectionTitle')}</h3>
         <Button
           variant="secondary"
           size="sm"
           onClick={generateForPage}
           disabled={isBusy}
         >
-          {isGenerating ? 'Creating new Q/A' : 'Create up to 5 Q/A with AI'}
+          {isGenerating ? t('creating') : t('createWithAi')}
         </Button>
       </div>
 
-      {isLoading ? <p className="study-qa-block__hint">Loading questions...</p> : null}
+      {isLoading ? <p className="study-qa-block__hint">{t('loading')}</p> : null}
 
       {isGenerating ? (
         <div className="study-qa-block__loader" role="status" aria-live="polite">
           <span className="study-qa-block__loader-spinner" aria-hidden="true" />
-          <p className="study-qa-block__loader-text">Creating new Q/A...</p>
+          <p className="study-qa-block__loader-text">{t('creatingLoader')}</p>
         </div>
       ) : (
         <div className="study-qa-block__create">
           <input
             className="study-qa-block__input"
-            placeholder="Question"
+            placeholder={t('questionPlaceholder')}
             value={newDraft.question}
             onChange={(event) =>
               setNewDraft((prev) => ({ ...prev, question: event.target.value }))
@@ -133,7 +135,7 @@ export function StudyQuestionsAnswersBlock({ pageId }: StudyQuestionsAnswersBloc
           />
           <textarea
             className="study-qa-block__textarea"
-            placeholder="Answer"
+            placeholder={t('answerPlaceholder')}
             value={newDraft.answer}
             onChange={(event) =>
               setNewDraft((prev) => ({ ...prev, answer: event.target.value }))
@@ -146,7 +148,7 @@ export function StudyQuestionsAnswersBlock({ pageId }: StudyQuestionsAnswersBloc
             onClick={submitNew}
             disabled={isBusy}
           >
-            Create new Q/A
+            {t('createManual')}
           </Button>
         </div>
       )}
@@ -175,7 +177,7 @@ export function StudyQuestionsAnswersBlock({ pageId }: StudyQuestionsAnswersBloc
                   />
                   <div className="study-qa-block__actions">
                     <Button size="sm" onClick={submitEdit} disabled={isBusy}>
-                      Save
+                      {t('save')}
                     </Button>
                     <Button
                       variant="ghost"
@@ -183,7 +185,7 @@ export function StudyQuestionsAnswersBlock({ pageId }: StudyQuestionsAnswersBloc
                       onClick={cancelEdit}
                       disabled={isBusy}
                     >
-                      Cancel
+                      {t('cancel')}
                     </Button>
                   </div>
                 </>
@@ -197,8 +199,8 @@ export function StudyQuestionsAnswersBlock({ pageId }: StudyQuestionsAnswersBloc
                         size="icon-sm"
                         onClick={() => startEdit(pair)}
                         disabled={isBusy}
-                        aria-label="Edit question and answer"
-                        title="Edit"
+                        aria-label={t('editAria')}
+                        title={t('editTitle')}
                       >
                         <RiPencilLine />
                       </Button>
@@ -207,8 +209,8 @@ export function StudyQuestionsAnswersBlock({ pageId }: StudyQuestionsAnswersBloc
                         size="icon-sm"
                         onClick={() => removePair(pair.id)}
                         disabled={isBusy}
-                        aria-label="Delete question and answer"
-                        title="Delete"
+                        aria-label={t('deleteAria')}
+                        title={t('deleteTitle')}
                         className="study-qa-block__delete-icon-btn"
                       >
                         <RiDeleteBinLine />

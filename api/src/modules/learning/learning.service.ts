@@ -681,6 +681,5 @@ export async function getStudyItemReviewLogs(userId: string, pageId: string) {
 }
 
 export async function getTodayReviewLogs(userId: string, timezone: string) {
-  const dayKey = getDayKey(timezone);
-  return learningSQL.getReviewLogsByUserAndDayKey(userId, dayKey);
+  return learningSQL.getReviewLogsByUserTodayInTimezone(userId, timezone);
 }
