@@ -1,5 +1,6 @@
 import { Star } from 'lucide-react';
 import { RiArrowDownSLine } from 'react-icons/ri';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/ui';
 import { TreeNode } from '../SidebarNotesTree/TreeNode';
 import type { NoteListItem } from '../../model/types';
@@ -38,6 +39,8 @@ export function SidebarFavoritesList({
   navigate,
   activeId,
 }: SidebarFavoritesListProps) {
+  const { t } = useTranslation('notes');
+
   if (favoriteIds.length === 0) return null;
 
   return (
@@ -49,7 +52,7 @@ export function SidebarFavoritesList({
         className="sidebar-favorites__header"
       >
         <Star className="sidebar-favorites__star size-4" />
-        <span>Favorite</span>
+        <span>{t('sidebar.favorites')}</span>
         <span
           className={`sidebar-favorites__chevron ${!isExpanded ? 'sidebar-favorites__chevron--collapsed' : ''}`}
           aria-hidden

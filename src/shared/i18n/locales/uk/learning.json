@@ -1,0 +1,38 @@
+{
+  "grades": {
+    "again": "Знову",
+    "hard": "Важко",
+    "good": "Добре",
+    "easy": "Легко"
+  },
+  "page": {
+    "loadingSession": "Завантаження сесії...",
+    "noItemsToday": "Сьогодні немає елементів для повторення.",
+    "noPendingItems": "Немає елементів у черзі.",
+    "untitled": "(Без назви)"
+  },
+  "summary": {
+    "title": "Сесію завершено",
+    "stats": "Ви повторили {{doneCount}} з {{totalCount}} елементів.",
+    "done": "Готово"
+  },
+  "sidebar": {
+    "title": "Навчання",
+    "loading": "Завантаження...",
+    "remaining": "залишилось",
+    "ready": "готово",
+    "sessionLimit": "Ліміт сьогоднішньої сесії: {{count}}",
+    "queueRemaining": "У черзі залишилось: {{count}}",
+    "noItemsDue": "Немає елементів до повторення",
+    "completed": "Навчальну сесію завершено",
+    "starting": "Запуск...",
+    "continue": "Продовжити",
+    "startToday": "Почати сьогоднішню сесію",
+    "startLearning": "Почати навчання",
+    "continueScopedSessions": "Продовжити scoped-сесії",
+    "scopedModes": {
+      "deep_dive": "Глибоке занурення",
+      "due_only": "Лише прострочені"
+    }
+  }
+}

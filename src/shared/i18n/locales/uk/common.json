@@ -1,0 +1,44 @@
+{
+  "appName": "Rememo",
+  "pageTitles": {
+    "login": "Вхід",
+    "notes": "Нотатки",
+    "learning": "Навчання",
+    "settings": "Налаштування"
+  },
+  "status": {
+    "loading": "Завантаження...",
+    "redirectingToLogin": "Перенаправлення на вхід...",
+    "loadingAuthentication": "Завантаження автентифікації...",
+    "redirecting": "Перенаправлення..."
+  },
+  "navigation": {
+    "openSidebar": "Відкрити бічну панель",
+    "closeSidebar": "Закрити бічну панель",
+    "closeSidebarOverlay": "Закрити накладку бічної панелі",
+    "goToHomePage": "Перейти на головну сторінку",
+    "settings": "Налаштування",
+    "trash": "Кошик"
+  },
+  "user": {
+    "fallbackName": "Користувач"
+  },
+  "userMenu": {
+    "settings": "Налаштування",
+    "logout": "Вийти",
+    "debug": {
+      "adding": "Додавання...",
+      "addMore": "Додати більше елементів (debug)",
+      "resetting": "Скидання...",
+      "resetSession": "Скинути сесію (debug)",
+      "deleting": "Видалення...",
+      "deleteFutureSessions": "Видалити майбутні сесії (debug)",
+      "deleteTodayScopedSessions": "Видалити сьогоднішні scoped-сесії (debug)",
+      "refreshing": "Оновлення...",
+      "refreshAllGrades": "Оновити всі оцінки (debug)"
+    }
+  },
+  "errors": {
+    "withMessage": "Помилка: {{message}}"
+  }
+}

@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 
 interface ProtectedRouteProps {
@@ -7,6 +8,7 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { isAuthed, isLoading, isApiReady, login } = useAuth();
+  const { t } = useTranslation('common');
 
   useEffect(() => {
     if (!isAuthed && !isLoading && isApiReady) {
@@ -17,7 +19,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   if (isLoading || (isAuthed && !isApiReady)) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <div className="text-muted-foreground text-sm">Loading...</div>
+        <div className="text-muted-foreground text-sm">{t('status.loading')}</div>
       </div>
     );
   }
@@ -25,7 +27,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   if (!isAuthed) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <div className="text-muted-foreground text-sm">Redirecting to login...</div>
+        <div className="text-muted-foreground text-sm">{t('status.redirectingToLogin')}</div>
       </div>
     );
   }

@@ -1,0 +1,18 @@
+{
+  "page": {
+    "title": "Settings",
+    "heading": "Settings",
+    "description": "Manage your Rememo preferences."
+  },
+  "language": {
+    "sectionTitle": "Interface language",
+    "label": "Language",
+    "description": "Choose the language used for buttons, menus, labels, and other UI text.",
+    "hint": "This only changes the app interface. It does not translate note titles, note content, or generated study material.",
+    "storageHint": "The selected language is currently stored locally and can be synced to a backend user profile later.",
+    "options": {
+      "en": "English",
+      "uk": "Ukrainian"
+    }
+  }
+}

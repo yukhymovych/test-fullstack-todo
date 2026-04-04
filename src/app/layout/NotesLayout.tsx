@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { SidebarNotesTree } from '../../features/notes/ui/SidebarNotesTree/SidebarNotesTree';
 import './NotesLayout.css';
 
 export function NotesLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { t } = useTranslation('common');
 
   const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
   const closeSidebar = () => setIsSidebarOpen(false);
@@ -28,7 +30,9 @@ export function NotesLayout() {
       <button
         type="button"
         className="notes-layout__menu-button"
-        aria-label={isSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+        aria-label={
+          isSidebarOpen ? t('navigation.closeSidebar') : t('navigation.openSidebar')
+        }
         aria-expanded={isSidebarOpen}
         aria-controls="notes-sidebar"
         onClick={toggleSidebar}
@@ -46,7 +50,7 @@ export function NotesLayout() {
       <button
         type="button"
         className={`notes-layout__backdrop ${isSidebarOpen ? 'notes-layout__backdrop--visible' : ''}`}
-        aria-label="Close sidebar overlay"
+        aria-label={t('navigation.closeSidebarOverlay')}
         onClick={closeSidebar}
       />
 

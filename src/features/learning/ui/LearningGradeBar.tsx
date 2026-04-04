@@ -1,7 +1,8 @@
 import { cn } from '@/lib/utils';
 import { Button } from '@/shared/ui';
+import { useTranslation } from 'react-i18next';
 import type { Grade } from '../domain/learning.types';
-import { GRADE_BUTTON_STYLES, GRADE_LABELS } from '../lib/gradePresentation';
+import { GRADE_BUTTON_STYLES, getGradeLabel } from '../lib/gradePresentation';
 
 export interface LearningGradeBarProps {
   onGrade: (grade: Grade) => void;
@@ -10,6 +11,7 @@ export interface LearningGradeBarProps {
 
 export function LearningGradeBar({ onGrade, disabled }: LearningGradeBarProps) {
   const grades: Grade[] = ['again', 'hard', 'good', 'easy'];
+  const { t } = useTranslation('learning');
 
   return (
     <div className="learning-grade-bar">
@@ -22,7 +24,7 @@ export function LearningGradeBar({ onGrade, disabled }: LearningGradeBarProps) {
           disabled={disabled}
           className={cn('learning-grade-bar__btn', GRADE_BUTTON_STYLES[grade])}
         >
-          {GRADE_LABELS[grade]}
+          {getGradeLabel(t, grade)}
         </Button>
       ))}
     </div>

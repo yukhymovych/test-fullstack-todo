@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FileStack, Trash2 } from 'lucide-react';
 import { RiArrowDownSLine } from 'react-icons/ri';
+import { useTranslation } from 'react-i18next';
 import { useNotesTree } from '../../model/useNotesTree';
 import { TreeNode } from './TreeNode';
 import { DndContextWrapper } from './DndContextWrapper';
@@ -20,6 +21,7 @@ export interface SidebarNotesTreeProps {
 
 export function SidebarNotesTree({ onNavigate }: SidebarNotesTreeProps) {
   const location = useLocation();
+  const { t } = useTranslation(['common', 'notes']);
   const {
     isLoading,
     error,
@@ -91,11 +93,15 @@ export function SidebarNotesTree({ onNavigate }: SidebarNotesTreeProps) {
   );
 
   if (isLoading) {
-    return <div className="sidebar-loading">Loading...</div>;
+    return <div className="sidebar-loading">{t('sidebar.loading', { ns: 'notes' })}</div>;
   }
 
   if (error) {
-    return <div className="sidebar-error">Error: {error.message}</div>;
+    return (
+      <div className="sidebar-error">
+        {t('errors.withMessage', { ns: 'common', message: error.message })}
+      </div>
+    );
   }
 
   const isTrashActive = location.pathname.startsWith(notesRoutes.trash());
@@ -108,7 +114,7 @@ export function SidebarNotesTree({ onNavigate }: SidebarNotesTreeProps) {
             <Link
               to="/"
               className="sidebar-brand__link"
-              aria-label="Go to home page"
+              aria-label={t('navigation.goToHomePage', { ns: 'common' })}
               onClick={onNavigate}
             >
               <img src="/logo.png" alt="Rememo" className="sidebar-brand__logo" />
@@ -127,7 +133,9 @@ export function SidebarNotesTree({ onNavigate }: SidebarNotesTreeProps) {
             onClick={handleCreateRoot}
             disabled={createNote.isPending}
           >
-            {createNote.isPending ? 'Creating...' : 'New page'}
+            {createNote.isPending
+              ? t('sidebar.creating', { ns: 'notes' })
+              : t('sidebar.newPage', { ns: 'notes' })}
           </Button>
         </div>
         <LearningSidebarCard />
@@ -164,7 +172,7 @@ export function SidebarNotesTree({ onNavigate }: SidebarNotesTreeProps) {
             className="sidebar-all-pages__header"
           >
             <FileStack className="sidebar-all-pages__icon size-4" />
-            <span>All pages</span>
+            <span>{t('sidebar.allPages', { ns: 'notes' })}</span>
             <span
               className={`sidebar-all-pages__chevron ${!allPagesExpanded ? 'sidebar-all-pages__chevron--collapsed' : ''}`}
               aria-hidden
@@ -209,7 +217,7 @@ export function SidebarNotesTree({ onNavigate }: SidebarNotesTreeProps) {
         >
           <Link to={notesRoutes.trash()} onClick={onNavigate}>
             <Trash2 className="size-4" />
-            <span>Trash</span>
+            <span>{t('navigation.trash', { ns: 'common' })}</span>
           </Link>
         </Button>
       </div>

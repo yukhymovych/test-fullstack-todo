@@ -1,0 +1,38 @@
+{
+  "grades": {
+    "again": "Again",
+    "hard": "Hard",
+    "good": "Good",
+    "easy": "Easy"
+  },
+  "page": {
+    "loadingSession": "Loading session...",
+    "noItemsToday": "No items to review today.",
+    "noPendingItems": "No pending items.",
+    "untitled": "(Untitled)"
+  },
+  "summary": {
+    "title": "Session complete",
+    "stats": "You reviewed {{doneCount}} of {{totalCount}} items.",
+    "done": "Done"
+  },
+  "sidebar": {
+    "title": "Learning",
+    "loading": "Loading...",
+    "remaining": "remaining",
+    "ready": "ready",
+    "sessionLimit": "Today's session limit: {{count}}",
+    "queueRemaining": "{{count}} remaining in queue",
+    "noItemsDue": "No items due",
+    "completed": "Learning session is complete",
+    "starting": "Starting...",
+    "continue": "Continue",
+    "startToday": "Start today's session",
+    "startLearning": "Start learning",
+    "continueScopedSessions": "Continue scoped sessions",
+    "scopedModes": {
+      "deep_dive": "Deep dive",
+      "due_only": "Due only"
+    }
+  }
+}

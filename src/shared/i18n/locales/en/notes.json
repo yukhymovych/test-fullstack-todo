@@ -1,0 +1,28 @@
+{
+  "sidebar": {
+    "loading": "Loading...",
+    "newPage": "New page",
+    "creating": "Creating...",
+    "allPages": "All pages",
+    "favorites": "Favorites",
+    "recentlyVisited": "Recently visited"
+  },
+  "list": {
+    "loading": "Loading data...",
+    "errorLoading": "Error loading data: {{message}}",
+    "recentlyVisited": "Recently visited",
+    "todayMainLearningSession": "Today's main learning session",
+    "pendingInTodaySession": "Pending in today's session",
+    "readyForLearning": "Ready for learning",
+    "dueItemsInfo": "Due items info",
+    "dueItemsTooltip": "All notes with next review date equal to today or in the past.",
+    "recentlyReviewed": "Recently reviewed",
+    "empty": "No notes yet. Click \"New page\" to create one.",
+    "continueLearningSession": "Continue learning session",
+    "startLearningSession": "Start learning session"
+  },
+  "confirm": {
+    "trashPage": "Move this page and its child pages to trash?"
+  },
+  "untitled": "Untitled"
+}

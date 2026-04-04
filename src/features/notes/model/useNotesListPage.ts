@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useNotesQuery, useCreateNote } from './useNotes';
 import { notesRoutes } from '../lib/routes';
 import {
@@ -18,6 +19,7 @@ import type { Grade } from '@/features/learning/domain/learning.types';
 
 export function useNotesListPage() {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation('notes');
   const { data: notes, isLoading, error } = useNotesQuery();
   const {
     data: todayLearningSession,
@@ -81,19 +83,19 @@ export function useNotesListPage() {
     const map = new Map<string, string>();
     recentNotes.forEach((n) => {
       if (n.last_visited_at) {
-        map.set(n.id, formatRelativeTime(n.last_visited_at));
+        map.set(n.id, formatRelativeTime(n.last_visited_at, i18n.resolvedLanguage));
       }
     });
     return map;
-  }, [recentNotes]);
+  }, [recentNotes, i18n.resolvedLanguage]);
 
   const mainLearningSessionFormattedTimes = useMemo(() => {
     const map = new Map<string, string>();
     mainLearningSessionNotes.forEach((n) => {
-      map.set(n.id, 'Pending in today session');
+      map.set(n.id, t('list.pendingInTodaySession'));
     });
     return map;
-  }, [mainLearningSessionNotes]);
+  }, [mainLearningSessionNotes, t]);
 
   const dueReadyFormattedTimes = useMemo(() => {
     const map = new Map<string, string>();
@@ -103,11 +105,11 @@ export function useNotesListPage() {
     dueReadyNotes.forEach((note) => {
       const dueAt = dueAtByNoteId.get(note.id);
       if (dueAt) {
-        map.set(note.id, formatTodayOrPastDate(dueAt));
+        map.set(note.id, formatTodayOrPastDate(dueAt, i18n.resolvedLanguage));
       }
     });
     return map;
-  }, [dueReadyNotes, dueStudyItems]);
+  }, [dueReadyNotes, dueStudyItems, i18n.resolvedLanguage]);
 
   const recentlyReviewedMeta = useMemo(() => {
     const map = new Map<string, { grade: Grade; reviewedAt: string }>();
@@ -115,11 +117,11 @@ export function useNotesListPage() {
       if (!log.grade || map.has(log.note_id)) return;
       map.set(log.note_id, {
         grade: log.grade,
-        reviewedAt: formatRelativeTime(log.reviewed_at),
+        reviewedAt: formatRelativeTime(log.reviewed_at, i18n.resolvedLanguage),
       });
     });
     return map;
-  }, [todayReviewLogs]);
+  }, [todayReviewLogs, i18n.resolvedLanguage]);
 
   const handleNewNote = async () => {
     const note = await createMutation.mutateAsync({});
@@ -144,8 +146,8 @@ export function useNotesListPage() {
   const shouldShowLearningSessionButton = hasActiveTodayLearningSession
     || (!todayLearningSession && !isDueStudyItemsLoading && hasItemsToLearnToday);
   const learningSessionButtonLabel = hasActiveTodayLearningSession
-    ? 'Continue learning session'
-    : 'Start learning session';
+    ? t('list.continueLearningSession')
+    : t('list.startLearningSession');
 
   const handleLearningSessionClick = () => {
     if (

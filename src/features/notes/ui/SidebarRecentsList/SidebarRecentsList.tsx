@@ -1,5 +1,6 @@
 import { Clock } from 'lucide-react';
 import { RiArrowDownSLine } from 'react-icons/ri';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/ui';
 import type { NoteListItem } from '../../model/types';
 import './SidebarRecentsList.css';
@@ -23,6 +24,8 @@ export function SidebarRecentsList({
   navigate,
   activeId,
 }: SidebarRecentsListProps) {
+  const { t } = useTranslation('notes');
+
   if (recentIds.length === 0) return null;
 
   return (
@@ -34,7 +37,7 @@ export function SidebarRecentsList({
         className="sidebar-recents__header"
       >
         <Clock className="sidebar-recents__clock size-4" />
-        <span>Recently visited</span>
+        <span>{t('sidebar.recentlyVisited')}</span>
         <span
           className={`sidebar-recents__chevron ${!isExpanded ? 'sidebar-recents__chevron--collapsed' : ''}`}
           aria-hidden
@@ -58,7 +61,7 @@ export function SidebarRecentsList({
                 onClick={() => navigate(noteId)}
               >
                 <span className="sidebar-recents__title">
-                  {note.title || 'Untitled'}
+                  {note.title || t('untitled')}
                 </span>
                 {formattedTime && (
                   <span className="sidebar-recents__time">{formattedTime}</span>

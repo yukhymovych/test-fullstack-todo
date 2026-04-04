@@ -1,10 +1,22 @@
+function capitalize(value: string): string {
+  if (!value) {
+    return value;
+  }
+
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function createRelativeTimeFormatter(locale?: string, style: Intl.RelativeTimeFormatStyle = 'long') {
+  return new Intl.RelativeTimeFormat(locale, { numeric: 'auto', style });
+}
+
 /**
  * Formats ISO date string for display.
  * Pure function - no side effects, no React.
  */
-export function formatDate(iso: string): string {
+export function formatDate(iso: string, locale?: string): string {
   const d = new Date(iso);
-  return d.toLocaleDateString(undefined, {
+  return d.toLocaleDateString(locale, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -14,36 +26,34 @@ export function formatDate(iso: string): string {
 }
 
 /**
- * Formats ISO date as relative time: "5 min ago", "17m ago", "2h ago", "2d ago", "1 week ago", "Feb 21".
+ * Formats ISO date as localized relative time.
  * Pure function - no side effects, no React.
  */
-export function formatRelativeTime(iso: string): string {
+export function formatRelativeTime(iso: string, locale?: string): string {
   const d = new Date(iso);
   const now = new Date();
-  const diffMs = now.getTime() - d.getTime();
-  const diffSec = Math.floor(diffMs / 1000);
-  const diffMin = Math.floor(diffSec / 60);
-  const diffH = Math.floor(diffMin / 60);
-  const diffD = Math.floor(diffH / 24);
-  const diffW = Math.floor(diffD / 7);
+  const diffMs = d.getTime() - now.getTime();
+  const diffSec = Math.round(diffMs / 1000);
+  const diffMin = Math.round(diffSec / 60);
+  const diffH = Math.round(diffMin / 60);
+  const diffD = Math.round(diffH / 24);
+  const diffW = Math.round(diffD / 7);
+  const formatter = createRelativeTimeFormatter(locale, 'short');
 
-  if (diffSec < 60) return 'just now';
-  if (diffMin < 60) {
-    if (diffMin === 1) return '1 min ago';
-    if (diffMin < 10) return `${diffMin} min ago`;
-    return `${diffMin}m ago`;
-  }
-  if (diffH < 24) return `${diffH}h ago`;
-  if (diffD < 7) return `${diffD}d ago`;
-  if (diffW < 4) return diffW === 1 ? '1 week ago' : `${diffW} weeks ago`;
-  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  if (Math.abs(diffSec) < 60) return capitalize(formatter.format(0, 'second'));
+  if (Math.abs(diffMin) < 60) return formatter.format(diffMin, 'minute');
+  if (Math.abs(diffH) < 24) return formatter.format(diffH, 'hour');
+  if (Math.abs(diffD) < 7) return formatter.format(diffD, 'day');
+  if (Math.abs(diffW) < 4) return formatter.format(diffW, 'week');
+
+  return d.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
 }
 
 /**
- * Formats a future ISO date for "due" display: "Today", "Tomorrow", "in 2 days", "Mar 1, 2025".
+ * Formats a future ISO date for "due" display.
  * Pure function - no side effects, no React.
  */
-export function formatDueDate(iso: string): string {
+export function formatDueDate(iso: string, locale?: string): string {
   const d = new Date(iso);
   const now = new Date();
   now.setHours(0, 0, 0, 0);
@@ -51,13 +61,13 @@ export function formatDueDate(iso: string): string {
   dueStart.setHours(0, 0, 0, 0);
   const diffMs = dueStart.getTime() - now.getTime();
   const diffD = Math.round(diffMs / (24 * 60 * 60 * 1000));
+  const formatter = createRelativeTimeFormatter(locale);
 
-  if (diffD <= 0) return 'Today';
-  if (diffD === 1) return 'Tomorrow';
-  if (diffD < 7) return `in ${diffD} days`;
-  if (diffD < 14) return 'in 1 week';
-  if (diffD < 30) return `in ${Math.floor(diffD / 7)} weeks`;
-  return d.toLocaleDateString(undefined, {
+  if (diffD <= 0) return capitalize(formatter.format(0, 'day'));
+  if (diffD < 7) return capitalize(formatter.format(diffD, 'day'));
+  if (diffD < 30) return capitalize(formatter.format(Math.floor(diffD / 7), 'week'));
+
+  return d.toLocaleDateString(locale, {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
@@ -65,10 +75,10 @@ export function formatDueDate(iso: string): string {
 }
 
 /**
- * Formats past/today ISO dates for "ready" display: "Today" or "Mar 8, 2026".
+ * Formats past/today ISO dates for "ready" display.
  * Pure function - no side effects, no React.
  */
-export function formatTodayOrPastDate(iso: string): string {
+export function formatTodayOrPastDate(iso: string, locale?: string): string {
   const d = new Date(iso);
   const now = new Date();
   const todayStart = new Date(now);
@@ -77,10 +87,10 @@ export function formatTodayOrPastDate(iso: string): string {
   dueStart.setHours(0, 0, 0, 0);
 
   if (dueStart.getTime() === todayStart.getTime()) {
-    return 'Today';
+    return capitalize(createRelativeTimeFormatter(locale).format(0, 'day'));
   }
 
-  return d.toLocaleDateString(undefined, {
+  return d.toLocaleDateString(locale, {
     month: 'short',
     day: 'numeric',
     year: 'numeric',

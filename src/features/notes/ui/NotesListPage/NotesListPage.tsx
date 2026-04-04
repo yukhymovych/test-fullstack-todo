@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BookOpen, CircleAlert, Clock, History } from 'lucide-react';
 import { Badge, Button, Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui';
-import { GRADE_BADGE_STYLES, GRADE_LABELS } from '@/features/learning/lib/gradePresentation';
+import { GRADE_BADGE_STYLES, getGradeLabel } from '@/features/learning/lib/gradePresentation';
 import { NotesSliderSection } from '../NotesSliderSection';
 import type { NotesListPageProps } from './NotesListPage.types';
 import './NotesListPage.css';
@@ -29,15 +30,16 @@ export function NotesListPageView({
   onMainLearningSessionClick,
 }: NotesListPageProps) {
   const [isDueTooltipOpen, setIsDueTooltipOpen] = useState(false);
+  const { t } = useTranslation(['common', 'learning', 'notes']);
 
   if (isLoading) {
-    return <div className="notes-list-page__container">Loading data...</div>;
+    return <div className="notes-list-page__container">{t('list.loading', { ns: 'notes' })}</div>;
   }
 
   if (error) {
     return (
       <div className="notes-list-page__container notes-list-page__container--error">
-        Error loading data: {error.message}
+        {t('list.errorLoading', { ns: 'notes', message: error.message })}
       </div>
     );
   }
@@ -52,7 +54,9 @@ export function NotesListPageView({
             onClick={onNewNote}
             disabled={createPending}
           >
-            {createPending ? 'Creating...' : 'New page'}
+            {createPending
+              ? t('sidebar.creating', { ns: 'notes' })
+              : t('sidebar.newPage', { ns: 'notes' })}
           </Button>
           {showLearningSessionButton && (
             <Button
@@ -68,26 +72,28 @@ export function NotesListPageView({
       </div>
 
       {createError && (
-        <div className="notes-list-page__create-error">Error: {createError.message}</div>
+        <div className="notes-list-page__create-error">
+          {t('errors.withMessage', { ns: 'common', message: createError.message })}
+        </div>
       )}
 
       <div className="notes-list-page__middle">
         <NotesSliderSection
-          title="Recently visited"
+          title={t('list.recentlyVisited', { ns: 'notes' })}
           icon={Clock}
           notes={recentNotes}
           formattedTimes={recentFormattedTimes}
           onNoteClick={onNoteClick}
         />
         <NotesSliderSection
-          title="Today's main learning session"
+          title={t('list.todayMainLearningSession', { ns: 'notes' })}
           icon={BookOpen}
           notes={mainLearningSessionNotes}
           formattedTimes={mainLearningSessionFormattedTimes}
           onNoteClick={onMainLearningSessionClick}
         />
         <NotesSliderSection
-          title="Ready for learning"
+          title={t('list.readyForLearning', { ns: 'notes' })}
           icon={BookOpen}
           titleSuffix={
             <>
@@ -98,7 +104,7 @@ export function NotesListPageView({
                 <TooltipTrigger asChild>
                   <button
                     type="button"
-                    aria-label="Due items info"
+                    aria-label={t('list.dueItemsInfo', { ns: 'notes' })}
                     className="inline-flex cursor-help items-center border-0 bg-transparent p-0 text-[#9ca3af] hover:text-[#d1d5db]"
                     onClick={() => setIsDueTooltipOpen((prev) => !prev)}
                   >
@@ -106,7 +112,7 @@ export function NotesListPageView({
                   </button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  All notes with next review date equals Today or in the past.
+                  {t('list.dueItemsTooltip', { ns: 'notes' })}
                 </TooltipContent>
               </Tooltip>
             </>
@@ -116,7 +122,7 @@ export function NotesListPageView({
           onNoteClick={onNoteClick}
         />
         <NotesSliderSection
-          title="Recently reviewed"
+          title={t('list.recentlyReviewed', { ns: 'notes' })}
           icon={History}
           notes={recentlyReviewedNotes}
           formattedTimes={new Map()}
@@ -126,7 +132,7 @@ export function NotesListPageView({
             return (
               <span className="notes-list-page__reviewed-meta">
                 <Badge className={GRADE_BADGE_STYLES[meta.grade]}>
-                  {GRADE_LABELS[meta.grade]}
+                  {getGradeLabel(t, meta.grade)}
                 </Badge>
                 <span>{meta.reviewedAt}</span>
               </span>
@@ -138,7 +144,7 @@ export function NotesListPageView({
 
       <div>
         {!notes || notes.length === 0 && (
-          <p>No notes yet. Click &quot;New note&quot; to create one.</p>
+          <p>{t('list.empty', { ns: 'notes' })}</p>
         )}
       </div>
     </div>

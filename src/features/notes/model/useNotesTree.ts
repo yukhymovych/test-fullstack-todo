@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import {
   useNotesQuery,
   useCreateNote,
@@ -119,6 +120,7 @@ function saveAllPagesExpandedToStorage(expanded: boolean) {
 
 export function useNotesTree() {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation('notes');
   const { id: activeId } = useParams<{ id: string }>();
   const queryClient = useQueryClient();
   const { data: notes, isLoading, error } = useNotesQuery();
@@ -183,11 +185,11 @@ export function useNotesTree() {
     recentIds.forEach((id) => {
       const note = byId.get(id);
       if (note?.last_visited_at) {
-        map.set(id, formatRelativeTime(note.last_visited_at));
+        map.set(id, formatRelativeTime(note.last_visited_at, i18n.resolvedLanguage));
       }
     });
     return map;
-  }, [recentIds, byId]);
+  }, [recentIds, byId, i18n.resolvedLanguage]);
 
   const toggleRecentsExpand = useCallback(() => {
     setRecentsExpanded((prev) => {
@@ -317,13 +319,13 @@ export function useNotesTree() {
 
   const handleDeletePage = useCallback(
     async (pageId: string) => {
-      if (!window.confirm('Move this page and its child pages to trash?')) return;
+      if (!window.confirm(t('confirm.trashPage'))) return;
       await trashNote.mutateAsync(pageId);
       if (activeId === pageId) {
         navigate(notesRoutes.list());
       }
     },
-    [trashNote, activeId, navigate]
+    [trashNote, activeId, navigate, t]
   );
 
   const handleAddToFavorites = useCallback(

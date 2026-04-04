@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useTodayLearningSession } from '../features/learning/model/useTodayLearningSession';
 import { useLearningSessionById } from '../features/learning/model/useLearningSessionById';
 import { useNoteQuery, useNoteEmbeds } from '../features/notes/model/useNotes';
@@ -16,7 +17,8 @@ import { usePageTitle } from '../shared/lib/usePageTitle';
 import '../features/learning/ui/LearningPage.css';
 
 export function LearningSessionPage() {
-  usePageTitle('Learning');
+  const { t } = useTranslation(['common', 'learning']);
+  usePageTitle(t('pageTitles.learning', { ns: 'common' }));
 
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('sessionId') ?? undefined;
@@ -47,13 +49,13 @@ export function LearningSessionPage() {
   }, [embeds]);
 
   if (isLoading) {
-    return <div className="learning-page-loading">Loading session...</div>;
+    return <div className="learning-page-loading">{t('page.loadingSession', { ns: 'learning' })}</div>;
   }
 
   if (error) {
     return (
       <div className="learning-page-error">
-        Error: {error.message}
+        {t('errors.withMessage', { ns: 'common', message: error.message })}
       </div>
     );
   }
@@ -61,7 +63,7 @@ export function LearningSessionPage() {
   if (!session || session.items.length === 0) {
     return (
       <div className="learning-page-empty">
-        <p>No items to review today.</p>
+        <p>{t('page.noItemsToday', { ns: 'learning' })}</p>
       </div>
     );
   }
@@ -79,7 +81,7 @@ export function LearningSessionPage() {
   if (!currentItem) {
     return (
       <div className="learning-page-empty">
-        <p>No pending items.</p>
+        <p>{t('page.noPendingItems', { ns: 'learning' })}</p>
       </div>
     );
   }
@@ -87,7 +89,7 @@ export function LearningSessionPage() {
   const doneCount = session.items.filter((i) => i.state === 'done').length;
   const displayIndex = doneCount;
   const note = noteQuery.data;
-  const title = currentItem.title ?? note?.title ?? '(Untitled)';
+  const title = currentItem.title ?? note?.title ?? t('page.untitled', { ns: 'learning' });
   const content = note?.content_text ?? '';
   const richContent = note?.rich_content;
 

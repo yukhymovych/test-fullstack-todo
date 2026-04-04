@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { BookOpen } from 'lucide-react';
 import { Button } from '@/shared/ui';
+import { useTranslation } from 'react-i18next';
 import { useTodayLearningSession } from '../model/useTodayLearningSession';
 import { useTodayScopedSessions } from '../model/useTodayScopedSessions';
 import { useDueStudyItemsCount } from '../model/useDueStudyItemsCount';
@@ -10,13 +11,9 @@ import './LearningSidebarCard.css';
 
 const GLOBAL_DAILY_CAP = 15;
 
-const SCOPED_MODE_LABEL: Record<'deep_dive' | 'due_only', string> = {
-  deep_dive: 'Deep dive',
-  due_only: 'Due only',
-};
-
 export function LearningSidebarCard() {
   const navigate = useNavigate();
+  const { t } = useTranslation('learning');
   const { data: session, isLoading } = useTodayLearningSession();
   const { data: scopedSessions = [], isLoading: scopedLoading } =
     useTodayScopedSessions();
@@ -50,7 +47,7 @@ export function LearningSidebarCard() {
   if (isLoading || scopedLoading) {
     return (
       <div className="learning-sidebar-card">
-        <div className="learning-sidebar-card__loading">Loading...</div>
+        <div className="learning-sidebar-card__loading">{t('sidebar.loading')}</div>
       </div>
     );
   }
@@ -59,7 +56,7 @@ export function LearningSidebarCard() {
     <div className="learning-sidebar-card">
       <div className="learning-sidebar-card__header">
         <BookOpen className="learning-sidebar-card__icon size-4" />
-        <span>Learning</span>
+        <span>{t('sidebar.title')}</span>
       </div>
       <div className="learning-sidebar-card__stats">
         {hasSession ? (
@@ -67,31 +64,30 @@ export function LearningSidebarCard() {
             <span className="learning-sidebar-card__remaining">{pendingCount}</span>
             <span className="learning-sidebar-card__separator">/</span>
             <span className="learning-sidebar-card__total">{totalCount}</span>
-            <span className="learning-sidebar-card__label"> remaining</span>
+            <span className="learning-sidebar-card__label"> {t('sidebar.remaining')}</span>
           </>
         ) : hasItemsReady ? (
           <>
             <div>
               <span className="learning-sidebar-card__remaining">{dueCount}</span>
-              <span className="learning-sidebar-card__label"> ready</span>
+              <span className="learning-sidebar-card__label"> {t('sidebar.ready')}</span>
             </div>
             <div className="learning-sidebar-card__hint">
-              Today&apos;s session: up to {sessionCapacity} item
-              {sessionCapacity === 1 ? '' : 's'}
+              {t('sidebar.sessionLimit', { count: sessionCapacity })}
             </div>
             {queuedCount > 0 && (
               <div className="learning-sidebar-card__hint">
-                {queuedCount} remain in queue
+                {t('sidebar.queueRemaining', { count: queuedCount })}
               </div>
             )}
           </>
         ) : (
-          <span className="learning-sidebar-card__label">No items due</span>
+          <span className="learning-sidebar-card__label">{t('sidebar.noItemsDue')}</span>
         )}
       </div>
       {isSessionCompleted ? (
         <div className="learning-sidebar-card__completed">
-          Learnings session is completed
+          {t('sidebar.completed')}
         </div>
       ) : (
         <Button
@@ -101,18 +97,18 @@ export function LearningSidebarCard() {
           disabled={startSession.isPending}
         >
           {startSession.isPending
-            ? 'Starting...'
+            ? t('sidebar.starting')
             : canContinue
-              ? 'Continue'
+              ? t('sidebar.continue')
               : hasItemsReady
-                ? "Start today's session"
-                : 'Start Learning'}
+                ? t('sidebar.startToday')
+                : t('sidebar.startLearning')}
         </Button>
       )}
       {activeScopedSessions.length > 0 && (
         <div className="learning-sidebar-card__scoped">
           <span className="learning-sidebar-card__scoped-label">
-            Continue scoped sessions
+            {t('sidebar.continueScopedSessions')}
           </span>
           {activeScopedSessions.map((s) => (
             <Button
@@ -122,7 +118,7 @@ export function LearningSidebarCard() {
               className="learning-sidebar-card__scoped-btn"
               onClick={() => navigate(learningRoutes.sessionById(s.sessionId))}
             >
-              {s.rootTitle} ({SCOPED_MODE_LABEL[s.mode]}): {s.done}/{s.total}
+              {s.rootTitle} ({t(`sidebar.scopedModes.${s.mode}`)}): {s.done}/{s.total}
             </Button>
           ))}
         </div>

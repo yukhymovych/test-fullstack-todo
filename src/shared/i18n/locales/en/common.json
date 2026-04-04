@@ -1,0 +1,44 @@
+{
+  "appName": "Rememo",
+  "pageTitles": {
+    "login": "Login",
+    "notes": "Notes",
+    "learning": "Learning",
+    "settings": "Settings"
+  },
+  "status": {
+    "loading": "Loading...",
+    "redirectingToLogin": "Redirecting to login...",
+    "loadingAuthentication": "Loading authentication...",
+    "redirecting": "Redirecting..."
+  },
+  "navigation": {
+    "openSidebar": "Open sidebar",
+    "closeSidebar": "Close sidebar",
+    "closeSidebarOverlay": "Close sidebar overlay",
+    "goToHomePage": "Go to home page",
+    "settings": "Settings",
+    "trash": "Trash"
+  },
+  "user": {
+    "fallbackName": "User"
+  },
+  "userMenu": {
+    "settings": "Settings",
+    "logout": "Logout",
+    "debug": {
+      "adding": "Adding...",
+      "addMore": "Add more items (debug)",
+      "resetting": "Resetting...",
+      "resetSession": "Reset session (debug)",
+      "deleting": "Deleting...",
+      "deleteFutureSessions": "Delete future sessions (debug)",
+      "deleteTodayScopedSessions": "Delete today scoped sessions (debug)",
+      "refreshing": "Refreshing...",
+      "refreshAllGrades": "Refresh all grades (debug)"
+    }
+  },
+  "errors": {
+    "withMessage": "Error: {{message}}"
+  }
+}

@@ -1,11 +1,9 @@
 import type { Grade } from '../domain/learning.types';
+import type { TFunction } from 'i18next';
 
-export const GRADE_LABELS: Record<Grade, string> = {
-  again: 'Again',
-  hard: 'Hard',
-  good: 'Good',
-  easy: 'Easy',
-};
+export function getGradeLabel(t: TFunction, grade: Grade): string {
+  return t(`grades.${grade}`, { ns: 'learning' });
+}
 
 export const GRADE_BUTTON_STYLES: Record<Grade, string> = {
   again: 'bg-red-500 text-white hover:bg-red-600 border-0',

@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import {
   useDeleteFutureSessionsDebug,
@@ -19,8 +20,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/ui';
-import { FolderMinus, LogOut, Plus, RefreshCw, RotateCcw, Trash2 } from 'lucide-react';
+import {
+  FolderMinus,
+  Languages,
+  LogOut,
+  Plus,
+  RefreshCw,
+  RotateCcw,
+  Trash2,
+} from 'lucide-react';
 import { DEBUG_ACTIONS } from '@/shared/config/env';
+import { notesRoutes } from '@/features/notes/lib/routes';
 
 function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/);
@@ -32,8 +42,9 @@ function getInitials(name: string): string {
 
 export function UserInfo() {
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
   const { user, logout } = useAuth();
-  const displayName = user?.name ?? user?.email ?? 'User';
+  const displayName = user?.name ?? user?.email ?? t('user.fallbackName');
   const deleteFutureSessions = useDeleteFutureSessionsDebug();
   const deleteTodayScopedSessions = useDeleteTodayScopedSessionsDebug();
   const refreshAllGrades = useRefreshAllGradesDebug();
@@ -80,6 +91,10 @@ export function UserInfo() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-48">
+        <DropdownMenuItem onClick={() => navigate(notesRoutes.settings())}>
+          <Languages className="size-4" />
+          {t('userMenu.settings')}
+        </DropdownMenuItem>
         {DEBUG_ACTIONS && (
           <>
             <DropdownMenuItem
@@ -88,7 +103,9 @@ export function UserInfo() {
               className="text-muted-foreground"
             >
               <Plus className="size-4" />
-              {refillSession.isPending ? 'Adding...' : 'Add more items (debug)'}
+              {refillSession.isPending
+                ? t('userMenu.debug.adding')
+                : t('userMenu.debug.addMore')}
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={handleResetSession}
@@ -96,7 +113,9 @@ export function UserInfo() {
               className="text-muted-foreground"
             >
               <RotateCcw className="size-4" />
-              {isResetting ? 'Resetting...' : 'Reset session (debug)'}
+              {isResetting
+                ? t('userMenu.debug.resetting')
+                : t('userMenu.debug.resetSession')}
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => deleteFutureSessions.mutate(undefined)}
@@ -105,8 +124,8 @@ export function UserInfo() {
             >
               <Trash2 className="size-4" />
               {deleteFutureSessions.isPending
-                ? 'Deleting...'
-                : 'Delete future sessions (debug)'}
+                ? t('userMenu.debug.deleting')
+                : t('userMenu.debug.deleteFutureSessions')}
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => deleteTodayScopedSessions.mutate(undefined)}
@@ -115,8 +134,8 @@ export function UserInfo() {
             >
               <FolderMinus className="size-4" />
               {deleteTodayScopedSessions.isPending
-                ? 'Deleting...'
-                : 'Delete today scoped sessions (debug)'}
+                ? t('userMenu.debug.deleting')
+                : t('userMenu.debug.deleteTodayScopedSessions')}
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => refreshAllGrades.mutate(undefined)}
@@ -125,14 +144,14 @@ export function UserInfo() {
             >
               <RefreshCw className="size-4" />
               {refreshAllGrades.isPending
-                ? 'Refreshing...'
-                : 'Refresh all grades (debug)'}
+                ? t('userMenu.debug.refreshing')
+                : t('userMenu.debug.refreshAllGrades')}
             </DropdownMenuItem>
           </>
         )}
         <DropdownMenuItem variant="destructive" onClick={logout}>
           <LogOut className="size-4" />
-          Logout
+          {t('userMenu.logout')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

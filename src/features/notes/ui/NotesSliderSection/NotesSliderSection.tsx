@@ -1,4 +1,5 @@
 import type { NotesSliderSectionProps } from './NotesSliderSection.types';
+import { useTranslation } from 'react-i18next';
 import {
   Carousel,
   CarouselContent,
@@ -17,6 +18,8 @@ export function NotesSliderSection({
   renderMeta,
   onNoteClick,
 }: NotesSliderSectionProps) {
+  const { t } = useTranslation('notes');
+
   if (notes.length === 0) return null;
 
   return (
@@ -43,7 +46,7 @@ export function NotesSliderSection({
                 onClick={() => onNoteClick(note.id)}
               >
                 <div className="notes-slider-section__card-title">
-                  {note.title || 'Untitled'}
+                  {note.title || t('untitled')}
                 </div>
                 <div className="notes-slider-section__card-meta">
                   {renderMeta ? renderMeta(note.id) : (formattedTimes.get(note.id) ?? '')}

@@ -1,9 +1,11 @@
 import { useNotesListPage } from '../features/notes/model/useNotesListPage';
 import { NotesListPageView } from '../features/notes/ui/NotesListPage';
+import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '../shared/lib/usePageTitle';
 
 export function NotesListPage() {
-  usePageTitle('Notes');
+  const { t } = useTranslation('common');
+  usePageTitle(t('pageTitles.notes'));
 
   const {
     notes,
