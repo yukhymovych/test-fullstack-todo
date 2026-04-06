@@ -26,7 +26,7 @@ self.addEventListener('push', (event) => {
 
   const title = payload.title ?? 'Rememo';
   const body = payload.body ?? '';
-  const url = payload.url ?? '/learning';
+  const url = payload.url ?? '/notes';
 
   event.waitUntil(
     self.registration.showNotification(title, {
@@ -42,7 +42,7 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const targetUrl = String(event.notification.data?.url ?? '/learning');
+  const targetUrl = String(event.notification.data?.url ?? '/notes');
 
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {

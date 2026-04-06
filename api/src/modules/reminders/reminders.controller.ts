@@ -83,10 +83,6 @@ export async function runDailyReminderJobDebug(
   next: NextFunction
 ): Promise<void> {
   try {
-    if (process.env.NODE_ENV === 'production') {
-      res.status(404).json({ error: 'Not found' });
-      return;
-    }
     const userId = req.user!.id;
     const result = await remindersService.scheduleDebugPushForUser(userId, 10);
     res.json({ success: true, ...result });

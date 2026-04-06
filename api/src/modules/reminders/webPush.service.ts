@@ -22,7 +22,7 @@ export interface DailyReminderPushPayload {
   type: 'daily-review-reminder';
   title: 'Rememo';
   body: string;
-  url: '/learning';
+  url: '/notes';
 }
 
 type PushPayload = {
@@ -75,7 +75,7 @@ export async function sendDailyReminderPush(
     type: 'daily-review-reminder',
     title: 'Rememo',
     body: `You have ${dueCount} pages to review today`,
-    url: '/learning',
+    url: '/notes',
   };
   return sendPushPayload(subscription, payload);
 }
@@ -91,7 +91,7 @@ export async function sendDebugReminderPush(
       dueCount > 0
         ? `You have ${dueCount} pages to review today`
         : 'Debug reminder test: open Rememo learning',
-    url: '/learning',
+    url: '/notes',
   };
   return sendPushPayload(subscription, payload);
 }
