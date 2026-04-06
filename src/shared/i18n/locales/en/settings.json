@@ -14,5 +14,22 @@
       "en": "English",
       "uk": "Ukrainian"
     }
+  },
+  "reminders": {
+    "sectionTitle": "Daily reminders",
+    "description": "Get one daily browser notification when you have study pages due.",
+    "statusLabel": "Status",
+    "subscriptionLabel": "Current browser subscription",
+    "subscriptionActive": "active",
+    "subscriptionMissing": "missing",
+    "enableButton": "Enable daily reminders",
+    "disableButton": "Disable daily reminders",
+    "debugRunJobButton": "Send debug push in 10s",
+    "status": {
+      "unsupported": "Push notifications are not supported in this browser",
+      "permission-denied": "Permission denied in browser settings",
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    }
   }
 }

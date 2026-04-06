@@ -60,6 +60,6 @@ export const http = {
     fetchJson<T>(endpoint, { method: 'PATCH', body }),
   put: <T>(endpoint: string, body?: unknown) =>
     fetchJson<T>(endpoint, { method: 'PUT', body }),
-  delete: <T>(endpoint: string) =>
-    fetchJson<T>(endpoint, { method: 'DELETE' }),
+  delete: <T>(endpoint: string, body?: unknown) =>
+    fetchJson<T>(endpoint, { method: 'DELETE', body }),
 };

@@ -1,15 +1,18 @@
 import type { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { UiLanguage } from '@/shared/i18n/config';
+import type { ReactNode } from 'react';
 
 export interface SettingsPageViewProps {
   currentLanguage: UiLanguage;
   onLanguageChange: (language: UiLanguage) => void;
+  remindersSection?: ReactNode;
 }
 
 export function SettingsPageView({
   currentLanguage,
   onLanguageChange,
+  remindersSection,
 }: SettingsPageViewProps) {
   const { t } = useTranslation('settings');
 
@@ -50,6 +53,7 @@ export function SettingsPageView({
           <p>{t('language.storageHint')}</p>
         </div>
       </section>
+      {remindersSection}
     </div>
   );
 }

@@ -36,6 +36,21 @@ DATABASE_URL=postgresql://todo_user:password@localhost:5432/todo_db
 PORT=4000
 ```
 
+Для Web Push (щоденні нагадування) додайте:
+
+```
+WEB_PUSH_VAPID_PUBLIC_KEY=...
+WEB_PUSH_VAPID_PRIVATE_KEY=...
+WEB_PUSH_VAPID_SUBJECT=mailto:you@example.com
+DAILY_REMINDER_HOUR_UTC=9
+```
+
+Згенерувати VAPID-ключі можна командою:
+
+```bash
+npx web-push generate-vapid-keys
+```
+
 ### 4. Запуск міграцій
 
 Прогоніть міграції для створення таблиць:

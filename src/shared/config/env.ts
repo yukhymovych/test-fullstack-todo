@@ -6,6 +6,8 @@ export const API_URL =
 export const AUTH0_DOMAIN = import.meta.env.VITE_AUTH0_DOMAIN || '';
 export const AUTH0_CLIENT_ID = import.meta.env.VITE_AUTH0_CLIENT_ID || '';
 export const AUTH0_AUDIENCE = import.meta.env.VITE_AUTH0_AUDIENCE || '';
+export const WEB_PUSH_VAPID_PUBLIC_KEY =
+  import.meta.env.VITE_WEB_PUSH_VAPID_PUBLIC_KEY || '';
 
 const DEBUG_ACTIONS_RAW =
   import.meta.env.VITE_DEBUG_ACTIONS ?? import.meta.env.DEBUG_ACTIONS;

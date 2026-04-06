@@ -14,5 +14,22 @@
       "en": "English",
       "uk": "Українська"
     }
+  },
+  "reminders": {
+    "sectionTitle": "Щоденні нагадування",
+    "description": "Отримуйте одне щоденне сповіщення в браузері, якщо є сторінки для повторення.",
+    "statusLabel": "Статус",
+    "subscriptionLabel": "Підписка поточного браузера",
+    "subscriptionActive": "активна",
+    "subscriptionMissing": "відсутня",
+    "enableButton": "Увімкнути щоденні нагадування",
+    "disableButton": "Вимкнути щоденні нагадування",
+    "debugRunJobButton": "Надіслати debug push через 10с",
+    "status": {
+      "unsupported": "Push-сповіщення не підтримуються в цьому браузері",
+      "permission-denied": "Дозвіл заборонено в налаштуваннях браузера",
+      "enabled": "Увімкнено",
+      "disabled": "Вимкнено"
+    }
   }
 }
