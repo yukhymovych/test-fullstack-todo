@@ -1,0 +1,156 @@
+.daily-reminders-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.daily-reminders-section__header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.daily-reminders-section__title {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.daily-reminders-section__description {
+  font-size: 14px;
+  color: var(--muted-foreground);
+}
+
+.daily-reminders-section__status {
+  font-size: 14px;
+}
+
+.daily-reminders-section__status-value {
+  font-weight: 500;
+}
+
+.daily-reminders-section__subscription {
+  color: var(--muted-foreground);
+}
+
+.daily-reminders-section__time-field {
+  max-width: 384px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.daily-reminders-section__label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.daily-reminders-section__time-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.daily-reminders-section__select-wrap {
+  position: relative;
+}
+
+.daily-reminders-section__select {
+  height: 35px;
+  width: 60px;
+  border: 1px solid var(--input);
+  border-radius: 6px;
+  background: var(--background);
+  padding: 0 10px;
+  font-size: 14px;
+  appearance: none;
+  outline: none;
+}
+
+.daily-reminders-section__select:focus-visible {
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+.daily-reminders-section__select-icon {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  color: var(--muted-foreground);
+  pointer-events: none;
+  width: 14px;
+  height: 14px;
+}
+
+.daily-reminders-section__separator {
+  font-size: 14px;
+}
+
+.daily-reminders-section__hints {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--muted-foreground);
+}
+
+.daily-reminders-section__timezone-value {
+  font-weight: 500;
+}
+
+.daily-reminders-section__actions {
+  display: flex;
+}
+
+.daily-reminders-section__disable-button,
+.daily-reminders-section__enable-button {
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 6px;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.daily-reminders-section__disable-button:disabled,
+.daily-reminders-section__enable-button:disabled,
+.daily-reminders-section__debug-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.daily-reminders-section__disable-button {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--foreground);
+}
+
+.daily-reminders-section__enable-button {
+  border: 1px solid var(--foreground);
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.daily-reminders-section__debug {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.daily-reminders-section__debug-button {
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  background: transparent;
+  color: var(--foreground);
+}

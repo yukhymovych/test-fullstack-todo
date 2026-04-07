@@ -1,15 +1,11 @@
 {
   "page": {
-    "title": "Settings",
-    "heading": "Settings",
-    "description": "Manage your Rememo preferences."
+    "heading": "Settings"
   },
   "language": {
     "sectionTitle": "Interface language",
-    "label": "Language",
     "description": "Choose the language used for buttons, menus, labels, and other UI text.",
     "hint": "This only changes the app interface. It does not translate note titles, note content, or generated study material.",
-    "storageHint": "The selected language is currently stored locally and can be synced to a backend user profile later.",
     "options": {
       "en": "English",
       "uk": "Ukrainian"
@@ -20,7 +16,6 @@
     "description": "Get one daily browser notification when you have study pages due.",
     "statusLabel": "Status",
     "timeLabel": "Reminder time",
-    "timeHint": "Reminders follow your current device timezone and are checked after this local time.",
     "catchUpHint": "If nothing is due at that time, Rememo will still send one reminder later that same day when pages become due.",
     "timezoneLabel": "Current device timezone",
     "subscriptionLabel": "Current browser subscription",

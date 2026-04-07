@@ -1,0 +1,99 @@
+.settings-page {
+  width: 100%;
+  max-width: 768px;
+  margin: 0 auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.settings-page__header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-page__title {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.settings-page__section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.settings-page__section-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.settings-page__section-title {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.settings-page__section-description {
+  font-size: 14px;
+  color: var(--muted-foreground);
+}
+
+.settings-page__language-field {
+  max-width: 384px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-page__select-wrap {
+  position: relative;
+}
+
+.settings-page__select {
+  width: 100%;
+  height: 40px;
+  display: flex;
+  border: 1px solid var(--input);
+  border-radius: 6px;
+  background: var(--background);
+  padding: 0px 15px;
+  font-size: 14px;
+  outline: none;
+  appearance: none;
+}
+
+.settings-page__select:focus-visible {
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+.settings-page__select-icon {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  color: var(--muted-foreground);
+  pointer-events: none;
+  width: 16px;
+  height: 16px;
+}
+
+.settings-page__hints {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--muted-foreground);
+}
+
+@media (max-width: 767px) {
+  .settings-page__title {
+    margin-left: 40px;
+  }
+}

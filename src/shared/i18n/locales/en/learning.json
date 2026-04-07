@@ -9,7 +9,8 @@
     "loadingSession": "Loading session...",
     "noItemsToday": "No items to review today.",
     "noPendingItems": "No pending items.",
-    "untitled": "(Untitled)"
+    "untitled": "(Untitled)",
+    "studiedTodayAlready": "This page was studied today already."
   },
   "progress": {
     "stopLearning": "Stop learning"
