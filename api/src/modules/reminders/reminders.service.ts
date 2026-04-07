@@ -7,6 +7,9 @@ import {
   shouldAttemptReminderNow,
 } from './reminderSchedule.js';
 
+const ALLOW_MULTIPLE_REMINDERS_PER_DAY =
+  process.env.REMINDER_ALLOW_MULTIPLE_PER_DAY?.toLowerCase() === 'true';
+
 export async function savePushSubscription(input: {
   userId: string;
   endpoint: string;
@@ -109,7 +112,9 @@ export async function runDailyReminderJob(): Promise<DailyReminderJobStats> {
       now,
       timezone: user.timezone,
       reminderTimeLocal: user.daily_reminder_time_local,
-      lastReminderSentDayKey: user.last_daily_reminder_sent_day_key,
+      lastReminderSentDayKey: ALLOW_MULTIPLE_REMINDERS_PER_DAY
+        ? null
+        : user.last_daily_reminder_sent_day_key,
     });
     if (!timingDecision.shouldAttempt) {
       if (timingDecision.skipReason === 'before-time') {
