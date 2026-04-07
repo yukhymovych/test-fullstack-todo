@@ -1,6 +1,14 @@
 import * as learningService from '../learning/learning.service.js';
 import * as remindersSQL from './reminders.sql.js';
 import { sendDailyReminderPush, sendDebugReminderPush } from './webPush.service.js';
+import {
+  normalizeReminderTimeLocal,
+  normalizeTimezone,
+  shouldAttemptReminderNow,
+} from './reminderSchedule.js';
+
+const ALLOW_MULTIPLE_REMINDERS_PER_DAY =
+  process.env.REMINDER_ALLOW_MULTIPLE_PER_DAY?.toLowerCase() === 'true';
 
 export async function savePushSubscription(input: {
   userId: string;
@@ -29,31 +37,53 @@ export async function deactivatePushSubscription(
 
 export async function updateReminderSettings(
   userId: string,
-  dailyRemindersEnabled: boolean
-): Promise<{ dailyRemindersEnabled: boolean }> {
-  const enabled = await remindersSQL.setDailyRemindersEnabled(
-    userId,
-    dailyRemindersEnabled
-  );
-  return { dailyRemindersEnabled: enabled };
+  input: {
+    dailyRemindersEnabled?: boolean;
+    reminderTimeLocal?: string;
+    timezone?: string;
+  }
+): Promise<{
+  dailyRemindersEnabled: boolean;
+  reminderTimeLocal: string;
+  timezone: string;
+}> {
+  const settings = await remindersSQL.updateReminderSettings(userId, {
+    dailyRemindersEnabled: input.dailyRemindersEnabled,
+    reminderTimeLocal: input.reminderTimeLocal
+      ? normalizeReminderTimeLocal(input.reminderTimeLocal)
+      : undefined,
+    timezone:
+      input.timezone !== undefined ? normalizeTimezone(input.timezone) : undefined,
+  });
+  return {
+    dailyRemindersEnabled: Boolean(settings.daily_reminders_enabled),
+    reminderTimeLocal: normalizeReminderTimeLocal(settings.daily_reminder_time_local),
+    timezone: normalizeTimezone(settings.timezone),
+  };
 }
 
 export async function getReminderState(userId: string): Promise<{
   dailyRemindersEnabled: boolean;
   hasActivePushSubscription: boolean;
+  reminderTimeLocal: string;
+  timezone: string;
 }> {
-  const [dailyRemindersEnabled, subscriptions] = await Promise.all([
-    remindersSQL.getDailyRemindersEnabled(userId),
+  const [settings, subscriptions] = await Promise.all([
+    remindersSQL.getReminderSettings(userId),
     remindersSQL.listActivePushSubscriptionsByUser(userId),
   ]);
   return {
-    dailyRemindersEnabled,
+    dailyRemindersEnabled: Boolean(settings.daily_reminders_enabled),
     hasActivePushSubscription: subscriptions.length > 0,
+    reminderTimeLocal: normalizeReminderTimeLocal(settings.daily_reminder_time_local),
+    timezone: normalizeTimezone(settings.timezone),
   };
 }
 
 export interface DailyReminderJobStats {
   usersChecked: number;
+  usersSkippedBeforeTime: number;
+  usersSkippedAlreadySentToday: number;
   usersSkippedNoSubscriptions: number;
   usersSkippedNoDue: number;
   pushesAttempted: number;
@@ -64,8 +94,11 @@ export interface DailyReminderJobStats {
 
 export async function runDailyReminderJob(): Promise<DailyReminderJobStats> {
   const users = await remindersSQL.listReminderEnabledUsers();
+  const now = new Date();
   const stats: DailyReminderJobStats = {
     usersChecked: users.length,
+    usersSkippedBeforeTime: 0,
+    usersSkippedAlreadySentToday: 0,
     usersSkippedNoSubscriptions: 0,
     usersSkippedNoDue: 0,
     pushesAttempted: 0,
@@ -75,23 +108,64 @@ export async function runDailyReminderJob(): Promise<DailyReminderJobStats> {
   };
 
   for (const user of users) {
+    const timingDecision = shouldAttemptReminderNow({
+      now,
+      timezone: user.timezone,
+      reminderTimeLocal: user.daily_reminder_time_local,
+      lastReminderSentDayKey: ALLOW_MULTIPLE_REMINDERS_PER_DAY
+        ? null
+        : user.last_daily_reminder_sent_day_key,
+    });
+    if (!timingDecision.shouldAttempt) {
+      if (timingDecision.skipReason === 'before-time') {
+        stats.usersSkippedBeforeTime += 1;
+      } else if (timingDecision.skipReason === 'already-sent-today') {
+        stats.usersSkippedAlreadySentToday += 1;
+      }
+      console.log('[reminders] user decision', {
+        userId: user.id,
+        decision: timingDecision.skipReason ?? 'skipped',
+        timezone: user.timezone,
+        reminderTimeLocal: user.daily_reminder_time_local,
+        todayDayKey: timingDecision.todayDayKey,
+      });
+      continue;
+    }
+
     const subscriptions = await remindersSQL.listActivePushSubscriptionsByUser(user.id);
     if (subscriptions.length === 0) {
       stats.usersSkippedNoSubscriptions += 1;
+      console.log('[reminders] user decision', {
+        userId: user.id,
+        decision: 'no-active-subscriptions',
+        timezone: user.timezone,
+        reminderTimeLocal: user.daily_reminder_time_local,
+        todayDayKey: timingDecision.todayDayKey,
+      });
       continue;
     }
 
     const dueCount = await learningService.getDueStudyItemsCount(user.id);
     if (dueCount <= 0) {
       stats.usersSkippedNoDue += 1;
+      console.log('[reminders] user decision', {
+        userId: user.id,
+        decision: 'no-due-items',
+        dueCount,
+        timezone: user.timezone,
+        reminderTimeLocal: user.daily_reminder_time_local,
+        todayDayKey: timingDecision.todayDayKey,
+      });
       continue;
     }
 
+    let userHadSuccessfulPush = false;
     for (const subscription of subscriptions) {
       stats.pushesAttempted += 1;
       const result = await sendDailyReminderPush(subscription, dueCount);
       if (result.success) {
         stats.pushesSucceeded += 1;
+        userHadSuccessfulPush = true;
       } else {
         stats.pushesFailed += 1;
         if (result.shouldDeactivate) {
@@ -99,6 +173,29 @@ export async function runDailyReminderJob(): Promise<DailyReminderJobStats> {
           stats.subscriptionsDeactivated += 1;
         }
       }
+    }
+
+    if (userHadSuccessfulPush) {
+      await remindersSQL.markReminderSent(
+        user.id,
+        timingDecision.todayDayKey,
+        now
+      );
+      console.log('[reminders] user decision', {
+        userId: user.id,
+        decision: 'sent',
+        dueCount,
+        activeSubscriptions: subscriptions.length,
+        todayDayKey: timingDecision.todayDayKey,
+      });
+    } else {
+      console.log('[reminders] user decision', {
+        userId: user.id,
+        decision: 'all-pushes-failed',
+        dueCount,
+        activeSubscriptions: subscriptions.length,
+        todayDayKey: timingDecision.todayDayKey,
+      });
     }
   }
 

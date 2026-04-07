@@ -2,6 +2,7 @@ import { http } from '@/shared/api/http';
 import type {
   ReminderStateResponse,
   SavePushSubscriptionRequest,
+  UpdateReminderSettingsRequest,
 } from '../domain/reminders.types';
 
 export async function getReminderState(): Promise<ReminderStateResponse> {
@@ -9,11 +10,19 @@ export async function getReminderState(): Promise<ReminderStateResponse> {
 }
 
 export async function updateReminderSettings(
-  dailyRemindersEnabled: boolean
-): Promise<{ dailyRemindersEnabled: boolean }> {
-  return http.patch<{ dailyRemindersEnabled: boolean }>(
+  payload: UpdateReminderSettingsRequest
+): Promise<{
+  dailyRemindersEnabled: boolean;
+  reminderTimeLocal: string;
+  timezone: string;
+}> {
+  return http.patch<{
+    dailyRemindersEnabled: boolean;
+    reminderTimeLocal: string;
+    timezone: string;
+  }>(
     '/reminders/users/me/reminder-settings',
-    { dailyRemindersEnabled }
+    payload
   );
 }
 

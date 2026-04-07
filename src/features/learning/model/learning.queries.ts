@@ -1,3 +1,5 @@
+export { getBrowserTimezone } from '@/shared/lib/browserTimezone';
+
 export const LEARNING_KEYS = {
   all: ['learning'] as const,
   todaySession: (timezone?: string) =>
@@ -12,11 +14,3 @@ export const LEARNING_KEYS = {
   studyItemStatus: (pageId: string) =>
     [...LEARNING_KEYS.all, 'studyItem', pageId] as const,
 };
-
-export function getBrowserTimezone(): string {
-  try {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone ?? 'UTC';
-  } catch {
-    return 'UTC';
-  }
-}

@@ -53,10 +53,7 @@ export async function patchReminderSettings(
   try {
     const userId = req.user!.id;
     const input = updateReminderSettingsBodySchema.parse(req.body);
-    const result = await remindersService.updateReminderSettings(
-      userId,
-      input.dailyRemindersEnabled
-    );
+    const result = await remindersService.updateReminderSettings(userId, input);
     res.json(result);
   } catch (error) {
     next(error);

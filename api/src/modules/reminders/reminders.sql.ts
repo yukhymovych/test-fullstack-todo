@@ -1,4 +1,8 @@
 import { pool } from '../../db/pool.js';
+import {
+  DEFAULT_REMINDER_TIME_LOCAL,
+  DEFAULT_REMINDER_TIMEZONE,
+} from './reminderSchedule.js';
 
 export interface PushSubscriptionRecord {
   id: string;
@@ -13,6 +17,15 @@ export interface PushSubscriptionRecord {
 
 export interface ReminderCandidateUser {
   id: string;
+  timezone: string;
+  daily_reminder_time_local: string;
+  last_daily_reminder_sent_day_key: string | null;
+}
+
+export interface ReminderSettingsRecord {
+  daily_reminders_enabled: boolean;
+  daily_reminder_time_local: string;
+  timezone: string;
 }
 
 export async function upsertPushSubscription(input: {
@@ -89,33 +102,71 @@ export async function listActivePushSubscriptionsByUser(
 
 export async function listReminderEnabledUsers(): Promise<ReminderCandidateUser[]> {
   const result = await pool.query(
-    `SELECT id
+    `SELECT id,
+            COALESCE(timezone, $1) AS timezone,
+            COALESCE(daily_reminder_time_local, $2) AS daily_reminder_time_local,
+            last_daily_reminder_sent_day_key
      FROM users
      WHERE daily_reminders_enabled = true`
+    ,
+    [DEFAULT_REMINDER_TIMEZONE, DEFAULT_REMINDER_TIME_LOCAL]
   );
   return result.rows;
 }
 
-export async function setDailyRemindersEnabled(
+export async function updateReminderSettings(
   userId: string,
-  enabled: boolean
-): Promise<boolean> {
+  input: {
+    dailyRemindersEnabled?: boolean;
+    reminderTimeLocal?: string;
+    timezone?: string;
+  }
+): Promise<ReminderSettingsRecord> {
   const result = await pool.query(
     `UPDATE users
-     SET daily_reminders_enabled = $2
+     SET daily_reminders_enabled = COALESCE($2, daily_reminders_enabled),
+         daily_reminder_time_local = COALESCE($3, daily_reminder_time_local, $5),
+         timezone = COALESCE($4, timezone, $6)
      WHERE id = $1
-     RETURNING daily_reminders_enabled`,
-    [userId, enabled]
+     RETURNING daily_reminders_enabled,
+               COALESCE(daily_reminder_time_local, $5) AS daily_reminder_time_local,
+               COALESCE(timezone, $6) AS timezone`,
+    [
+      userId,
+      input.dailyRemindersEnabled ?? null,
+      input.reminderTimeLocal ?? null,
+      input.timezone ?? null,
+      DEFAULT_REMINDER_TIME_LOCAL,
+      DEFAULT_REMINDER_TIMEZONE,
+    ]
   );
-  return Boolean(result.rows[0]?.daily_reminders_enabled);
+  return result.rows[0];
 }
 
-export async function getDailyRemindersEnabled(userId: string): Promise<boolean> {
+export async function getReminderSettings(
+  userId: string
+): Promise<ReminderSettingsRecord> {
   const result = await pool.query(
-    `SELECT daily_reminders_enabled
+    `SELECT daily_reminders_enabled,
+            COALESCE(daily_reminder_time_local, $2) AS daily_reminder_time_local,
+            COALESCE(timezone, $3) AS timezone
      FROM users
      WHERE id = $1`,
-    [userId]
+    [userId, DEFAULT_REMINDER_TIME_LOCAL, DEFAULT_REMINDER_TIMEZONE]
   );
-  return Boolean(result.rows[0]?.daily_reminders_enabled);
+  return result.rows[0];
+}
+
+export async function markReminderSent(
+  userId: string,
+  dayKey: string,
+  sentAt: Date
+): Promise<void> {
+  await pool.query(
+    `UPDATE users
+     SET last_daily_reminder_sent_day_key = $2,
+         last_daily_reminder_sent_at = $3
+     WHERE id = $1`,
+    [userId, dayKey, sentAt]
+  );
 }

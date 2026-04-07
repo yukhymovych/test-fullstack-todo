@@ -1,6 +1,14 @@
 export interface ReminderStateResponse {
   dailyRemindersEnabled: boolean;
   hasActivePushSubscription: boolean;
+  reminderTimeLocal: string;
+  timezone: string;
+}
+
+export interface UpdateReminderSettingsRequest {
+  dailyRemindersEnabled?: boolean;
+  reminderTimeLocal?: string;
+  timezone?: string;
 }
 
 export interface SavePushSubscriptionRequest {
