@@ -121,7 +121,7 @@ export function SidebarNotesTree({ onNavigate }: SidebarNotesTreeProps) {
             </Link>
           </div>
           <div className="sidebar-user-info">
-            <UserInfo />
+            <UserInfo onNavigate={onNavigate} />
           </div>
         </div>
         <div className="sidebar-new-page-button">

@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next';
+import { ChevronDown } from 'lucide-react';
 import type { ReminderCapabilityStatus } from '../domain/reminders.types';
+import './DailyRemindersSection.css';
 
 const HOURS_24 = Array.from({ length: 24 }, (_, hour) =>
   String(hour).padStart(2, '0')
@@ -47,18 +49,20 @@ export function DailyRemindersSection(props: DailyRemindersSectionProps) {
   };
 
   return (
-    <section className="bg-card flex flex-col gap-4 rounded-lg border p-5">
-      <div className="space-y-1">
-        <h2 className="text-base font-medium">{t('reminders.sectionTitle')}</h2>
-        <p className="text-muted-foreground text-sm">{t('reminders.description')}</p>
+    <section className="daily-reminders-section">
+      <div className="daily-reminders-section__header">
+        <h2 className="daily-reminders-section__title">{t('reminders.sectionTitle')}</h2>
+        <p className="daily-reminders-section__description">{t('reminders.description')}</p>
       </div>
 
-      <div className="text-sm">
+      <div className="daily-reminders-section__status">
         <p>
           {t('reminders.statusLabel')}:{' '}
-          <span className="font-medium">{t(`reminders.status.${status}`)}</span>
+          <span className="daily-reminders-section__status-value">
+            {t(`reminders.status.${status}`)}
+          </span>
         </p>
-        <p className="text-muted-foreground">
+        <p className="daily-reminders-section__subscription">
           {t('reminders.subscriptionLabel')}:{' '}
           {hasActivePushSubscription
             ? t('reminders.subscriptionActive')
@@ -66,62 +70,74 @@ export function DailyRemindersSection(props: DailyRemindersSectionProps) {
         </p>
       </div>
 
-      <div className="flex max-w-sm flex-col gap-2">
-        <label htmlFor="daily-reminder-time" className="text-sm font-medium">
+      <div className="daily-reminders-section__time-field">
+        <label htmlFor="daily-reminder-time" className="daily-reminders-section__label">
           {t('reminders.timeLabel')}
         </label>
         <div
           id="daily-reminder-time"
-          className="flex items-center gap-2"
+          className="daily-reminders-section__time-controls"
           onBlur={onReminderTimeLocalBlur}
         >
-          <select
-            aria-label="Reminder hour"
-            className="border-input bg-background ring-offset-background h-10 w-20 rounded-md border px-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-            value={hourPart}
-            disabled={isBusy}
-            onChange={(event) => {
-              applyReminderTime(event.target.value, minutePart);
-            }}
-          >
-            {HOURS_24.map((hour) => (
-              <option key={hour} value={hour}>
-                {hour}
-              </option>
-            ))}
-          </select>
-          <span className="text-sm">:</span>
-          <select
-            aria-label="Reminder minute"
-            className="border-input bg-background ring-offset-background h-10 w-20 rounded-md border px-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-            value={minutePart}
-            disabled={isBusy}
-            onChange={(event) => {
-              applyReminderTime(hourPart, event.target.value);
-            }}
-          >
-            {MINUTES_60.map((minute) => (
-              <option key={minute} value={minute}>
-                {minute}
-              </option>
-            ))}
-          </select>
+          <div className="daily-reminders-section__select-wrap">
+            <select
+              aria-label="Reminder hour"
+              className="daily-reminders-section__select"
+              value={hourPart}
+              disabled={isBusy}
+              onChange={(event) => {
+                applyReminderTime(event.target.value, minutePart);
+              }}
+            >
+              {HOURS_24.map((hour) => (
+                <option key={hour} value={hour}>
+                  {hour}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              aria-hidden
+              className="daily-reminders-section__select-icon"
+            />
+          </div>
+          <span className="daily-reminders-section__separator">:</span>
+          <div className="daily-reminders-section__select-wrap">
+            <select
+              aria-label="Reminder minute"
+              className="daily-reminders-section__select"
+              value={minutePart}
+              disabled={isBusy}
+              onChange={(event) => {
+                applyReminderTime(hourPart, event.target.value);
+              }}
+            >
+              {MINUTES_60.map((minute) => (
+                <option key={minute} value={minute}>
+                  {minute}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              aria-hidden
+              className="daily-reminders-section__select-icon"
+            />
+          </div>
         </div>
       </div>
 
-      <div className="text-muted-foreground space-y-1 text-sm">
-        <p>{t('reminders.timeHint')}</p>
+      <div className="daily-reminders-section__hints">
         <p>{t('reminders.catchUpHint')}</p>
         <p>
-          {t('reminders.timezoneLabel')}: <span className="font-medium">{timezone}</span>
+          {t('reminders.timezoneLabel')}:{' '}
+          <span className="daily-reminders-section__timezone-value">{timezone}</span>
         </p>
       </div>
 
-      <div>
+      <div className="daily-reminders-section__actions">
         {remindersEnabled ? (
           <button
             type="button"
-            className="inline-flex h-10 cursor-pointer items-center rounded-md border px-4 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60"
+            className="daily-reminders-section__disable-button"
             disabled={isBusy}
             onClick={onDisable}
           >
@@ -130,7 +146,7 @@ export function DailyRemindersSection(props: DailyRemindersSectionProps) {
         ) : (
           <button
             type="button"
-            className="bg-foreground text-background inline-flex h-10 cursor-pointer items-center rounded-md px-4 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60"
+            className="daily-reminders-section__enable-button"
             disabled={isBusy || status === 'unsupported'}
             onClick={onEnable}
           >
@@ -139,10 +155,10 @@ export function DailyRemindersSection(props: DailyRemindersSectionProps) {
         )}
       </div>
       {showDebugActions && onRunDebugJobNow ? (
-        <div className="border-border border-t pt-3">
+        <div className="daily-reminders-section__debug">
           <button
             type="button"
-            className="inline-flex h-9 cursor-pointer items-center rounded-md border px-3 text-xs font-medium disabled:cursor-not-allowed disabled:opacity-60"
+            className="daily-reminders-section__debug-button"
             disabled={isBusy}
             onClick={onRunDebugJobNow}
           >

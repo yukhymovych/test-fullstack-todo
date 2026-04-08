@@ -2,6 +2,7 @@ import { LearningGradeBar } from './LearningGradeBar';
 import { useStudyItemStatus } from '../model/useStudyItemStatus';
 import { useSubmitGradeByPage } from '../model/useSubmitLearningGrade';
 import type { Grade } from '../domain/learning.types';
+import { useTranslation } from 'react-i18next';
 import './LearningGradeBar.css';
 
 export interface NoteEditorLearningGradeBarProps {
@@ -9,6 +10,7 @@ export interface NoteEditorLearningGradeBarProps {
 }
 
 export function NoteEditorLearningGradeBar({ noteId }: NoteEditorLearningGradeBarProps) {
+  const { t } = useTranslation('learning');
   const { data: status } = useStudyItemStatus(noteId);
   const submitGrade = useSubmitGradeByPage();
 
@@ -21,7 +23,7 @@ export function NoteEditorLearningGradeBar({ noteId }: NoteEditorLearningGradeBa
   if (studiedToday) {
     return (
       <div className="note-editor-learning-grade-bar note-editor-learning-grade-bar--studied">
-        This page was studied today already.
+        {t('page.studiedTodayAlready')}
       </div>
     );
   }

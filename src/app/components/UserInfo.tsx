@@ -40,7 +40,11 @@ function getInitials(name: string): string {
   return name.slice(0, 2).toUpperCase();
 }
 
-export function UserInfo() {
+export interface UserInfoProps {
+  onNavigate?: () => void;
+}
+
+export function UserInfo({ onNavigate }: UserInfoProps) {
   const navigate = useNavigate();
   const { t } = useTranslation('common');
   const { user, logout } = useAuth();
@@ -91,7 +95,12 @@ export function UserInfo() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-48">
-        <DropdownMenuItem onClick={() => navigate(notesRoutes.settings())}>
+        <DropdownMenuItem
+          onClick={() => {
+            navigate(notesRoutes.settings());
+            onNavigate?.();
+          }}
+        >
           <Languages className="size-4" />
           {t('userMenu.settings')}
         </DropdownMenuItem>

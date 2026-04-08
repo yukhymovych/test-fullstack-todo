@@ -9,7 +9,8 @@
     "loadingSession": "Завантаження сесії...",
     "noItemsToday": "Сьогодні немає елементів для повторення.",
     "noPendingItems": "Немає елементів у черзі.",
-    "untitled": "(Без назви)"
+    "untitled": "(Без назви)",
+    "studiedTodayAlready": "Цю сторінку вже вивчено сьогодні."
   },
   "progress": {
     "stopLearning": "Зупинити навчання"
