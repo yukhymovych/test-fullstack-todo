@@ -112,7 +112,7 @@ export function SidebarNotesTree({ onNavigate }: SidebarNotesTreeProps) {
         <div className="sidebar-header">
           <div className="sidebar-brand">
             <Link
-              to="/"
+              to={notesRoutes.list()}
               className="sidebar-brand__link"
               aria-label={t('navigation.goToHomePage', { ns: 'common' })}
               onClick={onNavigate}

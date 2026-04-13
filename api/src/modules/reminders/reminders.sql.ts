@@ -20,6 +20,7 @@ export interface ReminderCandidateUser {
   timezone: string;
   daily_reminder_time_local: string;
   last_daily_reminder_sent_day_key: string | null;
+  ui_language: string;
 }
 
 export interface ReminderSettingsRecord {
@@ -105,7 +106,8 @@ export async function listReminderEnabledUsers(): Promise<ReminderCandidateUser[
     `SELECT id,
             COALESCE(timezone, $1) AS timezone,
             COALESCE(daily_reminder_time_local, $2) AS daily_reminder_time_local,
-            last_daily_reminder_sent_day_key
+            last_daily_reminder_sent_day_key,
+            COALESCE(NULLIF(TRIM(ui_language), ''), 'en') AS ui_language
      FROM users
      WHERE daily_reminders_enabled = true`
     ,

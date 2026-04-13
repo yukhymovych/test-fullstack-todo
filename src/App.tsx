@@ -10,6 +10,7 @@ import { NotesLayout } from './app/layout/NotesLayout';
 import { LearningLayout } from './app/layout/LearningLayout';
 import { useAuth } from './app/contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { useSyncUiLanguageToServer } from '@/features/settings/model/useSyncUiLanguageToServer';
 import './App.css';
 
 function RootRedirect() {
@@ -28,6 +29,7 @@ function RootRedirect() {
 }
 
 function App() {
+  useSyncUiLanguageToServer();
   return (
     <Routes>
       <Route path="/" element={<RootRedirect />} />

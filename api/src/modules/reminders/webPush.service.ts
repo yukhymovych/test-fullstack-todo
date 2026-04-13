@@ -1,5 +1,10 @@
 import webpush from 'web-push';
 import type { PushSubscriptionRecord } from './reminders.sql.js';
+import {
+  getDailyReminderPushCopy,
+  getDebugReminderPushCopy,
+  type PushNotificationLocale,
+} from './pushNotificationI18n.js';
 
 const vapidPublicKey = process.env.WEB_PUSH_VAPID_PUBLIC_KEY;
 const vapidPrivateKey = process.env.WEB_PUSH_VAPID_PRIVATE_KEY;
@@ -16,13 +21,6 @@ function ensureConfigured() {
   }
   webpush.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey);
   isConfigured = true;
-}
-
-export interface DailyReminderPushPayload {
-  type: 'daily-review-reminder';
-  title: 'Rememo';
-  body: string;
-  url: '/notes';
 }
 
 type PushPayload = {
@@ -69,12 +67,14 @@ async function sendPushPayload(
 
 export async function sendDailyReminderPush(
   subscription: PushSubscriptionRecord,
-  dueCount: number
+  dueCount: number,
+  locale: PushNotificationLocale = 'en'
 ): Promise<{ success: true } | { success: false; shouldDeactivate: boolean; error: string }> {
-  const payload: DailyReminderPushPayload = {
+  const copy = getDailyReminderPushCopy(locale, dueCount);
+  const payload: PushPayload = {
     type: 'daily-review-reminder',
-    title: 'Rememo',
-    body: `You have ${dueCount} pages to review today`,
+    title: copy.title,
+    body: copy.body,
     url: '/notes',
   };
   return sendPushPayload(subscription, payload);
@@ -82,15 +82,14 @@ export async function sendDailyReminderPush(
 
 export async function sendDebugReminderPush(
   subscription: PushSubscriptionRecord,
-  dueCount: number
+  dueCount: number,
+  locale: PushNotificationLocale = 'en'
 ): Promise<{ success: true } | { success: false; shouldDeactivate: boolean; error: string }> {
+  const copy = getDebugReminderPushCopy(locale, dueCount);
   const payload: PushPayload = {
     type: 'daily-review-reminder',
-    title: 'Rememo',
-    body:
-      dueCount > 0
-        ? `You have ${dueCount} pages to review today`
-        : 'Debug reminder test: open Rememo learning',
+    title: copy.title,
+    body: copy.body,
     url: '/notes',
   };
   return sendPushPayload(subscription, payload);

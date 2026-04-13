@@ -1,6 +1,8 @@
 import * as learningService from '../learning/learning.service.js';
+import * as authSQL from '../auth/auth.sql.js';
 import * as remindersSQL from './reminders.sql.js';
 import { sendDailyReminderPush, sendDebugReminderPush } from './webPush.service.js';
+import { normalizePushLocale } from './pushNotificationI18n.js';
 import {
   normalizeReminderTimeLocal,
   normalizeTimezone,
@@ -159,10 +161,11 @@ export async function runDailyReminderJob(): Promise<DailyReminderJobStats> {
       continue;
     }
 
+    const locale = normalizePushLocale(user.ui_language);
     let userHadSuccessfulPush = false;
     for (const subscription of subscriptions) {
       stats.pushesAttempted += 1;
-      const result = await sendDailyReminderPush(subscription, dueCount);
+      const result = await sendDailyReminderPush(subscription, dueCount, locale);
       if (result.success) {
         stats.pushesSucceeded += 1;
         userHadSuccessfulPush = true;
@@ -218,13 +221,16 @@ export async function scheduleDebugPushForUser(
         return;
       }
 
+      const locale = normalizePushLocale(
+        await authSQL.getUiLanguageByUserId(userId)
+      );
       const dueCount = await learningService.getDueStudyItemsCount(userId);
       let pushesSucceeded = 0;
       let pushesFailed = 0;
       let subscriptionsDeactivated = 0;
 
       for (const subscription of subscriptions) {
-        const result = await sendDebugReminderPush(subscription, dueCount);
+        const result = await sendDebugReminderPush(subscription, dueCount, locale);
         if (result.success) {
           pushesSucceeded += 1;
         } else {

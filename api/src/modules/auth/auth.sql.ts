@@ -6,6 +6,7 @@ export interface User {
   email: string | null;
   name: string | null;
   timezone: string | null;
+  ui_language?: string | null;
   created_at: Date;
 }
 
@@ -37,4 +38,30 @@ export async function findOrCreateByAuth0Sub(
   const existing = await findByAuth0Sub(auth0Sub);
   if (existing) return existing;
   return createFromAuth0(auth0Sub, email, name);
+}
+
+export async function getUiLanguageByUserId(
+  userId: string
+): Promise<'en' | 'uk'> {
+  const result = await pool.query(
+    `SELECT COALESCE(NULLIF(TRIM(ui_language), ''), 'en') AS ui_language
+     FROM users
+     WHERE id = $1`,
+    [userId]
+  );
+  return result.rows[0]?.ui_language === 'uk' ? 'uk' : 'en';
+}
+
+export async function setUiLanguageByUserId(
+  userId: string,
+  uiLanguage: 'en' | 'uk'
+): Promise<'en' | 'uk'> {
+  const result = await pool.query(
+    `UPDATE users
+     SET ui_language = $2
+     WHERE id = $1
+     RETURNING COALESCE(NULLIF(TRIM(ui_language), ''), 'en') AS ui_language`,
+    [userId, uiLanguage]
+  );
+  return result.rows[0]?.ui_language === 'uk' ? 'uk' : 'en';
 }
