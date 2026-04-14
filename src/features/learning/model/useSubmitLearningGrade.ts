@@ -111,6 +111,11 @@ export function useSubmitLearningGrade() {
       learningApi.submitGrade(sessionItemId, grade),
     onSuccess: async (response, variables) => {
       queryClient.invalidateQueries({ queryKey: LEARNING_KEYS.all });
+      if (response.retrievabilityAtReview != null) {
+        console.log(
+          `[learning] retrievability at review: ${(response.retrievabilityAtReview * 100).toFixed(1)}%`
+        );
+      }
       await logReviewHistoryForPage(variables.noteId);
 
       showUndoGradeToast({
@@ -133,6 +138,11 @@ export function useSubmitGradeByPage() {
       learningApi.submitGradeByPage(pageId, grade, timezone),
     onSuccess: async (response, variables) => {
       queryClient.invalidateQueries({ queryKey: LEARNING_KEYS.all });
+      if (response.retrievabilityAtReview != null) {
+        console.log(
+          `[learning] retrievability at review: ${(response.retrievabilityAtReview * 100).toFixed(1)}%`
+        );
+      }
       await logReviewHistoryForPage(variables.pageId);
 
       showUndoGradeToast({

@@ -58,6 +58,8 @@ export interface StudyItemStatusResponse {
   gradedToday?: boolean;
   inTodaySession?: boolean;
   sessionItemState?: SessionItemState;
+  /** Estimated current memory retrievability [0, 1]. Null when the page has never been reviewed. */
+  retrievability?: number | null;
 }
 
 export interface StudyItemReviewLog {
@@ -89,6 +91,8 @@ export interface GradeSubmitResponse {
   reviewLogId?: string;
   undoToken?: string;
   undoExpiresAt?: string;
+  /** Estimated memory retrievability at the moment the grade was submitted [0, 1]. Null when first review. */
+  retrievabilityAtReview?: number | null;
 }
 
 export interface UndoReviewRequest {

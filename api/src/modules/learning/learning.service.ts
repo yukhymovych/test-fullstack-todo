@@ -4,7 +4,7 @@ import * as notesSQL from '../notes/notes.sql.js';
 import * as learningSQL from './learning.sql.js';
 import type { Grade } from './learning.schemas.js';
 import { getDayKey, isDateTodayInTimezone } from './learning.timezone.js';
-import { scheduleFsrsLight } from './fsrsLight.js';
+import { scheduleFsrsLight, computeRetrievability, diffDays, MIN_STABILITY_DAYS, MAX_STABILITY_DAYS } from './fsrsLight.js';
 import {
   computeDueOnlyScopedNoteIds,
   computeEligibleScopedNoteIds,
@@ -294,6 +294,7 @@ export async function gradeSessionItem(
         reviewLogId,
         undoToken,
         undoExpiresAt: undoExpiresAt.toISOString(),
+        retrievabilityAtReview: schedule.retrievabilityAtReview,
       };
     }
 
@@ -321,6 +322,7 @@ export async function gradeSessionItem(
       reviewLogId,
       undoToken,
       undoExpiresAt: undoExpiresAt.toISOString(),
+      retrievabilityAtReview: schedule.retrievabilityAtReview,
     };
   } catch (e) {
     await client.query('ROLLBACK');
@@ -446,6 +448,7 @@ export async function gradeByPage(
       reviewLogId,
       undoToken,
       undoExpiresAt: undoExpiresAt.toISOString(),
+      retrievabilityAtReview: schedule.retrievabilityAtReview,
     };
   } catch (e) {
     await client.query('ROLLBACK');
@@ -650,6 +653,23 @@ export async function getStudyItemStatus(
   const status = item.is_active ? ('active' as const) : ('inactive' as const);
   const gradedToday =
     !!timezone && isDateTodayInTimezone(item.last_reviewed_at, timezone);
+
+  let retrievability: number | null | undefined;
+  if (timezone) {
+    const todayKey = getDayKey(timezone);
+    const lastReviewedKey = item.last_reviewed_at
+      ? item.last_reviewed_at.toLocaleDateString('en-CA', { timeZone: timezone })
+      : null;
+    const elapsedDaysCurrent = lastReviewedKey
+      ? diffDays(todayKey, lastReviewedKey)
+      : null;
+    const stabilityDays = Math.min(
+      MAX_STABILITY_DAYS,
+      Math.max(MIN_STABILITY_DAYS, Number(item.stability_days))
+    );
+    retrievability = computeRetrievability(elapsedDaysCurrent, stabilityDays);
+  }
+
   const base = {
     status,
     dueAt: item.due_at,
@@ -657,6 +677,7 @@ export async function getStudyItemStatus(
     stabilityDays: Number(item.stability_days),
     difficulty: Number(item.difficulty),
     gradedToday: gradedToday || undefined,
+    retrievability,
   };
 
   if (!timezone) return base;
