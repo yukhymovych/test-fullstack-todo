@@ -55,14 +55,6 @@ function extractContentText(richContent: unknown): string {
       }
       if ('content' in o) walk(o.content);
       if ('children' in o) walk(o.children);
-      if (Array.isArray(o.content)) {
-        o.content.forEach((c: unknown) => {
-          if (c && typeof c === 'object' && 'text' in (c as object)) {
-            const t = (c as { text: string }).text;
-            if (typeof t === 'string') texts.push(t);
-          }
-        });
-      }
     }
   }
   walk(richContent);
@@ -75,6 +67,21 @@ async function purgeExpiredTrashIfNeeded(userId: string): Promise<void> {
     notesSQL.TRASH_RETENTION_DAYS
   );
   await notesSQL.purgeExpiredTrash(userId, expireBefore);
+}
+
+function normalizeSearchQuery(query: string): string {
+  return query
+    .trim()
+    .toLowerCase()
+    .replace(/-/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function tokenizeSearchQuery(normalizedQuery: string): string[] {
+  if (!normalizedQuery) return [];
+  const parts = normalizedQuery.split(' ').filter(Boolean);
+  return [...new Set(parts)];
 }
 
 export async function getAllNotes(userId: string) {
@@ -95,6 +102,27 @@ export async function getAllTrashedNotes(userId: string) {
 export async function getTrashNoteById(id: string, userId: string) {
   await purgeExpiredTrashIfNeeded(userId);
   return notesSQL.getTrashNoteById(id, userId);
+}
+
+export async function searchNotes(
+  userId: string,
+  query: string,
+  limit: number,
+  rootNoteId?: string
+) {
+  await purgeExpiredTrashIfNeeded(userId);
+  const normalizedQuery = normalizeSearchQuery(query);
+  const tokens = tokenizeSearchQuery(normalizedQuery);
+  if (tokens.length === 0) {
+    return [];
+  }
+  return notesSQL.searchNotes(
+    userId,
+    normalizedQuery,
+    tokens,
+    limit,
+    rootNoteId
+  );
 }
 
 export async function createNote(userId: string, input: CreateNoteInput) {

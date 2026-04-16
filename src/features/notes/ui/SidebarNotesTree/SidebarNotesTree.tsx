@@ -10,6 +10,9 @@ import { DropZone } from './DropZone';
 import { SidebarRecentsList } from '../SidebarRecentsList/SidebarRecentsList';
 import { SidebarFavoritesList } from '../SidebarFavoritesList/SidebarFavoritesList';
 import { LearningSidebarCard } from '@/features/learning/ui/LearningSidebarCard';
+import { SearchModal } from '@/features/search/ui/SearchModal';
+import { SearchTrigger } from '@/features/search/ui/SearchTrigger';
+import { useSearchModal } from '@/features/search/model/useSearchModal';
 import { Button } from '@/shared/ui';
 import { UserInfo } from '@/app/components/UserInfo';
 import { notesRoutes } from '../../lib/routes';
@@ -22,6 +25,7 @@ export interface SidebarNotesTreeProps {
 export function SidebarNotesTree({ onNavigate }: SidebarNotesTreeProps) {
   const location = useLocation();
   const { t } = useTranslation(['common', 'notes']);
+  const searchModal = useSearchModal({ onSelect: onNavigate });
   const {
     isLoading,
     error,
@@ -138,6 +142,13 @@ export function SidebarNotesTree({ onNavigate }: SidebarNotesTreeProps) {
               : t('sidebar.newPage', { ns: 'notes' })}
           </Button>
         </div>
+        <div className="sidebar-search-trigger-wrap">
+          <SearchTrigger
+            label={t('search.triggerPlaceholder', { ns: 'notes' })}
+            shortcut={t('search.shortcut', { ns: 'notes' })}
+            onClick={searchModal.openModal}
+          />
+        </div>
         <LearningSidebarCard />
         <SidebarRecentsList
           recentIds={recentIds}
@@ -221,6 +232,19 @@ export function SidebarNotesTree({ onNavigate }: SidebarNotesTreeProps) {
           </Link>
         </Button>
       </div>
+      <SearchModal
+        isOpen={searchModal.isOpen}
+        query={searchModal.query}
+        isFetching={searchModal.isFetching}
+        isQueryEligible={searchModal.isQueryEligible}
+        results={searchModal.results}
+        activeIndex={searchModal.activeIndex}
+        onQueryChange={searchModal.setQuery}
+        onClose={searchModal.closeModal}
+        onInputKeyDown={searchModal.onInputKeyDown}
+        onHoverResult={searchModal.setActiveIndex}
+        onSelectResult={searchModal.selectResult}
+      />
     </div>
   );
 }

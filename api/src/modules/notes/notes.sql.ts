@@ -33,6 +33,14 @@ export interface NoteListItem {
   trashed_root_id?: string | null;
 }
 
+export interface NoteSearchItem {
+  id: string;
+  title: string;
+  parent_id: string | null;
+  content_text: string;
+  updated_at: Date;
+}
+
 export async function getAllNotes(userId: string): Promise<NoteListItem[]> {
   const result = await pool.query(
     `SELECT id, title, parent_id, sort_order, updated_at, is_favorite, last_visited_at
@@ -40,6 +48,125 @@ export async function getAllNotes(userId: string): Promise<NoteListItem[]> {
      WHERE user_id = $1 AND trashed_at IS NULL
      ORDER BY updated_at DESC`,
     [userId]
+  );
+  return result.rows;
+}
+
+export async function searchNotes(
+  userId: string,
+  normalizedQuery: string,
+  tokens: string[],
+  limit: number,
+  rootNoteId?: string
+): Promise<NoteSearchItem[]> {
+  if (rootNoteId) {
+    const result = await pool.query(
+      `WITH RECURSIVE scope AS (
+         SELECT id
+         FROM notes
+         WHERE id = $4 AND user_id = $1 AND trashed_at IS NULL
+         UNION ALL
+         SELECT n.id
+         FROM notes n
+         JOIN scope s ON n.parent_id = s.id
+         WHERE n.user_id = $1 AND n.trashed_at IS NULL
+       )
+       SELECT n.id, n.title, n.parent_id, n.content_text, n.updated_at
+       FROM notes n
+       CROSS JOIN LATERAL (
+         SELECT
+           REGEXP_REPLACE(REPLACE(LOWER(n.title), '-', ' '), '\\s+', ' ', 'g') AS normalized_title,
+           REGEXP_REPLACE(REPLACE(LOWER(n.content_text), '-', ' '), '\\s+', ' ', 'g') AS normalized_content
+       ) norm
+       CROSS JOIN LATERAL (
+         SELECT
+           COUNT(*) FILTER (
+             WHERE n.title ILIKE ('%' || token || '%')
+           ) AS title_token_matches,
+           COUNT(*) FILTER (
+             WHERE n.content_text ILIKE ('%' || token || '%')
+           ) AS content_token_matches,
+           COUNT(*) FILTER (
+             WHERE n.title ILIKE ('%' || token || '%')
+                OR n.content_text ILIKE ('%' || token || '%')
+           ) AS total_token_matches,
+           CARDINALITY($2::text[]) AS token_count
+         FROM UNNEST($2::text[]) AS t(token)
+       ) rank_data
+       WHERE n.user_id = $1
+         AND n.trashed_at IS NULL
+         AND n.id IN (SELECT id FROM scope)
+         AND rank_data.total_token_matches > 0
+       ORDER BY
+         CASE
+           WHEN norm.normalized_title = $3 THEN 1
+           ELSE 0
+         END DESC,
+         CASE
+           WHEN norm.normalized_title LIKE ('%' || $3 || '%')
+             OR norm.normalized_content LIKE ('%' || $3 || '%') THEN 1
+           ELSE 0
+         END DESC,
+         CASE
+           WHEN rank_data.total_token_matches = rank_data.token_count THEN 1
+           ELSE 0
+         END DESC,
+         rank_data.title_token_matches DESC,
+         rank_data.content_token_matches DESC,
+         rank_data.total_token_matches DESC,
+         n.updated_at DESC
+       LIMIT $5`,
+      [userId, tokens, normalizedQuery, rootNoteId, limit]
+    );
+    return result.rows;
+  }
+
+  const result = await pool.query(
+    `SELECT n.id, n.title, n.parent_id, n.content_text, n.updated_at
+     FROM notes n
+     CROSS JOIN LATERAL (
+       SELECT
+         REGEXP_REPLACE(REPLACE(LOWER(n.title), '-', ' '), '\\s+', ' ', 'g') AS normalized_title,
+         REGEXP_REPLACE(REPLACE(LOWER(n.content_text), '-', ' '), '\\s+', ' ', 'g') AS normalized_content
+     ) norm
+     CROSS JOIN LATERAL (
+       SELECT
+         COUNT(*) FILTER (
+           WHERE n.title ILIKE ('%' || token || '%')
+         ) AS title_token_matches,
+         COUNT(*) FILTER (
+           WHERE n.content_text ILIKE ('%' || token || '%')
+         ) AS content_token_matches,
+         COUNT(*) FILTER (
+           WHERE n.title ILIKE ('%' || token || '%')
+              OR n.content_text ILIKE ('%' || token || '%')
+         ) AS total_token_matches,
+         CARDINALITY($2::text[]) AS token_count
+       FROM UNNEST($2::text[]) AS t(token)
+     ) rank_data
+     WHERE n.user_id = $1
+       AND n.trashed_at IS NULL
+       AND rank_data.total_token_matches > 0
+     ORDER BY
+       CASE
+         WHEN norm.normalized_title = $3 THEN 1
+         ELSE 0
+       END DESC,
+       CASE
+         WHEN norm.normalized_title LIKE ('%' || $3 || '%')
+           OR norm.normalized_content LIKE ('%' || $3 || '%') THEN 1
+         ELSE 0
+       END DESC,
+       CASE
+         WHEN rank_data.total_token_matches = rank_data.token_count THEN 1
+         ELSE 0
+       END DESC,
+       rank_data.title_token_matches DESC,
+       rank_data.content_token_matches DESC,
+       rank_data.total_token_matches DESC,
+       n.updated_at DESC
+     LIMIT $4`,
+    [userId, tokens, normalizedQuery, limit]
   );
   return result.rows;
 }

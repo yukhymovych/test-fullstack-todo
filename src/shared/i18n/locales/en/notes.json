@@ -7,6 +7,15 @@
     "favorites": "Favorites",
     "recentlyVisited": "Recently visited"
   },
+  "search": {
+    "triggerPlaceholder": "Search...",
+    "shortcut": "Ctrl+K",
+    "modalPlaceholder": "Search notes...",
+    "emptyPrompt": "Start typing to search...",
+    "minQueryHint": "Enter at least 2 characters...",
+    "loading": "Searching...",
+    "noResults": "No notes found."
+  },
   "editor": {
     "saveStatus": {
       "saving": "Saving...",

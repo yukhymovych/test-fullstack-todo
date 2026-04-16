@@ -7,6 +7,15 @@
     "favorites": "Обране",
     "recentlyVisited": "Нещодавно відкриті"
   },
+  "search": {
+    "triggerPlaceholder": "Пошук...",
+    "shortcut": "Ctrl+K",
+    "modalPlaceholder": "Пошук нотаток...",
+    "emptyPrompt": "Почніть вводити для пошуку...",
+    "minQueryHint": "Введіть щонайменше 2 символи...",
+    "loading": "Пошук...",
+    "noResults": "Нотаток не знайдено."
+  },
   "editor": {
     "saveStatus": {
       "saving": "Збереження...",

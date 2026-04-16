@@ -6,6 +6,7 @@ import {
   moveNoteSchema,
   setFavoriteSchema,
   noteIdSchema,
+  searchNotesQuerySchema,
 } from './notes.schemas.js';
 
 const DEFAULT_RICH_CONTENT = [{ type: 'paragraph', content: [] }];
@@ -281,6 +282,26 @@ export async function getNoteEmbeds(
 
     const embeds = await notesService.getNoteEmbeds(id, userId);
     res.json(embeds);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function searchNotes(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const query = searchNotesQuerySchema.parse(req.query);
+    const results = await notesService.searchNotes(
+      userId,
+      query.q,
+      query.limit,
+      query.rootNoteId
+    );
+    res.json({ results });
   } catch (error) {
     next(error);
   }

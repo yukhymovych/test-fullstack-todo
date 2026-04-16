@@ -22,6 +22,7 @@ notesRouter.post(
   '/:pageId/study-questions/generate',
   studyQuestionsController.generateStudyQuestions
 );
+notesRouter.get('/search', notesController.searchNotes);
 notesRouter.get('/:id/embeds', notesController.getNoteEmbeds);
 notesRouter.get('/:id', notesController.getNote);
 notesRouter.post('/', notesController.createNote);
