@@ -84,6 +84,58 @@ function tokenizeSearchQuery(normalizedQuery: string): string[] {
   return [...new Set(parts)];
 }
 
+const SEARCH_STOP_WORDS = new Set([
+  'a',
+  'an',
+  'and',
+  'as',
+  'at',
+  'be',
+  'by',
+  'for',
+  'from',
+  'in',
+  'is',
+  'it',
+  'of',
+  'on',
+  'or',
+  'that',
+  'the',
+  'this',
+  'to',
+  'with',
+  'are',
+  'was',
+  'were',
+  'but',
+  'not',
+  'you',
+  'your',
+  'our',
+  'their',
+  'й',
+  'та',
+  'або',
+  'але',
+  'в',
+  'у',
+  'на',
+  'до',
+  'за',
+  'із',
+  'з',
+  'це',
+  'як',
+  'не',
+  'що',
+  'де',
+]);
+
+function toMeaningfulTokens(tokens: string[]): string[] {
+  return tokens.filter((token) => token.length >= 3 && !SEARCH_STOP_WORDS.has(token));
+}
+
 export async function getAllNotes(userId: string) {
   await purgeExpiredTrashIfNeeded(userId);
   return notesSQL.getAllNotes(userId);
@@ -113,6 +165,7 @@ export async function searchNotes(
   await purgeExpiredTrashIfNeeded(userId);
   const normalizedQuery = normalizeSearchQuery(query);
   const tokens = tokenizeSearchQuery(normalizedQuery);
+  const meaningfulTokens = toMeaningfulTokens(tokens);
   if (tokens.length === 0) {
     return [];
   }
@@ -120,6 +173,7 @@ export async function searchNotes(
     userId,
     normalizedQuery,
     tokens,
+    meaningfulTokens,
     limit,
     rootNoteId
   );

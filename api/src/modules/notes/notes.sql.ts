@@ -56,6 +56,7 @@ export async function searchNotes(
   userId: string,
   normalizedQuery: string,
   tokens: string[],
+  meaningfulTokens: string[],
   limit: number,
   rootNoteId?: string
 ): Promise<NoteSearchItem[]> {
@@ -64,7 +65,7 @@ export async function searchNotes(
       `WITH RECURSIVE scope AS (
          SELECT id
          FROM notes
-         WHERE id = $4 AND user_id = $1 AND trashed_at IS NULL
+         WHERE id = $5 AND user_id = $1 AND trashed_at IS NULL
          UNION ALL
          SELECT n.id
          FROM notes n
@@ -92,31 +93,54 @@ export async function searchNotes(
            ) AS total_token_matches,
            CARDINALITY($2::text[]) AS token_count
          FROM UNNEST($2::text[]) AS t(token)
+       ) meaningful_data
+       CROSS JOIN LATERAL (
+         SELECT
+           COUNT(*) FILTER (
+             WHERE n.title ILIKE ('%' || mtoken || '%')
+                OR n.content_text ILIKE ('%' || mtoken || '%')
+           ) AS meaningful_token_matches,
+           CARDINALITY($3::text[]) AS meaningful_token_count
+         FROM UNNEST($3::text[]) AS mt(mtoken)
        ) rank_data
        WHERE n.user_id = $1
          AND n.trashed_at IS NULL
          AND n.id IN (SELECT id FROM scope)
-         AND rank_data.total_token_matches > 0
+         AND (
+           (
+             norm.normalized_title LIKE ('%' || $4 || '%')
+             OR norm.normalized_content LIKE ('%' || $4 || '%')
+           )
+           OR (
+             meaningful_data.meaningful_token_count > 0
+             AND meaningful_data.meaningful_token_matches = meaningful_data.meaningful_token_count
+           )
+           OR (
+             meaningful_data.meaningful_token_count >= 3
+             AND meaningful_data.meaningful_token_matches >= 2
+           )
+         )
        ORDER BY
          CASE
-           WHEN norm.normalized_title = $3 THEN 1
+           WHEN norm.normalized_title = $4 THEN 1
            ELSE 0
          END DESC,
          CASE
-           WHEN norm.normalized_title LIKE ('%' || $3 || '%')
-             OR norm.normalized_content LIKE ('%' || $3 || '%') THEN 1
+           WHEN norm.normalized_title LIKE ('%' || $4 || '%')
+             OR norm.normalized_content LIKE ('%' || $4 || '%') THEN 1
            ELSE 0
          END DESC,
          CASE
            WHEN rank_data.total_token_matches = rank_data.token_count THEN 1
            ELSE 0
          END DESC,
+         meaningful_data.meaningful_token_matches DESC,
          rank_data.title_token_matches DESC,
          rank_data.content_token_matches DESC,
          rank_data.total_token_matches DESC,
          n.updated_at DESC
-       LIMIT $5`,
-      [userId, tokens, normalizedQuery, rootNoteId, limit]
+       LIMIT $6`,
+      [userId, tokens, meaningfulTokens, normalizedQuery, rootNoteId, limit]
     );
     return result.rows;
   }
@@ -144,29 +168,52 @@ export async function searchNotes(
          CARDINALITY($2::text[]) AS token_count
        FROM UNNEST($2::text[]) AS t(token)
      ) rank_data
+     CROSS JOIN LATERAL (
+       SELECT
+         COUNT(*) FILTER (
+           WHERE n.title ILIKE ('%' || mtoken || '%')
+              OR n.content_text ILIKE ('%' || mtoken || '%')
+         ) AS meaningful_token_matches,
+         CARDINALITY($3::text[]) AS meaningful_token_count
+       FROM UNNEST($3::text[]) AS mt(mtoken)
+     ) meaningful_data
      WHERE n.user_id = $1
        AND n.trashed_at IS NULL
-       AND rank_data.total_token_matches > 0
+       AND (
+         (
+           norm.normalized_title LIKE ('%' || $4 || '%')
+           OR norm.normalized_content LIKE ('%' || $4 || '%')
+         )
+         OR (
+           meaningful_data.meaningful_token_count > 0
+           AND meaningful_data.meaningful_token_matches = meaningful_data.meaningful_token_count
+         )
+         OR (
+           meaningful_data.meaningful_token_count >= 3
+           AND meaningful_data.meaningful_token_matches >= 2
+         )
+       )
      ORDER BY
        CASE
-         WHEN norm.normalized_title = $3 THEN 1
+         WHEN norm.normalized_title = $4 THEN 1
          ELSE 0
        END DESC,
        CASE
-         WHEN norm.normalized_title LIKE ('%' || $3 || '%')
-           OR norm.normalized_content LIKE ('%' || $3 || '%') THEN 1
+         WHEN norm.normalized_title LIKE ('%' || $4 || '%')
+           OR norm.normalized_content LIKE ('%' || $4 || '%') THEN 1
          ELSE 0
        END DESC,
        CASE
          WHEN rank_data.total_token_matches = rank_data.token_count THEN 1
          ELSE 0
        END DESC,
+       meaningful_data.meaningful_token_matches DESC,
        rank_data.title_token_matches DESC,
        rank_data.content_token_matches DESC,
        rank_data.total_token_matches DESC,
        n.updated_at DESC
-     LIMIT $4`,
-    [userId, tokens, normalizedQuery, limit]
+     LIMIT $5`,
+    [userId, tokens, meaningfulTokens, normalizedQuery, limit]
   );
   return result.rows;
 }
