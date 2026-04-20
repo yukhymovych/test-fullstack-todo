@@ -20,9 +20,11 @@ import {
 import { learningRoutes } from '@/features/learning/lib/routes';
 import type { NotePageActionsMenuProps } from './NotePageActionsMenu.types';
 import { NoteImportExportMenuSection } from './NoteImportExportMenuSection';
+import { NoteBackupMenuSection } from './NoteBackupMenuSection';
 
 export function NotePageActionsMenu({
   noteId,
+  noteTitle,
   isFavorite,
   hasChildren = false,
   hasDescendantsInGlobal = false,
@@ -32,6 +34,7 @@ export function NotePageActionsMenu({
   onDelete,
   isDeleting,
   importExport,
+  pageBackup,
 }: NotePageActionsMenuProps) {
   const navigate = useNavigate();
   const { t } = useTranslation('notes');
@@ -150,7 +153,14 @@ export function NotePageActionsMenu({
         </DropdownMenuSub>
       )}
       <NoteImportExportMenuSection importExport={importExport} />
-      {importExport ? <DropdownMenuSeparator /> : null}
+      <NoteBackupMenuSection
+        noteId={noteId}
+        noteTitle={noteTitle ?? ''}
+        hasChildren={hasChildren}
+        pageBackup={pageBackup}
+        isMenuBusy={isBusy}
+      />
+      {importExport || pageBackup ? <DropdownMenuSeparator /> : null}
       <DropdownMenuItem onClick={() => onCreateChild(noteId)}>
         {t('menu.addNewPage')}
       </DropdownMenuItem>

@@ -2,6 +2,7 @@ import type { NoteItem } from '../treeUtils';
 import { DEFAULT_NOTE_TITLE } from '../../../model/types';
 import { NotePageActionsMenu } from '../../NotePageActionsMenu';
 import { useDescendantsWithLearningCount } from '@/features/learning/model/useDescendantsWithLearningCount';
+import { usePageBackupExport } from '@/features/backup/model/usePageBackupExport';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -57,6 +58,7 @@ export function TreeNodeRow({
     hasChildren ? nodeId : undefined
   );
   const hasDescendantsInGlobal = (descendantsWithLearning?.count ?? 0) > 0;
+  const pageBackup = usePageBackupExport();
 
   return (
     <div
@@ -130,6 +132,7 @@ export function TreeNodeRow({
           </DropdownMenuTrigger>
           <NotePageActionsMenu
             noteId={nodeId}
+            noteTitle={node.title || DEFAULT_NOTE_TITLE}
             isFavorite={isFavorite}
             hasChildren={hasChildren}
             hasDescendantsInGlobal={hasDescendantsInGlobal}
@@ -138,6 +141,7 @@ export function TreeNodeRow({
             onCreateChild={onCreateChild}
             onDelete={onDeletePage}
             isDeleting={isDeleting}
+            pageBackup={pageBackup}
           />
         </DropdownMenu>
       </div>

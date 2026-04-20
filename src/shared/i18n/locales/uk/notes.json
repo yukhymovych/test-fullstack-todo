@@ -62,6 +62,9 @@
     "exportAsTxt": "Як TXT",
     "exportAsPdf": "Як PDF",
     "treeAsFormat": "Дерево як {{format}}",
+    "backup": "Резервна копія",
+    "backupPage": "Сторінка (JSON)",
+    "backupPageWithChildren": "Сторінка з дочірніми (JSON)",
     "importHtmlTxtDocx": "Імпорт HTML/TXT/DOCX",
     "toasts": {
       "noEligiblePages": "Немає сторінок, доступних для навчання. Усі дочірні сторінки вже були вивчені сьогодні.",
@@ -126,6 +129,7 @@
     "couldNotExportPage": "Не вдалося експортувати цю сторінку.",
     "noChildPagesToExport": "У цієї сторінки немає дочірніх сторінок для експорту.",
     "couldNotExportTree": "Не вдалося експортувати дерево цієї сторінки.",
+    "couldNotExportBackup": "Не вдалося експортувати файл резервної копії.",
     "importing": "Імпорт...",
     "nothingImportable": "Не знайдено даних для імпорту.",
     "importedBlocks_one": "Імпортовано {{count}} блок.",

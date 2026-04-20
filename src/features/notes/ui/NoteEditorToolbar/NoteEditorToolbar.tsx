@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NoteBreadcrumbs } from '../NoteBreadcrumbs';
 import { NotePageActionsMenu } from '../NotePageActionsMenu';
+import { usePageBackupExport } from '@/features/backup/model/usePageBackupExport';
 import { useStudyItemStatus } from '@/features/learning/model/useStudyItemStatus';
 import { useStudyItemReviewLogs } from '@/features/learning/model/useStudyItemReviewLogs';
 import { useDescendantsWithLearningCount } from '@/features/learning/model/useDescendantsWithLearningCount';
@@ -104,6 +105,7 @@ export function NoteEditorToolbar({
     hasChildren ? activeId : undefined
   );
   const hasDescendantsInGlobal = (descendantsWithLearning?.count ?? 0) > 0;
+  const pageBackup = usePageBackupExport();
   const showDueAt =
     studyStatus?.status === 'active' && studyStatus?.dueAt;
 
@@ -132,6 +134,7 @@ export function NoteEditorToolbar({
             </DropdownMenuTrigger>
             <NotePageActionsMenu
               noteId={activeId}
+              noteTitle={currentTitle}
               isFavorite={isFavorite}
               hasChildren={hasChildren}
               hasDescendantsInGlobal={hasDescendantsInGlobal}
@@ -141,6 +144,7 @@ export function NoteEditorToolbar({
               onDelete={onDelete}
               isDeleting={isDeleting}
               importExport={importExport}
+              pageBackup={pageBackup}
             />
           </DropdownMenu>
         </div>

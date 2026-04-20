@@ -11,10 +11,6 @@ import {
   buildIdMap,
   computeSortOrders,
   findDuplicateNoteIds,
-  noteRecordToDto,
-  questionAnswerRecordToDto,
-  reanchorOrphanParents,
-  studyItemRecordToDto,
   topologicallyOrderBackupNotes,
 } from './backup.mappers.js';
 import {
@@ -30,6 +26,8 @@ import {
   type ImportBackupWarnings,
 } from './backup.types.js';
 import { buildStudyItemRow } from './backup.studyItem.js';
+import { buildBackupDocument } from './backup.export.js';
+import { fetchNoteRowsForScope as fetchNoteRowsForScopeWithDeps } from './backup.fetchScope.js';
 
 interface ErrorWithStatusCode extends Error {
   statusCode?: number;
@@ -45,7 +43,15 @@ export async function exportBackup(
   userId: string,
   options: ExportBackupOptions
 ): Promise<BackupDocument> {
-  if (options.rootNoteId) {
+  if (options.scope !== 'full') {
+    if (!options.rootNoteId) {
+      // Defense in depth: the schema already rejects this combination at the
+      // controller boundary.
+      throw createError(
+        `rootNoteId is required when scope is "${options.scope}"`,
+        400
+      );
+    }
     const exists = await backupSQL.noteExistsForUserNonTrashed(
       userId,
       options.rootNoteId
@@ -55,7 +61,7 @@ export async function exportBackup(
     }
   }
 
-  const noteRows = await backupSQL.getNotesForBackup(userId, options.rootNoteId);
+  const noteRows = await fetchNoteRowsForScope(userId, options);
   const noteIds = noteRows.map((n) => n.id);
 
   const [qaRows, studyItemRows] = await Promise.all([
@@ -63,22 +69,28 @@ export async function exportBackup(
     backupSQL.getStudyItemsForNotes(userId, noteIds),
   ]);
 
-  const notesDto = reanchorOrphanParents(noteRows.map(noteRecordToDto));
-  const questionAnswersDto = qaRows.map(questionAnswerRecordToDto);
-  const studyItemsDto = studyItemRows.map(studyItemRecordToDto);
-
-  return {
-    format: BACKUP_FORMAT_ID,
-    version: BACKUP_FORMAT_VERSION,
-    exportedAt: new Date().toISOString(),
-    scope: options.rootNoteId ? 'subtree' : 'full',
+  return buildBackupDocument({
+    scope: options.scope,
     rootNoteId: options.rootNoteId ?? null,
-    data: {
-      notes: notesDto,
-      questionAnswers: questionAnswersDto,
-      studyItems: studyItemsDto,
+    noteRows,
+    qaRows,
+    studyItemRows,
+    exportedAt: new Date().toISOString(),
+  });
+}
+
+function fetchNoteRowsForScope(
+  userId: string,
+  options: ExportBackupOptions
+) {
+  return fetchNoteRowsForScopeWithDeps(
+    {
+      getAllOrSubtree: backupSQL.getNotesForBackup,
+      getSingle: backupSQL.getSingleNoteForBackup,
     },
-  };
+    userId,
+    options
+  );
 }
 
 interface PreparedNoteInsert {

@@ -53,6 +53,24 @@ export async function getNotesForBackup(
   return result.rows;
 }
 
+/**
+ * Read a single non-trashed note for the user. Returns 0 or 1 rows in the same
+ * shape as `getNotesForBackup` so the export pipeline can treat them uniformly.
+ */
+export async function getSingleNoteForBackup(
+  userId: string,
+  noteId: string
+): Promise<NoteRowForBackup[]> {
+  const result = await pool.query(
+    `SELECT id, parent_id, title, rich_content, sort_order, is_favorite,
+            created_at, updated_at
+     FROM notes
+     WHERE id = $2 AND user_id = $1 AND trashed_at IS NULL`,
+    [userId, noteId]
+  );
+  return result.rows;
+}
+
 export async function noteExistsForUserNonTrashed(
   userId: string,
   noteId: string

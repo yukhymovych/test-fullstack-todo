@@ -1,7 +1,7 @@
 export const BACKUP_FORMAT_ID = 'rememo-backup' as const;
 export const BACKUP_FORMAT_VERSION = 1 as const;
 
-export type BackupScope = 'full' | 'subtree';
+export type BackupScope = 'full' | 'single' | 'subtree';
 
 export interface BackupNote {
   /** Backup-local handle. Used only as a join key inside the document. */
@@ -50,7 +50,8 @@ export interface BackupDocument {
 }
 
 export interface ExportBackupOptions {
-  /** When provided, exports the subtree rooted at this note id. Otherwise: full export. */
+  scope: BackupScope;
+  /** Required when `scope` is `'single'` or `'subtree'`; ignored when `'full'`. */
   rootNoteId?: string;
 }
 

@@ -29,11 +29,13 @@ export interface BackupStudyItem {
   difficulty: number;
 }
 
+export type ExportBackupScope = 'full' | 'single' | 'subtree';
+
 export interface BackupDocument {
   format: typeof BACKUP_FORMAT_ID;
   version: typeof BACKUP_FORMAT_VERSION;
   exportedAt: string;
-  scope: 'full' | 'subtree';
+  scope: ExportBackupScope;
   rootNoteId: string | null;
   data: {
     notes: BackupNote[];
@@ -43,6 +45,7 @@ export interface BackupDocument {
 }
 
 export interface ExportBackupInput {
+  scope?: ExportBackupScope;
   rootNoteId?: string;
 }
 

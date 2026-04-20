@@ -10,6 +10,9 @@ export async function exportBackup(
   input: ExportBackupInput = {}
 ): Promise<BackupDocument> {
   const params = new URLSearchParams();
+  if (input.scope) {
+    params.set('scope', input.scope);
+  }
   if (input.rootNoteId) {
     params.set('rootNoteId', input.rootNoteId);
   }

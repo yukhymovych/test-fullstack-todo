@@ -41,7 +41,7 @@ export const backupDocumentSchema = z.object({
   format: z.literal(BACKUP_FORMAT_ID),
   version: z.literal(BACKUP_FORMAT_VERSION),
   exportedAt: isoStringSchema,
-  scope: z.enum(['full', 'subtree']),
+  scope: z.enum(['full', 'single', 'subtree']),
   rootNoteId: z.string().uuid().nullable(),
   data: z.object({
     notes: z.array(backupNoteSchema).max(20000),
@@ -50,12 +50,26 @@ export const backupDocumentSchema = z.object({
   }),
 });
 
-export const exportBackupQuerySchema = z.object({
-  rootNoteId: z
-    .union([z.string().uuid(), z.literal('')])
-    .optional()
-    .transform((value) => (value ? value : undefined)),
-});
+export const exportBackupQuerySchema = z
+  .object({
+    scope: z.enum(['full', 'single', 'subtree']).optional().default('full'),
+    rootNoteId: z
+      .union([z.string().uuid(), z.literal('')])
+      .optional()
+      .transform((value) => (value ? value : undefined)),
+  })
+  .superRefine((value, ctx) => {
+    if (
+      (value.scope === 'single' || value.scope === 'subtree') &&
+      !value.rootNoteId
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['rootNoteId'],
+        message: `rootNoteId is required when scope is "${value.scope}"`,
+      });
+    }
+  });
 
 export const importBackupBodySchema = z.object({
   document: backupDocumentSchema,

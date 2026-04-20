@@ -58,6 +58,9 @@
     "exportAsTxt": "As TXT",
     "exportAsPdf": "As PDF",
     "treeAsFormat": "Tree as {{format}}",
+    "backup": "Backup",
+    "backupPage": "Page (JSON)",
+    "backupPageWithChildren": "Page with children (JSON)",
     "importHtmlTxtDocx": "Import HTML/TXT/DOCX",
     "toasts": {
       "noEligiblePages": "No eligible pages to learn. All child pages have already been studied today.",
@@ -116,6 +119,7 @@
     "couldNotExportPage": "Could not export this page.",
     "noChildPagesToExport": "This page has no child pages to export.",
     "couldNotExportTree": "Could not export this page tree.",
+    "couldNotExportBackup": "Could not export the backup file.",
     "importing": "Importing...",
     "nothingImportable": "Nothing importable was found.",
     "importedBlocks_one": "Imported {{count}} block.",

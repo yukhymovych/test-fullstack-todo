@@ -14,6 +14,7 @@ export async function exportBackup(
     const userId = req.user!.id;
     const query = exportBackupQuerySchema.parse(req.query);
     const document = await backupService.exportBackup(userId, {
+      scope: query.scope,
       rootNoteId: query.rootNoteId,
     });
     res.json(document);
