@@ -1,0 +1,56 @@
+.backup-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.backup-section__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.backup-section__title {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.backup-section__description {
+  font-size: 14px;
+  color: var(--muted-foreground);
+}
+
+.backup-section__row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.backup-section__row--separated {
+  margin-top: 32px;
+}
+
+.backup-section__row--column {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.backup-section__checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.backup-section__hint {
+  font-size: 13px;
+  color: var(--muted-foreground);
+}

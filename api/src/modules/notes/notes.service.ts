@@ -6,60 +6,9 @@ import {
   getTrashExpiryCutoff,
   resolveRestoreParentId,
 } from './trash.logic.js';
+import { extractContentText, extractEmbeddedNoteIds } from './notes.content.js';
 
 type BlockLike = { type?: string; props?: { noteId?: string }; content?: unknown[] };
-
-/** Walk blocks and extract noteId from embeddedPage blocks. Handles nested content. */
-function extractEmbeddedNoteIds(richContent: unknown): string[] {
-  const ids: string[] = [];
-  function walk(obj: unknown): void {
-    if (obj === null || obj === undefined) return;
-    if (Array.isArray(obj)) {
-      obj.forEach(walk);
-      return;
-    }
-    if (typeof obj === 'object') {
-      const o = obj as Record<string, unknown>;
-      if (o.type === 'embeddedPage' && o.props && typeof o.props === 'object') {
-        const props = o.props as Record<string, unknown>;
-        const noteId = props.noteId;
-        if (typeof noteId === 'string' && noteId) {
-          ids.push(noteId);
-        }
-      }
-      if ('content' in o) walk(o.content);
-      if ('children' in o) walk(o.children);
-    }
-  }
-  walk(richContent);
-  return ids;
-}
-
-function extractContentText(richContent: unknown): string {
-  if (!Array.isArray(richContent)) return '';
-  const texts: string[] = [];
-  function walk(obj: unknown): void {
-    if (obj === null || obj === undefined) return;
-    if (typeof obj === 'string') {
-      texts.push(obj);
-      return;
-    }
-    if (Array.isArray(obj)) {
-      obj.forEach(walk);
-      return;
-    }
-    if (typeof obj === 'object') {
-      const o = obj as Record<string, unknown>;
-      if ('text' in o && typeof o.text === 'string') {
-        texts.push(o.text);
-      }
-      if ('content' in o) walk(o.content);
-      if ('children' in o) walk(o.children);
-    }
-  }
-  walk(richContent);
-  return texts.join(' ').trim();
-}
 
 async function purgeExpiredTrashIfNeeded(userId: string): Promise<void> {
   const expireBefore = getTrashExpiryCutoff(

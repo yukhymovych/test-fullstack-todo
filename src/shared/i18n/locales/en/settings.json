@@ -30,5 +30,30 @@
       "enabled": "Enabled",
       "disabled": "Disabled"
     }
+  },
+  "backup": {
+    "sectionTitle": "Backup and restore",
+    "description": "Download a complete JSON backup of your notes, study questions, and FSRS study state. Restoring a backup imports it as a copy: every imported note gets a fresh ID and is added alongside your existing notes.",
+    "exportButton": "Download backup",
+    "exportingButton": "Preparing backup…",
+    "importButton": "Restore from backup file",
+    "importingButton": "Restoring…",
+    "importHint": "Restoring never overwrites or deletes existing notes. Imported notes appear at the top of the tree.",
+    "preserveStudyStateLabel": "Preserve study progress",
+    "preserveStudyStateHint": "When enabled, imported pages keep their FSRS schedule (due date, stability, difficulty). When disabled, imported pages start from scratch.",
+    "toast": {
+      "exportSuccess": "Backup downloaded.",
+      "exportFailed": "Failed to export backup: {{error}}",
+      "importSuccess": "Restored {{notes}} notes, {{questions}} questions, {{studyItems}} study items.",
+      "importWarnings": "Repaired during import: {{orphans}} orphan, {{cycles}} cycle, {{droppedEmbeds}} out-of-scope embeds, {{malformedEmbeds}} malformed embeds.",
+      "importFailed": "Failed to import backup: {{error}}",
+      "parseError": {
+        "cannotReadFile": "Could not read the selected file.",
+        "invalidJson": "The selected file is not valid JSON.",
+        "invalidShape": "The selected file is not a Rememo backup.",
+        "unsupportedFormat": "The selected file is not a Rememo backup.",
+        "unsupportedVersion": "This backup file uses a version that is not supported by the current app."
+      }
+    }
   }
 }

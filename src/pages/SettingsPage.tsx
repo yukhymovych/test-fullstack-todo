@@ -4,6 +4,7 @@ import { SettingsPageView } from '@/features/settings/ui/SettingsPageView';
 import { useLanguagePreference } from '@/features/settings/model/useLanguagePreference';
 import { DailyRemindersSection } from '@/features/reminders/ui/DailyRemindersSection';
 import { useDailyReminders } from '@/features/reminders/model/useDailyReminders';
+import { BackupSection } from '@/features/backup/ui/BackupSection';
 import { usePageTitle } from '@/shared/lib/usePageTitle';
 
 export function SettingsPage() {
@@ -53,6 +54,7 @@ export function SettingsPage() {
           }}
         />
       }
+      backupSection={<BackupSection />}
     />
   );
 }
