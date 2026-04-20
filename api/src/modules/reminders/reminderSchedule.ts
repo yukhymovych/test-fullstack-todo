@@ -7,14 +7,6 @@ interface ReminderTimeParts {
   minute: number;
 }
 
-export type ReminderSkipReason = 'before-time' | 'already-sent-today' | null;
-
-export interface ReminderTimingDecision {
-  shouldAttempt: boolean;
-  todayDayKey: string;
-  skipReason: ReminderSkipReason;
-}
-
 export function isValidTimezone(value: string): boolean {
   try {
     new Intl.DateTimeFormat('en-CA', { timeZone: value }).format(new Date());
@@ -51,55 +43,4 @@ export function parseReminderTimeLocal(value: string): ReminderTimeParts {
 
 export function getDayKeyForDate(date: Date, timezone: string): string {
   return date.toLocaleDateString('en-CA', { timeZone: timezone });
-}
-
-function getLocalHourAndMinute(date: Date, timezone: string): ReminderTimeParts {
-  const formatter = new Intl.DateTimeFormat('en-GB', {
-    timeZone: timezone,
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23',
-  });
-  const parts = formatter.formatToParts(date);
-  const hour = Number(parts.find((part) => part.type === 'hour')?.value ?? '0');
-  const minute = Number(parts.find((part) => part.type === 'minute')?.value ?? '0');
-  return { hour, minute };
-}
-
-export function shouldAttemptReminderNow(input: {
-  now: Date;
-  timezone: string | null | undefined;
-  reminderTimeLocal: string | null | undefined;
-  lastReminderSentDayKey: string | null | undefined;
-}): ReminderTimingDecision {
-  const timezone = normalizeTimezone(input.timezone);
-  const reminderTimeLocal = normalizeReminderTimeLocal(input.reminderTimeLocal);
-  const todayDayKey = getDayKeyForDate(input.now, timezone);
-
-  if (input.lastReminderSentDayKey === todayDayKey) {
-    return {
-      shouldAttempt: false,
-      todayDayKey,
-      skipReason: 'already-sent-today',
-    };
-  }
-
-  const localNow = getLocalHourAndMinute(input.now, timezone);
-  const reminderTime = parseReminderTimeLocal(reminderTimeLocal);
-  const currentMinutes = localNow.hour * 60 + localNow.minute;
-  const reminderMinutes = reminderTime.hour * 60 + reminderTime.minute;
-
-  if (currentMinutes < reminderMinutes) {
-    return {
-      shouldAttempt: false,
-      todayDayKey,
-      skipReason: 'before-time',
-    };
-  }
-
-  return {
-    shouldAttempt: true,
-    todayDayKey,
-    skipReason: null,
-  };
 }

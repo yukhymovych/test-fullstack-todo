@@ -42,9 +42,24 @@ PORT=4000
 WEB_PUSH_VAPID_PUBLIC_KEY=...
 WEB_PUSH_VAPID_PRIVATE_KEY=...
 WEB_PUSH_VAPID_SUBJECT=mailto:you@example.com
-DAILY_REMINDER_POLL_INTERVAL_MS=60000
 REMINDER_ALLOW_MULTIPLE_PER_DAY=false
+REMINDER_JOB_SECRET=...
+REMINDER_REPEAT_GAP_MS=600000
+REMINDER_JOB_BATCH_LIMIT=100
+REMINDER_CLAIM_STALE_AFTER_MS=600000
 ```
+
+Після деплою з новою колонкою `next_reminder_at_utc` один раз виконайте бекфіл:
+
+```bash
+npm run backfill:reminder-next
+```
+
+Нагадування обробляються **зовнішнім cron** (наприклад Render Cron кожні **10 хвилин** за замовчуванням), який викликає:
+
+`POST /internal/jobs/daily-reminders` з заголовком `X-Reminder-Job-Secret: <REMINDER_JOB_SECRET>` (або `Authorization: Bearer <REMINDER_JOB_SECRET>`).
+
+Якщо процес впав між «claim» і «finalize», рядок може залишитися з `next_reminder_at_utc = infinity`. На початку кожного запуску job знаходить «застарілі» claim (`reminder_claimed_at` старіші за `REMINDER_CLAIM_STALE_AFTER_MS`, типово 10 хв) і перераховує наступний час через ту саму логіку, що й для звичайного розкладу.
 
 Згенерувати VAPID-ключі можна командою:
 

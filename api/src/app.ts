@@ -7,6 +7,8 @@ import { studyQuestionsAnswersRouter } from './modules/studyQuestionsAnswers/stu
 import { remindersRouter } from './modules/reminders/reminders.routes.js';
 import { backupRouter } from './modules/backup/backup.routes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+import { requireReminderJobSecret } from './middlewares/requireReminderJobSecret.js';
+import { postRunDueReminders } from './modules/reminders/reminderJob.controller.js';
 
 const webOrigin = process.env.CLIENT_ORIGIN;
 const jsonBodyLimit = process.env.API_JSON_LIMIT ?? '2mb';
@@ -50,6 +52,12 @@ app.use(express.urlencoded({ extended: true, limit: jsonBodyLimit }));
 app.get('/health', (_req, res) => {
   res.json({ ok: true });
 });
+
+app.post(
+  '/internal/jobs/daily-reminders',
+  requireReminderJobSecret,
+  postRunDueReminders
+);
 
 app.use('/auth', authRouter);
 app.use('/notes', notesRouter);

@@ -468,6 +468,30 @@ export async function getDueStudyItemsCount(
   return result.rows[0]?.cnt ?? 0;
 }
 
+/** Due-item counts keyed by user id for reminder batch processing. */
+export async function getDueStudyItemsCountsByUserIds(
+  userIds: string[]
+): Promise<Map<string, number>> {
+  const map = new Map<string, number>();
+  if (userIds.length === 0) return map;
+
+  const result = await pool.query(
+    `SELECT si.user_id::text AS user_id, COUNT(*)::int AS cnt
+     FROM study_items si
+     JOIN notes n ON n.id = si.note_id AND n.user_id = si.user_id AND n.trashed_at IS NULL
+     WHERE si.user_id = ANY($1::uuid[])
+       AND si.is_active = true
+       AND si.due_at <= NOW()
+     GROUP BY si.user_id`,
+    [userIds]
+  );
+
+  for (const row of result.rows as Array<{ user_id: string; cnt: number }>) {
+    map.set(row.user_id, row.cnt);
+  }
+  return map;
+}
+
 export async function getDueStudyItemsAll(
   userId: string
 ): Promise<Array<{ note_id: string; due_at: Date }>> {

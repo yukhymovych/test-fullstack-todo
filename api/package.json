@@ -4,7 +4,8 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "test": "tsx --test src/modules/learning/learning.undo.test.ts src/modules/notes/trash.logic.test.ts src/modules/notes/notes.content.test.ts src/modules/backup/backup.mappers.test.ts src/modules/backup/backup.studyItem.test.ts src/modules/backup/backup.export.test.ts src/modules/backup/backup.fetchScope.test.ts",
+    "test": "tsx --test src/modules/learning/learning.undo.test.ts src/modules/notes/trash.logic.test.ts src/modules/notes/notes.content.test.ts src/modules/backup/backup.mappers.test.ts src/modules/backup/backup.studyItem.test.ts src/modules/backup/backup.export.test.ts src/modules/backup/backup.fetchScope.test.ts src/modules/reminders/reminderSchedule.test.ts src/modules/reminders/reminderNextUtc.test.ts",
+    "backfill:reminder-next": "tsx scripts/backfill-next-reminder-at-utc.ts",
     "simulate:fsrs": "tsx src/modules/learning/fsrsLight.simulation.cli.ts",
     "start": "node dist/server.js",
     "migrate:up": "node-pg-migrate up",
@@ -16,6 +17,7 @@
     "dotenv": "^17.3.1",
     "express": "^4.21.2",
     "express-oauth2-jwt-bearer": "^1.7.4",
+    "luxon": "^3.7.2",
     "pg": "^8.13.1",
     "web-push": "^3.6.7",
     "zod": "^3.24.1"
@@ -23,6 +25,7 @@
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
+    "@types/luxon": "^3.7.1",
     "@types/node": "^22.10.5",
     "@types/pg": "^8.11.10",
     "@types/web-push": "^3.6.4",
