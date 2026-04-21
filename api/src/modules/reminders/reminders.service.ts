@@ -408,6 +408,10 @@ export async function runDueRemindersJob(): Promise<DueRemindersJobStats> {
           logReminderJobEvent('info', 'user_skipped_no_subscriptions', {
             runId,
             userId: user.id,
+            dueCountSnapshot: dueCounts.get(user.id) ?? 0,
+            nextReminderAtUtc: user.next_reminder_at_utc.toISOString(),
+            reminderTimeLocal: user.daily_reminder_time_local,
+            timezone: user.timezone,
           });
           continue;
         }
@@ -418,6 +422,13 @@ export async function runDueRemindersJob(): Promise<DueRemindersJobStats> {
           logReminderJobEvent('info', 'user_skipped_no_due_items', {
             runId,
             userId: user.id,
+            dueCount,
+            activeSubscriptions: subs.length,
+            nextReminderAtUtc: user.next_reminder_at_utc.toISOString(),
+            reminderTimeLocal: user.daily_reminder_time_local,
+            timezone: user.timezone,
+            lastDailyReminderSentDayKey: user.last_daily_reminder_sent_day_key,
+            lastDailyReminderSentAt: user.last_daily_reminder_sent_at?.toISOString?.() ?? null,
           });
           continue;
         }
