@@ -55,5 +55,32 @@
         "unsupportedVersion": "This backup file uses a version that is not supported by the current app."
       }
     }
+  },
+  "offline": {
+    "sectionTitle": "Offline access",
+    "description": "Cache your notes on this device for read-only access when you're offline. Editing, learning, and AI features stay online-only.",
+    "status": {
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "stats": {
+      "cacheSize": "Cache size: {{size}}",
+      "lastSynced": "Last synced: {{time}}"
+    },
+    "actions": {
+      "enable": "Enable offline access",
+      "enabling": "Enabling…",
+      "refresh": "Refresh cache",
+      "refreshing": "Refreshing…",
+      "clear": "Clear cached data",
+      "clearing": "Clearing…"
+    },
+    "errors": {
+      "network": "Could not reach the server. Check your internet connection and try again.",
+      "notAuthenticated": "Sign in before enabling offline access.",
+      "totalSize": "Your notes exceed the offline cache size limit.",
+      "noteTooLarge": "One of your notes exceeds the per-note size limit.",
+      "unknown": "Could not enable offline access. Please try again."
+    }
   }
 }

@@ -8,7 +8,7 @@ import { SettingsPage } from './pages/SettingsPage';
 import { ProtectedRoute } from './app/components/ProtectedRoute';
 import { NotesLayout } from './app/layout/NotesLayout';
 import { LearningLayout } from './app/layout/LearningLayout';
-import { useAuth } from './app/contexts/AuthContext';
+import { useAuth } from './app/contexts/useAuth';
 import { useTranslation } from 'react-i18next';
 import { useSyncUiLanguageToServer } from '@/features/settings/model/useSyncUiLanguageToServer';
 import './App.css';

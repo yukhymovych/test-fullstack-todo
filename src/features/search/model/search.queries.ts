@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { searchNotes } from '../api/searchApi';
+import { searchNotes } from '../api/searchData';
 
 export const SEARCH_KEYS = {
   all: ['notes-search'] as const,

@@ -2,7 +2,11 @@ import { useEffect, useRef } from 'react';
 import type { NoteTitleInputProps } from './NoteTitleInput.types';
 import './NoteTitleInput.css';
 
-export function NoteTitleInput({ value, onChange }: NoteTitleInputProps) {
+export function NoteTitleInput({
+  value,
+  onChange,
+  readOnly = false,
+}: NoteTitleInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
@@ -16,7 +20,9 @@ export function NoteTitleInput({ value, onChange }: NoteTitleInputProps) {
     <textarea
       ref={textareaRef}
       value={value}
+      readOnly={readOnly}
       onChange={(e) => {
+        if (readOnly) return;
         e.currentTarget.style.height = '0px';
         e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
         onChange(e);

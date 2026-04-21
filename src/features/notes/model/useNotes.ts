@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
-import * as notesApi from '../api/notesApi';
+import * as notesData from '../api/notesData';
 import { LEARNING_KEYS } from '@/features/learning/model/learning.queries';
 import type { Note, NoteListItem } from './types';
 
@@ -46,21 +46,21 @@ function getCachedParentId(
 export function useNotesQuery() {
   return useQuery({
     queryKey: NOTES_KEY,
-    queryFn: notesApi.getNotes,
+    queryFn: notesData.getNotes,
   });
 }
 
 export function useTrashNotesQuery() {
   return useQuery({
     queryKey: TRASH_KEY,
-    queryFn: notesApi.getTrashNotes,
+    queryFn: notesData.getTrashNotes,
   });
 }
 
 export function useNoteQuery(id: string | undefined, enabled: boolean) {
   return useQuery({
     queryKey: NOTE_KEY(id ?? ''),
-    queryFn: () => notesApi.getNote(id!),
+    queryFn: () => notesData.getNote(id!),
     enabled: !!id && enabled,
   });
 }
@@ -68,7 +68,7 @@ export function useNoteQuery(id: string | undefined, enabled: boolean) {
 export function useTrashNoteQuery(id: string | undefined, enabled: boolean) {
   return useQuery({
     queryKey: TRASH_NOTE_KEY(id ?? ''),
-    queryFn: () => notesApi.getTrashNote(id!),
+    queryFn: () => notesData.getTrashNote(id!),
     enabled: !!id && enabled,
   });
 }
@@ -76,7 +76,7 @@ export function useTrashNoteQuery(id: string | undefined, enabled: boolean) {
 export function useCreateNote() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: notesApi.createNote,
+    mutationFn: notesData.createNote,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: NOTES_KEY });
       invalidateNotePage(queryClient, variables.parent_id);
@@ -88,7 +88,7 @@ export function useUpdateNote() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: { title: string; rich_content: unknown } }) =>
-      notesApi.updateNote(id, payload),
+      notesData.updateNote(id, payload),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: NOTES_KEY });
       queryClient.invalidateQueries({ queryKey: NOTE_KEY(variables.id) });
@@ -104,7 +104,7 @@ export function useDeleteNote() {
 export function useTrashNote() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: notesApi.trashNote,
+    mutationFn: notesData.trashNote,
     onSuccess: (_, noteId) => {
       const parentId = getCachedParentId(queryClient, noteId);
       invalidateNoteCollections(queryClient);
@@ -118,7 +118,7 @@ export function useTrashNote() {
 export function useRestoreNote() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: notesApi.restoreNote,
+    mutationFn: notesData.restoreNote,
     onSuccess: (note) => {
       invalidateNoteCollections(queryClient);
       queryClient.invalidateQueries({ queryKey: NOTE_KEY(note.id) });
@@ -131,7 +131,7 @@ export function useRestoreNote() {
 export function usePermanentDeleteNote() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: notesApi.permanentlyDeleteNote,
+    mutationFn: notesData.permanentlyDeleteNote,
     onSuccess: (_, noteId) => {
       invalidateNoteCollections(queryClient);
       queryClient.removeQueries({ queryKey: NOTE_KEY(noteId) });
@@ -144,7 +144,7 @@ export function useSetNoteFavorite() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, isFavorite }: { id: string; isFavorite: boolean }) =>
-      notesApi.setNoteFavorite(id, isFavorite),
+      notesData.setNoteFavorite(id, isFavorite),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: NOTES_KEY });
       queryClient.invalidateQueries({ queryKey: NOTE_KEY(variables.id) });
@@ -155,7 +155,7 @@ export function useSetNoteFavorite() {
 export function useUpdateNoteLastVisited() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => notesApi.updateNoteLastVisited(id),
+    mutationFn: (id: string) => notesData.updateNoteLastVisited(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: NOTES_KEY });
     },
@@ -164,7 +164,7 @@ export function useUpdateNoteLastVisited() {
 
 type MoveNoteVariables = {
   id: string;
-  payload: Parameters<typeof notesApi.moveNote>[1];
+  payload: Parameters<typeof notesData.moveNote>[1];
   oldParentId?: string;
 };
 
@@ -172,7 +172,7 @@ export function useMoveNote() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, payload }: MoveNoteVariables) =>
-      notesApi.moveNote(id, payload),
+      notesData.moveNote(id, payload),
     onSuccess: (_, variables: MoveNoteVariables) => {
       queryClient.invalidateQueries({ queryKey: NOTES_KEY });
       queryClient.invalidateQueries({ queryKey: NOTE_KEY(variables.id) });
@@ -185,7 +185,7 @@ export function useMoveNote() {
 export function useNoteEmbeds(noteId: string | undefined, enabled: boolean) {
   return useQuery({
     queryKey: NOTE_EMBEDS_KEY(noteId ?? ''),
-    queryFn: () => notesApi.getNoteEmbeds(noteId!),
+    queryFn: () => notesData.getNoteEmbeds(noteId!),
     enabled: !!noteId && enabled,
   });
 }

@@ -1,8 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/app/contexts/AuthContext';
+import { useAuth } from '@/app/contexts/useAuth';
 import * as userPreferencesApi from '@/features/settings/api/userPreferencesApi';
 import { normalizeLanguage, writeStoredLanguage } from '@/shared/i18n/config';
+import { useAppMode } from '@/features/offline/model/AppModeProvider';
 
 /**
  * Persists and hydrates active UI language via dedicated user preferences API.
@@ -11,6 +12,7 @@ import { normalizeLanguage, writeStoredLanguage } from '@/shared/i18n/config';
 export function useSyncUiLanguageToServer(): void {
   const { i18n } = useTranslation();
   const { isAuthed, isApiReady } = useAuth();
+  const { isReadOnly } = useAppMode();
   const hydratedRef = useRef(false);
   const syncingRef = useRef(false);
   const lastSyncedLanguageRef = useRef<string | null>(null);
@@ -23,7 +25,7 @@ export function useSyncUiLanguageToServer(): void {
   }, [isAuthed]);
 
   useEffect(() => {
-    if (!isAuthed || !isApiReady || hydratedRef.current || syncingRef.current) return;
+    if (!isAuthed || !isApiReady || isReadOnly || hydratedRef.current || syncingRef.current) return;
     syncingRef.current = true;
 
     void userPreferencesApi
@@ -50,10 +52,10 @@ export function useSyncUiLanguageToServer(): void {
       .finally(() => {
         syncingRef.current = false;
       });
-  }, [isAuthed, isApiReady, i18n]);
+  }, [isAuthed, isApiReady, isReadOnly, i18n]);
 
   useEffect(() => {
-    if (!isAuthed || !isApiReady || !hydratedRef.current || syncingRef.current) return;
+    if (!isAuthed || !isApiReady || isReadOnly || !hydratedRef.current || syncingRef.current) return;
     const lang = normalizeLanguage(i18n.resolvedLanguage ?? i18n.language);
     if (lastSyncedLanguageRef.current === lang) return;
 
@@ -66,5 +68,5 @@ export function useSyncUiLanguageToServer(): void {
       .finally(() => {
         syncingRef.current = false;
       });
-  }, [isAuthed, isApiReady, i18n.resolvedLanguage, i18n.language]);
+  }, [isAuthed, isApiReady, isReadOnly, i18n.resolvedLanguage, i18n.language]);
 }

@@ -1,4 +1,4 @@
-import { useAuth } from '../app/contexts/AuthContext';
+import { useAuth } from '../app/contexts/useAuth';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';

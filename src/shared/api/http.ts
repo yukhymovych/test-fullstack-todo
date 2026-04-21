@@ -1,4 +1,6 @@
 import { API_URL } from '../config/env';
+import { isOfflineMode } from '@/features/offline/sync/appModeRef';
+import { OfflineReadOnlyError } from '@/features/offline/domain/readOnlyGuard';
 
 type TokenProvider = () => Promise<string>;
 
@@ -8,14 +10,27 @@ export function setTokenProvider(provider: TokenProvider | null): void {
   tokenProvider = provider;
 }
 
+type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
+
+const MUTATION_METHODS: ReadonlySet<HttpMethod> = new Set([
+  'POST',
+  'PATCH',
+  'PUT',
+  'DELETE',
+]);
+
 interface FetchOptions {
-  method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
+  method: HttpMethod;
   body?: unknown;
   skipAuth?: boolean;
 }
 
 async function fetchJson<T>(endpoint: string, options: FetchOptions): Promise<T> {
   const { method, body, skipAuth } = options;
+
+  if (MUTATION_METHODS.has(method) && isOfflineMode()) {
+    throw new OfflineReadOnlyError();
+  }
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',

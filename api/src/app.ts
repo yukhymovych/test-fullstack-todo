@@ -6,6 +6,7 @@ import { learningRouter } from './modules/learning/learning.routes.js';
 import { studyQuestionsAnswersRouter } from './modules/studyQuestionsAnswers/studyQuestionsAnswers.routes.js';
 import { remindersRouter } from './modules/reminders/reminders.routes.js';
 import { backupRouter } from './modules/backup/backup.routes.js';
+import { offlineRouter } from './modules/offline/offline.routes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { requireReminderJobSecret } from './middlewares/requireReminderJobSecret.js';
 import { postRunDueReminders } from './modules/reminders/reminderJob.controller.js';
@@ -70,5 +71,6 @@ app.use(
   express.urlencoded({ extended: true, limit: backupJsonBodyLimit }),
   backupRouter
 );
+app.use('/offline', offlineRouter);
 
 app.use(errorHandler);

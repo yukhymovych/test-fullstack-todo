@@ -5,6 +5,7 @@ import { useLanguagePreference } from '@/features/settings/model/useLanguagePref
 import { DailyRemindersSection } from '@/features/reminders/ui/DailyRemindersSection';
 import { useDailyReminders } from '@/features/reminders/model/useDailyReminders';
 import { BackupSection } from '@/features/backup/ui/BackupSection';
+import { OfflineAccessSection } from '@/features/offline/ui/OfflineAccessSection';
 import { usePageTitle } from '@/shared/lib/usePageTitle';
 
 export function SettingsPage() {
@@ -55,6 +56,7 @@ export function SettingsPage() {
         />
       }
       backupSection={<BackupSection />}
+      offlineSection={<OfflineAccessSection />}
     />
   );
 }

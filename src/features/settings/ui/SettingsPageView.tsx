@@ -10,6 +10,7 @@ export interface SettingsPageViewProps {
   onLanguageChange: (language: UiLanguage) => void;
   remindersSection?: ReactNode;
   backupSection?: ReactNode;
+  offlineSection?: ReactNode;
 }
 
 export function SettingsPageView({
@@ -17,6 +18,7 @@ export function SettingsPageView({
   onLanguageChange,
   remindersSection,
   backupSection,
+  offlineSection,
 }: SettingsPageViewProps) {
   const { t } = useTranslation('settings');
 
@@ -59,6 +61,7 @@ export function SettingsPageView({
       </section>
       {remindersSection}
       {backupSection}
+      {offlineSection}
     </div>
   );
 }

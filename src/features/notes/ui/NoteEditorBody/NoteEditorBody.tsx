@@ -19,6 +19,7 @@ export function NoteEditorBody({
   isGeneratingOneQuestionFromSelection,
   isGeneratingUpToFiveQuestionsFromSelection,
   isStudyItemActive,
+  isReadOnly = false,
 }: NoteEditorBodyProps) {
   const isMobile = useMediaQuery('(max-width: 767px)');
   const [interactionVersion, setInteractionVersion] = useState(0);
@@ -47,29 +48,39 @@ export function NoteEditorBody({
       <div className="note-editor-body" onClickCapture={handleEditorClick}>
         <BlockNoteView
           editor={editor}
+          editable={!isReadOnly}
           slashMenu={false}
           formattingToolbar={false}
-          sideMenu={!isMobile}
+          sideMenu={!isMobile && !isReadOnly}
         >
-          <SuggestionMenuController triggerCharacter="/" getItems={getSlashMenuItems} />
-          <MobileBlockToolbar
-            isMobile={!!isMobile}
-            interactionVersion={interactionVersion}
-          />
-          <FormattingToolbarController
-            formattingToolbar={(props) => (
-              <SelectionQaToolbar
-                {...props}
-                onGenerateOneQuestionFromSelection={onGenerateOneQuestionFromSelection}
-                onGenerateUpToFiveQuestionsFromSelection={onGenerateUpToFiveQuestionsFromSelection}
-                isGeneratingOneQuestionFromSelection={isGeneratingOneQuestionFromSelection}
-                isGeneratingUpToFiveQuestionsFromSelection={
-                  isGeneratingUpToFiveQuestionsFromSelection
-                }
-                isStudyItemActive={isStudyItemActive}
-              />
-            )}
-          />
+          {!isReadOnly && (
+            <SuggestionMenuController
+              triggerCharacter="/"
+              getItems={getSlashMenuItems}
+            />
+          )}
+          {!isReadOnly && (
+            <MobileBlockToolbar
+              isMobile={!!isMobile}
+              interactionVersion={interactionVersion}
+            />
+          )}
+          {!isReadOnly && (
+            <FormattingToolbarController
+              formattingToolbar={(props) => (
+                <SelectionQaToolbar
+                  {...props}
+                  onGenerateOneQuestionFromSelection={onGenerateOneQuestionFromSelection}
+                  onGenerateUpToFiveQuestionsFromSelection={onGenerateUpToFiveQuestionsFromSelection}
+                  isGeneratingOneQuestionFromSelection={isGeneratingOneQuestionFromSelection}
+                  isGeneratingUpToFiveQuestionsFromSelection={
+                    isGeneratingUpToFiveQuestionsFromSelection
+                  }
+                  isStudyItemActive={isStudyItemActive}
+                />
+              )}
+            />
+          )}
         </BlockNoteView>
       </div>
     </NoteTitlesContext.Provider>

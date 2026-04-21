@@ -1,6 +1,9 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
+import { useAppMode } from '@/features/offline/model/AppModeProvider';
+import { OfflineUnavailableScreen } from '@/features/offline/ui/OfflineUnavailableScreen';
+import { OfflineEmptyScreen } from '@/features/offline/ui/OfflineEmptyScreen';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -8,15 +11,16 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { isAuthed, isLoading, isApiReady, login } = useAuth();
+  const { mode } = useAppMode();
   const { t } = useTranslation('common');
 
   useEffect(() => {
-    if (!isAuthed && !isLoading && isApiReady) {
+    if (mode === 'online_auth_required' && !isAuthed && !isLoading && isApiReady) {
       login();
     }
-  }, [isAuthed, isLoading, isApiReady, login]);
+  }, [mode, isAuthed, isLoading, isApiReady, login]);
 
-  if (isLoading || (isAuthed && !isApiReady)) {
+  if (mode === 'initializing' || isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="text-muted-foreground text-sm">{t('status.loading')}</div>
@@ -24,10 +28,24 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
-  if (!isAuthed) {
+  if (mode === 'offline_no_cache') {
+    return <OfflineUnavailableScreen />;
+  }
+
+  if (mode === 'offline_enabled_snapshot_missing') {
+    return <OfflineEmptyScreen />;
+  }
+
+  if (mode === 'offline_cached_readonly') {
+    return <>{children}</>;
+  }
+
+  if (!isAuthed || !isApiReady) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <div className="text-muted-foreground text-sm">{t('status.redirectingToLogin')}</div>
+        <div className="text-muted-foreground text-sm">
+          {t('status.redirectingToLogin')}
+        </div>
       </div>
     );
   }

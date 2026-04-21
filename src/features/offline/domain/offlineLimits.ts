@@ -1,0 +1,3 @@
+export const MAX_NOTE_CONTENT_BYTES = 20 * 1024 * 1024;
+export const MAX_TOTAL_CACHE_BYTES = 300 * 1024 * 1024;
+export const CACHE_SCHEMA_VERSION = 1;

@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { SidebarNotesTree } from '../../features/notes/ui/SidebarNotesTree/SidebarNotesTree';
+import { OfflineBanner } from '@/features/offline/ui/OfflineBanner';
 import './NotesLayout.css';
 
 export function NotesLayout() {
@@ -55,6 +56,7 @@ export function NotesLayout() {
       />
 
       <main className="notes-layout__main">
+        <OfflineBanner />
         <Outlet />
       </main>
     </div>

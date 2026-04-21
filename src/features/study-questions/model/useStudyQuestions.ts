@@ -1,5 +1,5 @@
 import { useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import * as studyQuestionsApi from '../api/studyQuestionsApi';
+import * as studyQuestionsApi from '../api/studyQuestionsData';
 import type {
   CreateStudyQuestionBody,
   UpdateStudyQuestionBody,

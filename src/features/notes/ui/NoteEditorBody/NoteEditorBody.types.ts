@@ -10,4 +10,5 @@ export interface NoteEditorBodyProps {
   isGeneratingOneQuestionFromSelection: boolean;
   isGeneratingUpToFiveQuestionsFromSelection: boolean;
   isStudyItemActive: boolean;
+  isReadOnly?: boolean;
 }

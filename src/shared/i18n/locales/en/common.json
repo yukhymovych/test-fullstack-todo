@@ -40,5 +40,24 @@
   },
   "errors": {
     "withMessage": "Error: {{message}}"
+  },
+  "offline": {
+    "banner": {
+      "title": "Offline mode — read-only.",
+      "lastSynced": "Last synced: {{time}}",
+      "unknown": "unknown"
+    },
+    "unavailable": {
+      "title": "You're offline",
+      "body": "No cached data is available for this device. Connect to the internet to sign in and load your notes."
+    },
+    "empty": {
+      "title": "Offline data not ready",
+      "body": "Offline access was enabled, but no snapshot is available yet. Reconnect to finish the initial sync."
+    },
+    "learningUnavailable": {
+      "title": "Learning is unavailable offline",
+      "body": "Study sessions, grading, and AI features require an internet connection."
+    }
   }
 }

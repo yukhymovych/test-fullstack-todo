@@ -1,6 +1,9 @@
 import { Outlet } from 'react-router-dom';
+import { useAppMode } from '@/features/offline/model/AppModeProvider';
+import { LearningUnavailableOffline } from '@/features/offline/ui/LearningUnavailableOffline';
 
 export function LearningLayout() {
+  const { isReadOnly } = useAppMode();
   return (
     <div
       style={{
@@ -15,7 +18,7 @@ export function LearningLayout() {
         backgroundColor: '#1a1a1a',
       }}
     >
-      <Outlet />
+      {isReadOnly ? <LearningUnavailableOffline /> : <Outlet />}
     </div>
   );
 }

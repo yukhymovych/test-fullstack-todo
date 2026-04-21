@@ -15,6 +15,7 @@ import { SearchTrigger } from '@/features/search/ui/SearchTrigger';
 import { useSearchModal } from '@/features/search/model/useSearchModal';
 import { Button } from '@/shared/ui';
 import { UserInfo } from '@/app/components/UserInfo';
+import { useAppMode } from '@/features/offline/model/AppModeProvider';
 import { notesRoutes } from '../../lib/routes';
 import './SidebarNotesTree.css';
 
@@ -25,6 +26,7 @@ export interface SidebarNotesTreeProps {
 export function SidebarNotesTree({ onNavigate }: SidebarNotesTreeProps) {
   const location = useLocation();
   const { t } = useTranslation(['common', 'notes']);
+  const { isReadOnly } = useAppMode();
   const searchModal = useSearchModal({ onSelect: onNavigate });
   const {
     isLoading,
@@ -128,20 +130,22 @@ export function SidebarNotesTree({ onNavigate }: SidebarNotesTreeProps) {
             <UserInfo onNavigate={onNavigate} />
           </div>
         </div>
-        <div className="sidebar-new-page-button">
-          <Button
-            variant="ghost"
-            className="sidebar-new-page-button"
-            size='sm'
-            fullWidth
-            onClick={handleCreateRoot}
-            disabled={createNote.isPending}
-          >
-            {createNote.isPending
-              ? t('sidebar.creating', { ns: 'notes' })
-              : t('sidebar.newPage', { ns: 'notes' })}
-          </Button>
-        </div>
+        {!isReadOnly && (
+          <div className="sidebar-new-page-button">
+            <Button
+              variant="ghost"
+              className="sidebar-new-page-button"
+              size='sm'
+              fullWidth
+              onClick={handleCreateRoot}
+              disabled={createNote.isPending}
+            >
+              {createNote.isPending
+                ? t('sidebar.creating', { ns: 'notes' })
+                : t('sidebar.newPage', { ns: 'notes' })}
+            </Button>
+          </div>
+        )}
         <div className="sidebar-search-trigger-wrap">
           <SearchTrigger
             label={t('search.triggerPlaceholder', { ns: 'notes' })}
@@ -149,7 +153,7 @@ export function SidebarNotesTree({ onNavigate }: SidebarNotesTreeProps) {
             onClick={searchModal.openModal}
           />
         </div>
-        <LearningSidebarCard />
+        {!isReadOnly && <LearningSidebarCard />}
         <SidebarRecentsList
           recentIds={recentIds}
           byId={byId}
@@ -219,19 +223,21 @@ export function SidebarNotesTree({ onNavigate }: SidebarNotesTreeProps) {
           )}
         </div>
       </div>
-      <div className="sidebar-footer">
-        <Button
-          variant="ghost"
-          fullWidth
-          asChild
-          className={isTrashActive ? 'sidebar-trash-link sidebar-trash-link--active' : 'sidebar-trash-link'}
-        >
-          <Link to={notesRoutes.trash()} onClick={onNavigate}>
-            <Trash2 className="size-4" />
-            <span>{t('navigation.trash', { ns: 'common' })}</span>
-          </Link>
-        </Button>
-      </div>
+      {!isReadOnly && (
+        <div className="sidebar-footer">
+          <Button
+            variant="ghost"
+            fullWidth
+            asChild
+            className={isTrashActive ? 'sidebar-trash-link sidebar-trash-link--active' : 'sidebar-trash-link'}
+          >
+            <Link to={notesRoutes.trash()} onClick={onNavigate}>
+              <Trash2 className="size-4" />
+              <span>{t('navigation.trash', { ns: 'common' })}</span>
+            </Link>
+          </Button>
+        </div>
+      )}
       <SearchModal
         isOpen={searchModal.isOpen}
         query={searchModal.query}
