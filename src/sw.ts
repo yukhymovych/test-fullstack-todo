@@ -6,7 +6,6 @@ import {
 } from 'workbox-precaching';
 import { NavigationRoute, registerRoute } from 'workbox-routing';
 import type { RouteHandlerCallbackOptions } from 'workbox-core/types.js';
-import { NetworkFirst } from 'workbox-strategies';
 
 declare const self: ServiceWorkerGlobalScope & {
   __WB_MANIFEST: Array<{
@@ -27,18 +26,10 @@ self.addEventListener('activate', (event) => {
 
 precacheAndRoute(self.__WB_MANIFEST);
 
-// In dev mode (vite-plugin-pwa `injectManifest` + `devOptions.enabled`),
-// `__WB_MANIFEST` is empty, so there is no precached `/index.html`. In
-// production the precache contains the built `index.html` and
-// `createHandlerBoundToURL` works. We keep both paths and fall back to a
-// runtime cache so deep-link refreshes work while offline regardless of
-// mode, provided the page was visited at least once online.
+// In dev, `__WB_MANIFEST` is often empty (no precached shell). After one
+// successful online navigation we store HTML as `/index.html` in NAV_CACHE so
+// deep-link refreshes can still load the SPA shell offline.
 const NAV_CACHE = 'rememo-app-shell-v1';
-
-const navStrategy = new NetworkFirst({
-  cacheName: NAV_CACHE,
-  networkTimeoutSeconds: 4,
-});
 
 let precachedShellHandler: ReturnType<typeof createHandlerBoundToURL> | null = null;
 try {
@@ -50,13 +41,9 @@ try {
 async function resolveAppShell(
   ctx: RouteHandlerCallbackOptions
 ): Promise<Response> {
-  try {
-    const response = await navStrategy.handle(ctx);
-    if (response) return response;
-  } catch {
-    // fall through to cached shell
-  }
-
+  // SPA navigations are usually client-side, so the browser may never have cached
+  // a document response for `/notes/:id`. NetworkFirst keyed by the full URL
+  // then misses offline. Always prefer the precached SPA shell for navigations.
   const precached = await matchPrecache('/index.html');
   if (precached) return precached;
 
@@ -67,6 +54,22 @@ async function resolveAppShell(
     } catch {
       // ignore
     }
+  }
+
+  const navCache = await caches.open(NAV_CACHE);
+  const canonicalShell = await navCache.match('/index.html');
+  if (canonicalShell) return canonicalShell;
+
+  try {
+    const response = await fetch(ctx.request);
+    const contentType = response.headers.get('content-type') ?? '';
+    if (response.ok && contentType.includes('text/html')) {
+      await navCache.put('/index.html', response.clone());
+      return response;
+    }
+    if (response.ok) return response;
+  } catch {
+    // offline / network error
   }
 
   const runtime = await caches.match('/index.html');

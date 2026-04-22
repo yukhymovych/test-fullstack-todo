@@ -61,7 +61,8 @@
     "description": "Cache your notes on this device for read-only access when you're offline. Editing, learning, and AI features stay online-only.",
     "status": {
       "enabled": "Enabled",
-      "disabled": "Disabled"
+      "disabled": "Disabled",
+      "disabledKeepsCache": "Disabled — local copy kept"
     },
     "stats": {
       "cacheSize": "Cache size: {{size}}",

@@ -14,7 +14,9 @@ export default defineConfig({
       srcDir: 'src',
       filename: 'sw.ts',
       injectRegister: false,
-      registerType: 'autoUpdate',
+      // `autoUpdate` reloads on every SW activate; in dev that races with offline/HMR and can
+      // leave no controlling worker. `prompt` matches plugin default and avoids surprise reloads.
+      registerType: 'prompt',
       manifest: false,
       includeAssets: ['logo.png', 'apple-touch-icon.png', 'pwa-192x192.png', 'pwa-512x512.png'],
       injectManifest: {
@@ -22,6 +24,14 @@ export default defineConfig({
       },
       devOptions: {
         enabled: true,
+        // Dev uses a temporary Workbox-generated SW (not `src/sw.ts`). Plugin default allowlist is
+        // only `/`, so deep links like `/notes/:id` never get `index.html` offline → dinosaur page.
+        navigateFallbackAllowlist: [
+          /^\/$/,
+          /^\/login(?:\/|$)/,
+          /^\/notes(?:\/|$)/,
+          /^\/learning(?:\/|$)/,
+        ],
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],

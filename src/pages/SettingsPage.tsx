@@ -7,9 +7,11 @@ import { useDailyReminders } from '@/features/reminders/model/useDailyReminders'
 import { BackupSection } from '@/features/backup/ui/BackupSection';
 import { OfflineAccessSection } from '@/features/offline/ui/OfflineAccessSection';
 import { usePageTitle } from '@/shared/lib/usePageTitle';
+import { useAppMode } from '@/features/offline/model/AppModeProvider';
 
 export function SettingsPage() {
   const { t } = useTranslation(['settings', 'common']);
+  const { isReadOnly } = useAppMode();
   const { currentLanguage, setLanguage } = useLanguagePreference();
   const reminders = useDailyReminders();
   const [draftReminderTimeLocal, setDraftReminderTimeLocal] = useState('09:00');
@@ -24,8 +26,10 @@ export function SettingsPage() {
     <SettingsPageView
       currentLanguage={currentLanguage}
       onLanguageChange={setLanguage}
+      readOnly={isReadOnly}
       remindersSection={
         <DailyRemindersSection
+          readOnly={isReadOnly}
           status={reminders.status}
           remindersEnabled={reminders.remindersEnabled}
           hasActivePushSubscription={reminders.hasActivePushSubscription}
@@ -55,8 +59,8 @@ export function SettingsPage() {
           }}
         />
       }
-      backupSection={<BackupSection />}
-      offlineSection={<OfflineAccessSection />}
+      backupSection={<BackupSection readOnly={isReadOnly} />}
+      offlineSection={<OfflineAccessSection readOnly={isReadOnly} />}
     />
   );
 }

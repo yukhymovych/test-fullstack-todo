@@ -6,7 +6,11 @@ import './BackupSection.css';
 
 const ACCEPT_TYPES = '.json,application/json';
 
-export function BackupSection() {
+export interface BackupSectionProps {
+  readOnly?: boolean;
+}
+
+export function BackupSection({ readOnly = false }: BackupSectionProps) {
   const { t } = useTranslation('settings');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { isExporting, isImporting, exportToFile, importFromFile } = useBackup();
@@ -42,7 +46,7 @@ export function BackupSection() {
         <Button
           type="button"
           onClick={handleExportClick}
-          disabled={isBusy}
+          disabled={isBusy || readOnly}
         >
           {isExporting ? t('backup.exportingButton') : t('backup.exportButton')}
         </Button>
@@ -53,7 +57,7 @@ export function BackupSection() {
           type="button"
           variant="secondary"
           onClick={handleImportButtonClick}
-          disabled={isBusy}
+          disabled={isBusy || readOnly}
         >
           {isImporting ? t('backup.importingButton') : t('backup.importButton')}
         </Button>
@@ -71,7 +75,7 @@ export function BackupSection() {
           <input
             type="checkbox"
             checked={preserveStudyState}
-            disabled={isBusy}
+            disabled={isBusy || readOnly}
             onChange={(event) => setPreserveStudyState(event.target.checked)}
           />
           <span>{t('backup.preserveStudyStateLabel')}</span>

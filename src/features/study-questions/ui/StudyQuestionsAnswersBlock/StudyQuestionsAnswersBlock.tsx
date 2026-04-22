@@ -22,7 +22,10 @@ interface DraftState {
 
 const EMPTY_DRAFT: DraftState = { question: '', answer: '' };
 
-export function StudyQuestionsAnswersBlock({ pageId }: StudyQuestionsAnswersBlockProps) {
+export function StudyQuestionsAnswersBlock({
+  pageId,
+  readOnly = false,
+}: StudyQuestionsAnswersBlockProps) {
   const { t } = useTranslation('study');
   const { data: pairs = [], isLoading } = useStudyQuestions(pageId);
   const createMutation = useCreateStudyQuestion(pageId);
@@ -102,28 +105,35 @@ export function StudyQuestionsAnswersBlock({ pageId }: StudyQuestionsAnswersBloc
     }
   };
 
+  if (readOnly && sortedPairs.length === 0) {
+    return null;
+  }
+
   return (
     <section className="study-qa-block">
       <div className="study-qa-block__header">
         <h3 className="study-qa-block__title">{t('sectionTitle')}</h3>
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={generateForPage}
-          disabled={isBusy}
-        >
-          {isGenerating ? t('creating') : t('createWithAi')}
-        </Button>
+        {!readOnly ? (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={generateForPage}
+            disabled={isBusy}
+          >
+            {isGenerating ? t('creating') : t('createWithAi')}
+          </Button>
+        ) : null}
       </div>
 
       {isLoading ? <p className="study-qa-block__hint">{t('loading')}</p> : null}
 
-      {isGenerating ? (
+      {!readOnly && isGenerating ? (
         <div className="study-qa-block__loader" role="status" aria-live="polite">
           <span className="study-qa-block__loader-spinner" aria-hidden="true" />
           <p className="study-qa-block__loader-text">{t('creatingLoader')}</p>
         </div>
-      ) : (
+      ) : null}
+      {!readOnly && !isGenerating ? (
         <div className="study-qa-block__create">
           <input
             className="study-qa-block__input"
@@ -151,11 +161,11 @@ export function StudyQuestionsAnswersBlock({ pageId }: StudyQuestionsAnswersBloc
             {t('createManual')}
           </Button>
         </div>
-      )}
+      ) : null}
 
       <div className="study-qa-block__list">
         {sortedPairs.map((pair) => {
-          const isEditing = editingId === pair.id;
+          const isEditing = !readOnly && editingId === pair.id;
           return (
             <article key={pair.id} className="study-qa-block__item">
               {isEditing ? (
@@ -193,29 +203,31 @@ export function StudyQuestionsAnswersBlock({ pageId }: StudyQuestionsAnswersBloc
                 <>
                   <div className="study-qa-block__item-header">
                     <p className="study-qa-block__question">{pair.question}</p>
-                    <div className="study-qa-block__icon-actions">
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={() => startEdit(pair)}
-                        disabled={isBusy}
-                        aria-label={t('editAria')}
-                        title={t('editTitle')}
-                      >
-                        <RiPencilLine />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={() => removePair(pair.id)}
-                        disabled={isBusy}
-                        aria-label={t('deleteAria')}
-                        title={t('deleteTitle')}
-                        className="study-qa-block__delete-icon-btn"
-                      >
-                        <RiDeleteBinLine />
-                      </Button>
-                    </div>
+                    {!readOnly ? (
+                      <div className="study-qa-block__icon-actions">
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => startEdit(pair)}
+                          disabled={isBusy}
+                          aria-label={t('editAria')}
+                          title={t('editTitle')}
+                        >
+                          <RiPencilLine />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => removePair(pair.id)}
+                          disabled={isBusy}
+                          aria-label={t('deleteAria')}
+                          title={t('deleteTitle')}
+                          className="study-qa-block__delete-icon-btn"
+                        >
+                          <RiDeleteBinLine />
+                        </Button>
+                      </div>
+                    ) : null}
                   </div>
                   <p className="study-qa-block__answer">{pair.answer}</p>
                 </>

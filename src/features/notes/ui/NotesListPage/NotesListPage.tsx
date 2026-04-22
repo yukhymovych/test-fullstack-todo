@@ -24,6 +24,7 @@ export function NotesListPageView({
   showLearningSessionButton,
   learningSessionButtonLabel,
   learningSessionButtonDisabled,
+  showNewPageButton = true,
   onNewNote,
   onLearningSessionClick,
   onNoteClick,
@@ -44,32 +45,38 @@ export function NotesListPageView({
     );
   }
 
+  const showToolbar = showNewPageButton || showLearningSessionButton;
+
   return (
     <div className="notes-list-page__container">
-      <div className="notes-list-page__toolbar">
-        <div className="notes-list-page__toolbar-actions">
-          <Button
-            variant="primary"
-            size='sm'
-            onClick={onNewNote}
-            disabled={createPending}
-          >
-            {createPending
-              ? t('sidebar.creating', { ns: 'notes' })
-              : t('sidebar.newPage', { ns: 'notes' })}
-          </Button>
-          {showLearningSessionButton && (
-            <Button
-              variant="ghost-muted"
-              size='sm'
-              onClick={onLearningSessionClick}
-              disabled={learningSessionButtonDisabled}
-            >
-              {learningSessionButtonLabel}
-            </Button>
-          )}
+      {showToolbar ? (
+        <div className="notes-list-page__toolbar">
+          <div className="notes-list-page__toolbar-actions">
+            {showNewPageButton ? (
+              <Button
+                variant="primary"
+                size='sm'
+                onClick={onNewNote}
+                disabled={createPending}
+              >
+                {createPending
+                  ? t('sidebar.creating', { ns: 'notes' })
+                  : t('sidebar.newPage', { ns: 'notes' })}
+              </Button>
+            ) : null}
+            {showLearningSessionButton ? (
+              <Button
+                variant="ghost-muted"
+                size='sm'
+                onClick={onLearningSessionClick}
+                disabled={learningSessionButtonDisabled}
+              >
+                {learningSessionButtonLabel}
+              </Button>
+            ) : null}
+          </div>
         </div>
-      </div>
+      ) : null}
 
       {createError && (
         <div className="notes-list-page__create-error">

@@ -28,3 +28,9 @@
   color: #8d6e63;
   font-weight: 400;
 }
+
+.offline-banner__hint {
+  flex-basis: 100%;
+  color: #6d4c41;
+  font-weight: 500;
+}

@@ -23,6 +23,8 @@ export interface NotesListPageProps {
   showLearningSessionButton: boolean;
   learningSessionButtonLabel: string;
   learningSessionButtonDisabled: boolean;
+  /** When false (e.g. offline read-only), hide the primary "New page" control. */
+  showNewPageButton?: boolean;
   onNewNote: () => void;
   onLearningSessionClick: () => void;
   onNoteClick: (noteId: string) => void;

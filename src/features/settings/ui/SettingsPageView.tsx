@@ -8,6 +8,8 @@ import './SettingsPageView.css';
 export interface SettingsPageViewProps {
   currentLanguage: UiLanguage;
   onLanguageChange: (language: UiLanguage) => void;
+  /** Offline / read-only: disable language selector (sync requires network). */
+  readOnly?: boolean;
   remindersSection?: ReactNode;
   backupSection?: ReactNode;
   offlineSection?: ReactNode;
@@ -16,6 +18,7 @@ export interface SettingsPageViewProps {
 export function SettingsPageView({
   currentLanguage,
   onLanguageChange,
+  readOnly = false,
   remindersSection,
   backupSection,
   offlineSection,
@@ -43,6 +46,7 @@ export function SettingsPageView({
               id="settings-language"
               className="settings-page__select"
               value={currentLanguage}
+              disabled={readOnly}
               onChange={handleLanguageChange}
             >
               <option value="en">{t('language.options.en')}</option>

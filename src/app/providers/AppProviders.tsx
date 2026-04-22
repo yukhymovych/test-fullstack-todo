@@ -14,6 +14,12 @@ const queryClient = new QueryClient({
     queries: {
       retry: 1,
       refetchOnWindowFocus: false,
+      // Default is `online`, which skips running `queryFn` while offline. Our
+      // read facades use Dexie when offline and must still execute.
+      networkMode: 'always',
+    },
+    mutations: {
+      networkMode: 'always',
     },
   },
 });

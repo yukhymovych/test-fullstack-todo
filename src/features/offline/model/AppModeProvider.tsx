@@ -12,6 +12,7 @@ import { useOnlineStatus } from './useOnlineStatus';
 import type { AppMode, CachedAccount } from '../domain/offline.types';
 import { deriveAccountKey } from '../lib/accountKey';
 import { getAccount, getLastActiveAccount, markAccountActive } from '../storage/accountsRepo';
+import { countNotes } from '../storage/notesRepo';
 import { reconcileOfflineCache } from '../sync/reconcileOfflineCache';
 import { setCurrentAppMode } from '../sync/appModeRef';
 import { setCurrentAccountKey } from '../sync/currentAccount';
@@ -112,7 +113,12 @@ export function AppModeProvider({ children }: { children: ReactNode }) {
         setCurrentAccountKey(last.accountKey);
         setAccount(last);
         if (!last.offlineEnabled) {
-          applyMode('offline_enabled_snapshot_missing', setMode);
+          const cachedNoteCount = await countNotes(last.accountKey);
+          if (cachedNoteCount > 0) {
+            applyMode('offline_cached_readonly', setMode);
+            return;
+          }
+          applyMode('offline_access_disabled', setMode);
           return;
         }
         applyMode('offline_cached_readonly', setMode);
@@ -131,7 +137,7 @@ export function AppModeProvider({ children }: { children: ReactNode }) {
       isReadOnly:
         mode === 'offline_cached_readonly' ||
         mode === 'offline_no_cache' ||
-        mode === 'offline_enabled_snapshot_missing',
+        mode === 'offline_access_disabled',
       account,
       lastSyncedAt: account?.lastSyncedAt ?? null,
       refresh: () => setBumpKey((k) => k + 1),

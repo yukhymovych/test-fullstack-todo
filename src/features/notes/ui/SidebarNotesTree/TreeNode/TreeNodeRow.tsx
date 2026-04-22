@@ -12,6 +12,7 @@ import {
 import { cn } from '@/lib/utils';
 import { MoreVertical } from 'lucide-react';
 import { RiArrowDownSLine } from 'react-icons/ri';
+import { useAppMode } from '@/features/offline/model/AppModeProvider';
 
 export interface TreeNodeRowProps {
   node: NoteItem;
@@ -53,6 +54,7 @@ export function TreeNodeRow({
   rowStyle,
 }: TreeNodeRowProps) {
   const { t } = useTranslation('notes');
+  const { isReadOnly } = useAppMode();
   const paddingLeft = 12 + depth * 14;
   const { data: descendantsWithLearning } = useDescendantsWithLearningCount(
     hasChildren ? nodeId : undefined
@@ -118,32 +120,34 @@ export function TreeNodeRow({
         >
           {node.title || DEFAULT_NOTE_TITLE}
         </Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              icon
-              className="menu-trigger-btn"
-              title={t('editor.pageOptions')}
-              style={{ opacity: 0.7 }}
-            >
-              <MoreVertical className="size-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <NotePageActionsMenu
-            noteId={nodeId}
-            noteTitle={node.title || DEFAULT_NOTE_TITLE}
-            isFavorite={isFavorite}
-            hasChildren={hasChildren}
-            hasDescendantsInGlobal={hasDescendantsInGlobal}
-            onAddToFavorites={onAddToFavorites}
-            onRemoveFromFavorites={onRemoveFromFavorites}
-            onCreateChild={onCreateChild}
-            onDelete={onDeletePage}
-            isDeleting={isDeleting}
-            pageBackup={pageBackup}
-          />
-        </DropdownMenu>
+        {!isReadOnly ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                icon
+                className="menu-trigger-btn"
+                title={t('editor.pageOptions')}
+                style={{ opacity: 0.7 }}
+              >
+                <MoreVertical className="size-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <NotePageActionsMenu
+              noteId={nodeId}
+              noteTitle={node.title || DEFAULT_NOTE_TITLE}
+              isFavorite={isFavorite}
+              hasChildren={hasChildren}
+              hasDescendantsInGlobal={hasDescendantsInGlobal}
+              onAddToFavorites={onAddToFavorites}
+              onRemoveFromFavorites={onRemoveFromFavorites}
+              onCreateChild={onCreateChild}
+              onDelete={onDeletePage}
+              isDeleting={isDeleting}
+              pageBackup={pageBackup}
+            />
+          </DropdownMenu>
+        ) : null}
       </div>
     </div>
   );

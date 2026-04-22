@@ -16,6 +16,11 @@ export async function getAllNotes(
   return await db.cachedNotes.where({ accountKey }).toArray();
 }
 
+export async function countNotes(accountKey: AccountKey): Promise<number> {
+  const db = getOfflineDb();
+  return await db.cachedNotes.where({ accountKey }).count();
+}
+
 export async function bulkPutNotes(notes: CachedNote[]): Promise<void> {
   if (notes.length === 0) return;
   const db = getOfflineDb();

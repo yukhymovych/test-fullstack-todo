@@ -12,6 +12,7 @@ const MINUTES_60 = Array.from({ length: 60 }, (_, minute) =>
 );
 
 export interface DailyRemindersSectionProps {
+  readOnly?: boolean;
   status: ReminderCapabilityStatus;
   remindersEnabled: boolean;
   hasActivePushSubscription: boolean;
@@ -29,6 +30,7 @@ export interface DailyRemindersSectionProps {
 export function DailyRemindersSection(props: DailyRemindersSectionProps) {
   const { t } = useTranslation('settings');
   const {
+    readOnly = false,
     status,
     remindersEnabled,
     hasActivePushSubscription,
@@ -77,14 +79,14 @@ export function DailyRemindersSection(props: DailyRemindersSectionProps) {
         <div
           id="daily-reminder-time"
           className="daily-reminders-section__time-controls"
-          onBlur={onReminderTimeLocalBlur}
+          onBlur={readOnly ? undefined : onReminderTimeLocalBlur}
         >
           <div className="daily-reminders-section__select-wrap">
             <select
               aria-label="Reminder hour"
               className="daily-reminders-section__select"
               value={hourPart}
-              disabled={isBusy}
+              disabled={isBusy || readOnly}
               onChange={(event) => {
                 applyReminderTime(event.target.value, minutePart);
               }}
@@ -106,7 +108,7 @@ export function DailyRemindersSection(props: DailyRemindersSectionProps) {
               aria-label="Reminder minute"
               className="daily-reminders-section__select"
               value={minutePart}
-              disabled={isBusy}
+              disabled={isBusy || readOnly}
               onChange={(event) => {
                 applyReminderTime(hourPart, event.target.value);
               }}
@@ -138,7 +140,7 @@ export function DailyRemindersSection(props: DailyRemindersSectionProps) {
           <button
             type="button"
             className="daily-reminders-section__disable-button"
-            disabled={isBusy}
+            disabled={isBusy || readOnly}
             onClick={onDisable}
           >
             {t('reminders.disableButton')}
@@ -147,7 +149,7 @@ export function DailyRemindersSection(props: DailyRemindersSectionProps) {
           <button
             type="button"
             className="daily-reminders-section__enable-button"
-            disabled={isBusy || status === 'unsupported'}
+            disabled={isBusy || readOnly || status === 'unsupported'}
             onClick={onEnable}
           >
             {t('reminders.enableButton')}
@@ -159,7 +161,7 @@ export function DailyRemindersSection(props: DailyRemindersSectionProps) {
           <button
             type="button"
             className="daily-reminders-section__debug-button"
-            disabled={isBusy}
+            disabled={isBusy || readOnly}
             onClick={onRunDebugJobNow}
           >
             {t('reminders.debugRunJobButton')}

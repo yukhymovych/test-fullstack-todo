@@ -32,7 +32,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <OfflineUnavailableScreen />;
   }
 
-  if (mode === 'offline_enabled_snapshot_missing') {
+  if (mode === 'offline_access_disabled') {
     return <OfflineEmptyScreen />;
   }
 

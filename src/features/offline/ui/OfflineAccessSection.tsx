@@ -6,7 +6,11 @@ import { useClearCurrentAccountCache } from '../model/useClearOfflineCache';
 import { formatBytes } from '../lib/formatBytes';
 import './OfflineAccessSection.css';
 
-export function OfflineAccessSection() {
+export interface OfflineAccessSectionProps {
+  readOnly?: boolean;
+}
+
+export function OfflineAccessSection({ readOnly = false }: OfflineAccessSectionProps) {
   const { t } = useTranslation('settings');
   const { data: account } = useOfflineAccount();
   const enableMutation = useEnableOfflineAccess();
@@ -14,9 +18,17 @@ export function OfflineAccessSection() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const enabled = !!account?.offlineEnabled;
+  const cacheBytes = account?.cacheBytesEstimate ?? 0;
+  const disabledKeepsLocalCopy = !enabled && cacheBytes > 0;
   const lastSynced = account?.lastSyncedAt
     ? new Date(account.lastSyncedAt).toLocaleString()
     : null;
+
+  const statusLabel = enabled
+    ? t('offline.status.enabled')
+    : disabledKeepsLocalCopy
+      ? t('offline.status.disabledKeepsCache')
+      : t('offline.status.disabled');
 
   const handleEnable = async () => {
     setErrorMessage(null);
@@ -48,13 +60,13 @@ export function OfflineAccessSection() {
             enabled ? 'is-enabled' : 'is-disabled'
           }`}
         >
-          {enabled ? t('offline.status.enabled') : t('offline.status.disabled')}
+          {statusLabel}
         </span>
-        {enabled && (
+        {(enabled || disabledKeepsLocalCopy) && (
           <div className="offline-section__stats">
             <span>
               {t('offline.stats.cacheSize', {
-                size: formatBytes(account?.cacheBytesEstimate ?? 0),
+                size: formatBytes(cacheBytes),
               })}
             </span>
             {lastSynced && (
@@ -72,7 +84,7 @@ export function OfflineAccessSection() {
             type="button"
             className="offline-section__btn is-primary"
             onClick={handleEnable}
-            disabled={enableMutation.isPending}
+            disabled={readOnly || enableMutation.isPending}
           >
             {enableMutation.isPending
               ? t('offline.actions.enabling')
@@ -85,7 +97,7 @@ export function OfflineAccessSection() {
               type="button"
               className="offline-section__btn"
               onClick={handleEnable}
-              disabled={enableMutation.isPending}
+              disabled={readOnly || enableMutation.isPending}
             >
               {enableMutation.isPending
                 ? t('offline.actions.refreshing')
@@ -95,7 +107,7 @@ export function OfflineAccessSection() {
               type="button"
               className="offline-section__btn is-danger"
               onClick={handleClear}
-              disabled={clearMutation.isPending}
+              disabled={readOnly || clearMutation.isPending}
             >
               {clearMutation.isPending
                 ? t('offline.actions.clearing')

@@ -2,7 +2,7 @@ import * as notesApi from './notesApi';
 import type { Note, NoteListItem } from '../model/types';
 import type { TrashNote, TrashNoteListItem } from '../model/trash.types';
 import { isOfflineMode } from '@/features/offline/sync/appModeRef';
-import { getCurrentAccountKey } from '@/features/offline/sync/currentAccount';
+import { resolveAccountKey } from '@/features/offline/sync/currentAccount';
 import {
   getAllNotes as getAllCachedNotes,
   getNote as getCachedNote,
@@ -43,7 +43,7 @@ function toNote(c: CachedNote): Note {
 
 export async function getNotes(): Promise<NoteListItem[]> {
   if (isOfflineMode()) {
-    const accountKey = getCurrentAccountKey();
+    const accountKey = await resolveAccountKey();
     if (!accountKey) return [];
     const all = await getAllCachedNotes(accountKey);
     return all.map(toListItem);
@@ -58,7 +58,7 @@ export async function getTrashNotes(): Promise<TrashNoteListItem[]> {
 
 export async function getNote(id: string): Promise<Note> {
   if (isOfflineMode()) {
-    const accountKey = getCurrentAccountKey();
+    const accountKey = await resolveAccountKey();
     const cached = accountKey ? await getCachedNote(accountKey, id) : null;
     if (!cached) {
       throw new Error('Note not cached offline');

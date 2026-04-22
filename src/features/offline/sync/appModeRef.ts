@@ -19,7 +19,7 @@ export function isReadOnlyMode(): boolean {
   return (
     currentAppMode === 'offline_cached_readonly' ||
     currentAppMode === 'offline_no_cache' ||
-    currentAppMode === 'offline_enabled_snapshot_missing'
+    currentAppMode === 'offline_access_disabled'
   );
 }
 

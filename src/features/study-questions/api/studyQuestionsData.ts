@@ -6,7 +6,7 @@ import type {
   GenerateStudyQuestionsBody,
 } from '../domain/studyQuestions.types';
 import { isOfflineMode } from '@/features/offline/sync/appModeRef';
-import { getCurrentAccountKey } from '@/features/offline/sync/currentAccount';
+import { resolveAccountKey } from '@/features/offline/sync/currentAccount';
 import { getQaByPage } from '@/features/offline/storage/qaRepo';
 import { assertWritable } from '@/features/offline/domain/readOnlyGuard';
 
@@ -14,7 +14,7 @@ export async function getStudyQuestionsForPage(
   pageId: string
 ): Promise<StudyQuestionAnswer[]> {
   if (isOfflineMode()) {
-    const accountKey = getCurrentAccountKey();
+    const accountKey = await resolveAccountKey();
     if (!accountKey) return [];
     const rows = await getQaByPage(accountKey, pageId);
     return rows.map((r) => ({

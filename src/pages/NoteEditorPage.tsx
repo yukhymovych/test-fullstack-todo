@@ -86,8 +86,8 @@ export function NoteEditorPage() {
         isStudyItemActive={studyItemStatus?.status === 'active'}
         isReadOnly={isReadOnly}
       />
-      {id && studyItemStatus?.status === 'active' && !isReadOnly ? (
-        <StudyQuestionsAnswersBlock pageId={id} />
+      {id && (isReadOnly || studyItemStatus?.status === 'active') ? (
+        <StudyQuestionsAnswersBlock pageId={id} readOnly={isReadOnly} />
       ) : null}
       {!isReadOnly && <NoteEditorLearningGradeBar noteId={id} />}
     </div>

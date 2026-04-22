@@ -6,7 +6,7 @@ export type AppMode =
   | 'online_auth_required'
   | 'offline_cached_readonly'
   | 'offline_no_cache'
-  | 'offline_enabled_snapshot_missing';
+  | 'offline_access_disabled';
 
 export interface CachedAccount {
   accountKey: AccountKey;

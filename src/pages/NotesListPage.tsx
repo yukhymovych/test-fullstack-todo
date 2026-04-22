@@ -2,9 +2,11 @@ import { useNotesListPage } from '../features/notes/model/useNotesListPage';
 import { NotesListPageView } from '../features/notes/ui/NotesListPage';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '../shared/lib/usePageTitle';
+import { useAppMode } from '@/features/offline/model/AppModeProvider';
 
 export function NotesListPage() {
   const { t } = useTranslation('common');
+  const { isReadOnly } = useAppMode();
   usePageTitle(t('pageTitles.notes'));
 
   const {
@@ -47,6 +49,7 @@ export function NotesListPage() {
       showLearningSessionButton={shouldShowLearningSessionButton}
       learningSessionButtonLabel={learningSessionButtonLabel}
       learningSessionButtonDisabled={isLearningSessionButtonDisabled}
+      showNewPageButton={!isReadOnly}
       onNewNote={handleNewNote}
       onLearningSessionClick={handleLearningSessionClick}
       onNoteClick={handleNoteClick}

@@ -1,7 +1,7 @@
 import * as learningApi from './learningApi';
 import type { StudyItemStatusResponse } from '../domain/learning.types';
 import { isOfflineMode } from '@/features/offline/sync/appModeRef';
-import { getCurrentAccountKey } from '@/features/offline/sync/currentAccount';
+import { resolveAccountKey } from '@/features/offline/sync/currentAccount';
 import { getStudyByNote } from '@/features/offline/storage/studyRepo';
 
 export async function getStudyItemStatus(
@@ -9,7 +9,7 @@ export async function getStudyItemStatus(
   timezone?: string
 ): Promise<StudyItemStatusResponse> {
   if (isOfflineMode()) {
-    const accountKey = getCurrentAccountKey();
+    const accountKey = await resolveAccountKey();
     if (!accountKey) return { status: 'inactive' };
     const row = await getStudyByNote(accountKey, pageId);
     if (!row) return { status: 'inactive' };
