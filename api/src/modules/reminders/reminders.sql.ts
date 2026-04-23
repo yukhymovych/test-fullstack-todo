@@ -116,8 +116,10 @@ export async function listActivePushSubscriptionsByUser(
 }
 
 export async function listDueReminderCandidates(
-  limit: number
+  limit: number,
+  options?: { bypassNextReminderInstant?: boolean }
 ): Promise<DueReminderUser[]> {
+  const bypassNextReminderInstant = Boolean(options?.bypassNextReminderInstant);
   const result = await pool.query(
     `SELECT id,
             COALESCE(timezone, $1) AS timezone,
@@ -129,10 +131,15 @@ export async function listDueReminderCandidates(
      FROM users
      WHERE daily_reminders_enabled = true
        AND next_reminder_at_utc IS NOT NULL
-       AND next_reminder_at_utc <= NOW()
+       AND ($4::boolean OR next_reminder_at_utc <= NOW())
      ORDER BY next_reminder_at_utc ASC
      LIMIT $3`,
-    [DEFAULT_REMINDER_TIMEZONE, DEFAULT_REMINDER_TIME_LOCAL, limit]
+    [
+      DEFAULT_REMINDER_TIMEZONE,
+      DEFAULT_REMINDER_TIME_LOCAL,
+      limit,
+      bypassNextReminderInstant,
+    ]
   );
   return result.rows as DueReminderUser[];
 }

@@ -49,6 +49,10 @@ REMINDER_JOB_BATCH_LIMIT=100
 REMINDER_CLAIM_STALE_AFTER_MS=600000
 ```
 
+Якщо `REMINDER_ALLOW_MULTIPLE_PER_DAY=true`, job додатково **не вимагає** `next_reminder_at_utc <= NOW()` для відбору кандидатів (зручно для дебагу push без очікування наступного wall-clock слоту). У продакшені зазвичай лишайте `false`.
+
+Логи job за замовчуванням **людиночитані** (багаторядкові в консолі). Для одного JSON-рядка на подію встановіть `REMINDER_JOB_LOG_FORMAT=json`.
+
 Після деплою з новою колонкою `next_reminder_at_utc` один раз виконайте бекфіл:
 
 ```bash
