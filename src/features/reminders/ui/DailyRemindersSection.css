@@ -58,6 +58,11 @@
   position: relative;
 }
 
+.daily-reminders-section__select-wrap--full {
+  flex: 1;
+  min-width: 0;
+}
+
 .daily-reminders-section__select {
   height: 35px;
   width: 60px;
@@ -68,6 +73,11 @@
   font-size: 14px;
   appearance: none;
   outline: none;
+}
+
+.daily-reminders-section__select--slot {
+  width: 100%;
+  padding-right: 28px;
 }
 
 .daily-reminders-section__select:focus-visible {
@@ -83,10 +93,6 @@
   pointer-events: none;
   width: 14px;
   height: 14px;
-}
-
-.daily-reminders-section__separator {
-  font-size: 14px;
 }
 
 .daily-reminders-section__hints {

@@ -16,6 +16,12 @@
     "description": "Get one daily browser notification when you have study pages due.",
     "statusLabel": "Status",
     "timeLabel": "Reminder time",
+    "timeSlotAriaLabel": "Reminder time of day",
+    "timeSlot": {
+      "morning": "Morning (9:00)",
+      "day": "Day (1:00 PM)",
+      "evening": "Evening (6:00 PM)"
+    },
     "catchUpHint": "If nothing is due at that time, Rememo will still send one reminder later that same day when pages become due.",
     "timezoneLabel": "Current device timezone",
     "subscriptionLabel": "Current browser subscription",

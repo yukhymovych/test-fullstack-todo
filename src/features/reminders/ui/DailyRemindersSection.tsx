@@ -1,15 +1,12 @@
 import { useTranslation } from 'react-i18next';
 import { ChevronDown } from 'lucide-react';
 import type { ReminderCapabilityStatus } from '../domain/reminders.types';
+import {
+  REMINDER_TIME_SLOTS,
+  isReminderTimeSlotId,
+  reminderTimeLocalToSlotId,
+} from '../domain/reminderTimeSlots';
 import './DailyRemindersSection.css';
-
-const HOURS_24 = Array.from({ length: 24 }, (_, hour) =>
-  String(hour).padStart(2, '0')
-);
-
-const MINUTES_60 = Array.from({ length: 60 }, (_, minute) =>
-  String(minute).padStart(2, '0')
-);
 
 export interface DailyRemindersSectionProps {
   readOnly?: boolean;
@@ -22,7 +19,6 @@ export interface DailyRemindersSectionProps {
   onEnable: () => void;
   onDisable: () => void;
   onReminderTimeLocalChange: (value: string) => void;
-  onReminderTimeLocalBlur: () => void;
   showDebugActions?: boolean;
   onRunDebugJobNow?: () => void;
 }
@@ -40,14 +36,16 @@ export function DailyRemindersSection(props: DailyRemindersSectionProps) {
     onEnable,
     onDisable,
     onReminderTimeLocalChange,
-    onReminderTimeLocalBlur,
     showDebugActions,
     onRunDebugJobNow,
   } = props;
-  const [hourPart = '09', minutePart = '00'] = reminderTimeLocal.split(':');
+  const slotValue = reminderTimeLocalToSlotId(reminderTimeLocal);
 
-  const applyReminderTime = (nextHour: string, nextMinute: string) => {
-    onReminderTimeLocalChange(`${nextHour}:${nextMinute}`);
+  const applySlot = (rawId: string) => {
+    if (!isReminderTimeSlotId(rawId)) return;
+    const slot = REMINDER_TIME_SLOTS.find((s) => s.id === rawId);
+    if (!slot) return;
+    onReminderTimeLocalChange(slot.reminderTimeLocal);
   };
 
   return (
@@ -76,46 +74,21 @@ export function DailyRemindersSection(props: DailyRemindersSectionProps) {
         <label htmlFor="daily-reminder-time" className="daily-reminders-section__label">
           {t('reminders.timeLabel')}
         </label>
-        <div
-          id="daily-reminder-time"
-          className="daily-reminders-section__time-controls"
-          onBlur={readOnly ? undefined : onReminderTimeLocalBlur}
-        >
-          <div className="daily-reminders-section__select-wrap">
+        <div className="daily-reminders-section__time-controls">
+          <div className="daily-reminders-section__select-wrap daily-reminders-section__select-wrap--full">
             <select
-              aria-label="Reminder hour"
-              className="daily-reminders-section__select"
-              value={hourPart}
+              id="daily-reminder-time"
+              aria-label={t('reminders.timeSlotAriaLabel')}
+              className="daily-reminders-section__select daily-reminders-section__select--slot"
+              value={slotValue}
               disabled={isBusy || readOnly}
               onChange={(event) => {
-                applyReminderTime(event.target.value, minutePart);
+                applySlot(event.target.value);
               }}
             >
-              {HOURS_24.map((hour) => (
-                <option key={hour} value={hour}>
-                  {hour}
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              aria-hidden
-              className="daily-reminders-section__select-icon"
-            />
-          </div>
-          <span className="daily-reminders-section__separator">:</span>
-          <div className="daily-reminders-section__select-wrap">
-            <select
-              aria-label="Reminder minute"
-              className="daily-reminders-section__select"
-              value={minutePart}
-              disabled={isBusy || readOnly}
-              onChange={(event) => {
-                applyReminderTime(hourPart, event.target.value);
-              }}
-            >
-              {MINUTES_60.map((minute) => (
-                <option key={minute} value={minute}>
-                  {minute}
+              {REMINDER_TIME_SLOTS.map((slot) => (
+                <option key={slot.id} value={slot.id}>
+                  {t(`reminders.timeSlot.${slot.id}`)}
                 </option>
               ))}
             </select>

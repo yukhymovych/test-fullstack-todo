@@ -45,13 +45,8 @@ export function SettingsPage() {
           }}
           onReminderTimeLocalChange={(value) => {
             setDraftReminderTimeLocal(value);
-          }}
-          onReminderTimeLocalBlur={() => {
-            if (
-              draftReminderTimeLocal &&
-              draftReminderTimeLocal !== reminders.reminderTimeLocal
-            ) {
-              void reminders.saveReminderTimeLocal(draftReminderTimeLocal);
+            if (value && value !== reminders.reminderTimeLocal) {
+              void reminders.saveReminderTimeLocal(value);
             }
           }}
           onRunDebugJobNow={() => {
