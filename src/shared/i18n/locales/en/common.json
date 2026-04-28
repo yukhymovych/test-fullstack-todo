@@ -43,8 +43,7 @@
   },
   "offline": {
     "banner": {
-      "title": "Offline mode — read-only.",
-      "lastSynced": "Last synced: {{time}}",
+      "statusLine": "Offline mode — view only · Last synced: {{time}}",
       "unknown": "unknown",
       "accessOffHint": "Offline access is turned off in Settings; you're viewing data already stored on this device."
     },

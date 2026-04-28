@@ -4,22 +4,21 @@ import { NoteBreadcrumbs } from '../NoteBreadcrumbs';
 import { NotePageActionsMenu } from '../NotePageActionsMenu';
 import { usePageBackupExport } from '@/features/backup/model/usePageBackupExport';
 import { useStudyItemStatus } from '@/features/learning/model/useStudyItemStatus';
-import { useStudyItemReviewLogs } from '@/features/learning/model/useStudyItemReviewLogs';
 import { useDescendantsWithLearningCount } from '@/features/learning/model/useDescendantsWithLearningCount';
+import { LearningStatsSheet } from '@/features/learning-stats/components/LearningStatsSheet';
 import { formatDueDate } from '../../domain/formatDate';
 import {
   Button,
   DropdownMenu,
   DropdownMenuTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
   Spinner,
+  Sheet,
+  SheetContent,
 } from '@/shared/ui';
-import { CircleAlert, MoreVertical } from 'lucide-react';
+import { LineChart, MoreVertical } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import type { SaveStatus } from '../../model/useNoteEditor';
 import type { NoteEditorToolbarProps } from './NoteEditorToolbar.types';
-import { getGradeLabel } from '@/features/learning/lib/gradePresentation';
 import './NoteEditorToolbar.css';
 
 const SAVE_STATUS_COLOR: Record<SaveStatus, string> = {
@@ -28,50 +27,6 @@ const SAVE_STATUS_COLOR: Record<SaveStatus, string> = {
   error: '#dc2626',
   idle: '#6b7280',
 };
-
-function getDaysAgoLabel(
-  iso: string | null | undefined,
-  t: (key: string, options?: Record<string, unknown>) => string
-): string {
-  if (!iso) return t('editor.notAvailable');
-  const now = Date.now();
-  const reviewedAt = new Date(iso).getTime();
-  if (Number.isNaN(reviewedAt)) return t('editor.notAvailable');
-  const diffMs = Math.max(0, now - reviewedAt);
-  const days = Math.floor(diffMs / (24 * 60 * 60 * 1000));
-  return days === 0 ? t('editor.today') : t('editor.daysAgo', { count: days });
-}
-
-function getScheduledIntervalLabel(
-  lastReviewedAt: string | null | undefined,
-  dueAt: string | undefined,
-  t: (key: string, options?: Record<string, unknown>) => string
-): string {
-  if (!lastReviewedAt || !dueAt) return t('editor.notAvailable');
-  const fromMs = new Date(lastReviewedAt).getTime();
-  const toMs = new Date(dueAt).getTime();
-  if (Number.isNaN(fromMs) || Number.isNaN(toMs)) return t('editor.notAvailable');
-  const interval = Math.max(0, (toMs - fromMs) / (24 * 60 * 60 * 1000));
-  return t('editor.intervalDays', { count: Number(interval.toFixed(1)) });
-}
-
-function isSameDay(iso: string | undefined): boolean {
-  if (!iso) {
-    return false;
-  }
-
-  const target = new Date(iso);
-  if (Number.isNaN(target.getTime())) {
-    return false;
-  }
-
-  const now = new Date();
-  return (
-    target.getFullYear() === now.getFullYear()
-    && target.getMonth() === now.getMonth()
-    && target.getDate() === now.getDate()
-  );
-}
 
 export function NoteEditorToolbar({
   activeId,
@@ -88,7 +43,8 @@ export function NoteEditorToolbar({
   importExport,
 }: NoteEditorToolbarProps) {
   const { t, i18n } = useTranslation('notes');
-  const [isWhyTodayTooltipOpen, setIsWhyTodayTooltipOpen] = useState(false);
+  const { t: tLearn } = useTranslation('learning');
+  const [statsOpen, setStatsOpen] = useState(false);
   const { data: studyStatus } = useStudyItemStatus(activeId);
   const saveStatusLabel: Record<SaveStatus, string> = {
     saving: t('editor.saveStatus.saving'),
@@ -99,9 +55,6 @@ export function NoteEditorToolbar({
   const dueLabel = studyStatus?.dueAt
     ? formatDueDate(studyStatus.dueAt, i18n.resolvedLanguage)
     : null;
-  const isDueToday = isSameDay(studyStatus?.dueAt);
-  const { data: reviewLogs } = useStudyItemReviewLogs(activeId, isDueToday);
-  const latestReviewLog = reviewLogs?.[0];
   const hasChildren = notes?.some((n) => n.parent_id === activeId) ?? false;
   const { data: descendantsWithLearning } = useDescendantsWithLearningCount(
     hasChildren ? activeId : undefined
@@ -112,6 +65,7 @@ export function NoteEditorToolbar({
     studyStatus?.status === 'active' && studyStatus?.dueAt;
 
   return (
+    <>
     <div className="note-editor-toolbar">
       <div className="note-editor-toolbar__top-row">
         <div className="note-editor-toolbar__left">
@@ -167,79 +121,50 @@ export function NoteEditorToolbar({
         </div>
       </div>
       {showDueAt && (
-        <span className="note-editor-toolbar__due">
-          {!isDueToday && (
-            <>
-              {t('editor.nextReview', {
-                relative: dueLabel,
-                date: new Date(studyStatus.dueAt!).toLocaleDateString(i18n.resolvedLanguage, {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                }),
-              })}
-            </>
-          )}
-          {isDueToday && (
-            <span className="note-editor-toolbar__due-today">
-              <span>
-                {t('editor.nextReview', {
-                  relative: dueLabel,
-                  date: new Date(studyStatus.dueAt!).toLocaleDateString(i18n.resolvedLanguage, {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                  }),
-                })}
-              </span>
-              <Tooltip open={isWhyTodayTooltipOpen} onOpenChange={setIsWhyTodayTooltipOpen}>
-                <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    aria-label={t('editor.whyTodayAria')}
-                    className="note-editor-toolbar__why-today"
-                    onClick={() => setIsWhyTodayTooltipOpen((prev) => !prev)}
-                  >
-                    {t('editor.whyToday')}
-                    <CircleAlert className="size-4" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" align="start">
-                  <div className="note-editor-toolbar__tooltip-grid">
-                    <div>
-                      {t('editor.lastReview', {
-                        value: getDaysAgoLabel(studyStatus.lastReviewedAt, t),
-                      })}
-                    </div>
-                    <div>
-                      {t('editor.stability', {
-                        value: studyStatus.stabilityDays?.toFixed(1) ?? t('editor.notAvailable'),
-                      })}
-                    </div>
-                    <div>
-                      {t('editor.difficulty', {
-                        value: studyStatus.difficulty?.toFixed(1) ?? t('editor.notAvailable'),
-                      })}
-                    </div>
-                    <div>
-                      {t('editor.lastGrade', {
-                        value: latestReviewLog?.grade
-                          ? getGradeLabel(t, latestReviewLog.grade)
-                          : t('editor.notAvailable'),
-                      })}
-                    </div>
-                    <div>
-                      {t('editor.scheduledInterval', {
-                        value: getScheduledIntervalLabel(studyStatus.lastReviewedAt, studyStatus.dueAt, t),
-                      })}
-                    </div>
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            </span>
-          )}
-        </span>
+        <div className="note-editor-toolbar__due-row">
+          <span className="note-editor-toolbar__due">
+            {t('editor.nextReview', {
+              relative: dueLabel,
+              date: new Date(studyStatus.dueAt!).toLocaleDateString(i18n.resolvedLanguage, {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              }),
+            })}
+          </span>
+          <Button
+            variant="outline"
+            type="button"
+            size="sm"
+            className={cn(
+              'shrink-0 border-white/10 bg-transparent text-muted-foreground',
+              'hover:bg-white/5 hover:text-foreground'
+            )}
+            onClick={() => setStatsOpen(true)}
+          >
+            <LineChart className="size-4" aria-hidden />
+            {tLearn('stats.openButton')}
+          </Button>
+        </div>
       )}
     </div>
+
+    <Sheet open={statsOpen} onOpenChange={setStatsOpen}>
+      <SheetContent
+        side="right"
+        className={cn(
+          'flex h-full w-full min-w-0 max-w-[100dvw] flex-col gap-0 overflow-y-auto overflow-x-hidden',
+          'border-l border-white/10 bg-zinc-950/95 p-4 text-foreground shadow-none',
+          'sm:w-[480px] sm:max-w-[480px] sm:shrink-0 sm:p-6'
+        )}
+      >
+        <LearningStatsSheet
+          noteId={activeId}
+          studyStatus={studyStatus}
+          enabled={statsOpen}
+        />
+      </SheetContent>
+    </Sheet>
+    </>
   );
 }

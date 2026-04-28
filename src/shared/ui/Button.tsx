@@ -12,6 +12,8 @@ const buttonVariants = cva(
         secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         danger: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
+        outline:
+          'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
         'ghost-muted':
           'w-full justify-start bg-white/5 text-[#d1d5db] hover:bg-white/10',
         link:
@@ -38,6 +40,7 @@ export type ButtonVariant =
   | 'secondary'
   | 'danger'
   | 'ghost'
+  | 'outline'
   | 'ghost-muted'
   | 'link';
 

@@ -110,6 +110,7 @@ export function MobileBlockToolbar({
 
   const handleCloseToolbar: MouseEventHandler<HTMLButtonElement> = (event) => {
     event.preventDefault();
+    editor.blur();
     setDismissedAtInteractionVersion(interactionVersion);
   };
 
