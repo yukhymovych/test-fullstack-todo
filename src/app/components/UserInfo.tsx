@@ -19,6 +19,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Spinner,
 } from '@/shared/ui';
 import {
   FolderMinus,
@@ -112,9 +113,14 @@ export function UserInfo({ onNavigate }: UserInfoProps) {
               className="text-muted-foreground"
             >
               <Plus className="size-4" />
-              {refillSession.isPending
-                ? t('userMenu.debug.adding')
-                : t('userMenu.debug.addMore')}
+              {refillSession.isPending ? (
+                <>
+                  <Spinner announce={false} size="sm" />
+                  <span className="sr-only">{t('userMenu.debug.adding')}</span>
+                </>
+              ) : (
+                t('userMenu.debug.addMore')
+              )}
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={handleResetSession}
@@ -122,9 +128,14 @@ export function UserInfo({ onNavigate }: UserInfoProps) {
               className="text-muted-foreground"
             >
               <RotateCcw className="size-4" />
-              {isResetting
-                ? t('userMenu.debug.resetting')
-                : t('userMenu.debug.resetSession')}
+              {isResetting ? (
+                <>
+                  <Spinner announce={false} size="sm" />
+                  <span className="sr-only">{t('userMenu.debug.resetting')}</span>
+                </>
+              ) : (
+                t('userMenu.debug.resetSession')
+              )}
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => deleteFutureSessions.mutate(undefined)}
@@ -132,9 +143,14 @@ export function UserInfo({ onNavigate }: UserInfoProps) {
               className="text-muted-foreground"
             >
               <Trash2 className="size-4" />
-              {deleteFutureSessions.isPending
-                ? t('userMenu.debug.deleting')
-                : t('userMenu.debug.deleteFutureSessions')}
+              {deleteFutureSessions.isPending ? (
+                <>
+                  <Spinner announce={false} size="sm" />
+                  <span className="sr-only">{t('userMenu.debug.deleting')}</span>
+                </>
+              ) : (
+                t('userMenu.debug.deleteFutureSessions')
+              )}
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => deleteTodayScopedSessions.mutate(undefined)}
@@ -142,9 +158,14 @@ export function UserInfo({ onNavigate }: UserInfoProps) {
               className="text-muted-foreground"
             >
               <FolderMinus className="size-4" />
-              {deleteTodayScopedSessions.isPending
-                ? t('userMenu.debug.deleting')
-                : t('userMenu.debug.deleteTodayScopedSessions')}
+              {deleteTodayScopedSessions.isPending ? (
+                <>
+                  <Spinner announce={false} size="sm" />
+                  <span className="sr-only">{t('userMenu.debug.deleting')}</span>
+                </>
+              ) : (
+                t('userMenu.debug.deleteTodayScopedSessions')
+              )}
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => refreshAllGrades.mutate(undefined)}
@@ -152,9 +173,14 @@ export function UserInfo({ onNavigate }: UserInfoProps) {
               className="text-muted-foreground"
             >
               <RefreshCw className="size-4" />
-              {refreshAllGrades.isPending
-                ? t('userMenu.debug.refreshing')
-                : t('userMenu.debug.refreshAllGrades')}
+              {refreshAllGrades.isPending ? (
+                <>
+                  <Spinner announce={false} size="sm" />
+                  <span className="sr-only">{t('userMenu.debug.refreshing')}</span>
+                </>
+              ) : (
+                t('userMenu.debug.refreshAllGrades')
+              )}
             </DropdownMenuItem>
           </>
         )}

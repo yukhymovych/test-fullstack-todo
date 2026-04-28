@@ -14,6 +14,7 @@ import { LearningAnimatedSwitch } from '../features/learning/ui/LearningAnimated
 import type { Grade } from '../features/learning/domain/learning.types';
 import { useStudyQuestions } from '../features/study-questions/model/useStudyQuestions';
 import { usePageTitle } from '../shared/lib/usePageTitle';
+import { Spinner } from '@/shared/ui';
 import '../features/learning/ui/LearningPage.css';
 
 export function LearningSessionPage() {
@@ -49,7 +50,11 @@ export function LearningSessionPage() {
   }, [embeds]);
 
   if (isLoading) {
-    return <div className="learning-page-loading">{t('page.loadingSession', { ns: 'learning' })}</div>;
+    return (
+      <div className="learning-page-loading">
+        <Spinner aria-label={t('page.loadingSession', { ns: 'learning' })} />
+      </div>
+    );
   }
 
   if (error) {

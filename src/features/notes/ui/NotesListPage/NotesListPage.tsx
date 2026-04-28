@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BookOpen, CircleAlert, Clock, History } from 'lucide-react';
-import { Badge, Button, Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui';
+import { Badge, Button, Spinner, Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui';
 import { GRADE_BADGE_STYLES, getGradeLabel } from '@/features/learning/lib/gradePresentation';
 import { NotesSliderSection } from '../NotesSliderSection';
 import type { NotesListPageProps } from './NotesListPage.types';
@@ -34,7 +34,16 @@ export function NotesListPageView({
   const { t } = useTranslation(['common', 'learning', 'notes']);
 
   if (isLoading) {
-    return <div className="notes-list-page__container">{t('list.loading', { ns: 'notes' })}</div>;
+    return (
+      <div className="notes-list-page__container notes-list-page__container--loading">
+        <span className="notes-list-page__loading-indicator">
+          <Spinner announce={false} />
+          <span className="notes-list-page__visually-hidden">
+            {t('list.loading', { ns: 'notes' })}
+          </span>
+        </span>
+      </div>
+    );
   }
 
   if (error) {
@@ -59,9 +68,14 @@ export function NotesListPageView({
                 onClick={onNewNote}
                 disabled={createPending}
               >
-                {createPending
-                  ? t('sidebar.creating', { ns: 'notes' })
-                  : t('sidebar.newPage', { ns: 'notes' })}
+                {createPending ? (
+                  <>
+                    <Spinner announce={false} size="sm" />
+                    <span className="sr-only">{t('sidebar.creating', { ns: 'notes' })}</span>
+                  </>
+                ) : (
+                  t('sidebar.newPage', { ns: 'notes' })
+                )}
               </Button>
             ) : null}
             {showLearningSessionButton ? (

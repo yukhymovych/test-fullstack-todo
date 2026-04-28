@@ -1,3 +1,4 @@
+import { Spinner } from '@/shared/ui';
 import { SearchResultItem } from './SearchResultItem';
 import type { SearchViewItem } from '../model/useSearchModal';
 
@@ -9,7 +10,7 @@ interface SearchResultsListProps {
   activeIndex: number;
   emptyPrompt: string;
   minQueryHint: string;
-  loadingText: string;
+  loadingAriaLabel: string;
   noResultsText: string;
   onHoverResult: (index: number) => void;
   onSelectResult: (noteId: string) => void;
@@ -23,7 +24,7 @@ export function SearchResultsList({
   activeIndex,
   emptyPrompt,
   minQueryHint,
-  loadingText,
+  loadingAriaLabel,
   noResultsText,
   onHoverResult,
   onSelectResult,
@@ -35,7 +36,9 @@ export function SearchResultsList({
       ) : !isQueryEligible ? (
         <div className="search-modal__status">{minQueryHint}</div>
       ) : isFetching ? (
-        <div className="search-modal__status">{loadingText}</div>
+        <div className="search-modal__status search-modal__status--busy">
+          <Spinner size="sm" aria-label={loadingAriaLabel} />
+        </div>
       ) : results.length === 0 ? (
         <div className="search-modal__status">{noResultsText}</div>
       ) : (

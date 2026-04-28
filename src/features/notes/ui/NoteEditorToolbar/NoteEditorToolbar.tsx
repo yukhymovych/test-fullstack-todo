@@ -14,6 +14,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  Spinner,
 } from '@/shared/ui';
 import { CircleAlert, MoreVertical } from 'lucide-react';
 import type { SaveStatus } from '../../model/useNoteEditor';
@@ -118,8 +119,21 @@ export function NoteEditorToolbar({
         </div>
         <div className="note-editor-toolbar__right">
           <span className="note-editor-toolbar__save-status" style={{ color: SAVE_STATUS_COLOR[saveStatus] }}>
-            {saveStatusLabel[saveStatus]}
-            {importExport.pendingLabel ? ` ${importExport.pendingLabel}` : null}
+            {saveStatus === 'saving' ? (
+              <>
+                <Spinner announce={false} size="sm" className="text-current" />
+                <span className="sr-only">{t('editor.saveStatus.saving')}</span>
+              </>
+            ) : (
+              saveStatusLabel[saveStatus]
+            )}
+            {importExport.pendingLabel ? (
+              <>
+                {' '}
+                <span className="sr-only">{importExport.pendingLabel}</span>
+                <Spinner announce={false} size="sm" className="text-current" />
+              </>
+            ) : null}
           </span>
           {!hidePageActions && (
             <DropdownMenu>

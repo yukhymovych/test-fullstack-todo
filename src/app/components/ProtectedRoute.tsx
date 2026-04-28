@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/useAuth';
 import { useAppMode } from '@/features/offline/model/AppModeProvider';
 import { OfflineUnavailableScreen } from '@/features/offline/ui/OfflineUnavailableScreen';
 import { OfflineEmptyScreen } from '@/features/offline/ui/OfflineEmptyScreen';
+import { Spinner } from '@/shared/ui';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -23,7 +24,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   if (mode === 'initializing' || isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <div className="text-muted-foreground text-sm">{t('status.loading')}</div>
+        <Spinner aria-label={t('status.loading')} />
       </div>
     );
   }
@@ -43,9 +44,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   if (!isAuthed || !isApiReady) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <div className="text-muted-foreground text-sm">
-          {t('status.redirectingToLogin')}
-        </div>
+        <Spinner aria-label={t('status.redirectingToLogin')} />
       </div>
     );
   }

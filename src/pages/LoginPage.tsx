@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '../shared/lib/usePageTitle';
+import { Spinner } from '@/shared/ui';
 
 export function LoginPage() {
   const { t } = useTranslation('common');
@@ -25,16 +26,14 @@ export function LoginPage() {
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <div className="text-muted-foreground text-sm">
-          {t('status.loadingAuthentication')}
-        </div>
+        <Spinner aria-label={t('status.loadingAuthentication')} />
       </div>
     );
   }
 
   return (
     <div className="flex h-screen items-center justify-center">
-      <div className="text-muted-foreground text-sm">{t('status.redirecting')}</div>
+      <Spinner aria-label={t('status.redirecting')} />
     </div>
   );
 }

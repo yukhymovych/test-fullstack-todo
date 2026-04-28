@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { BookOpen } from 'lucide-react';
-import { Button } from '@/shared/ui';
+import { Button, Spinner } from '@/shared/ui';
 import { useTranslation } from 'react-i18next';
 import { useTodayLearningSession } from '../model/useTodayLearningSession';
 import { useTodayScopedSessions } from '../model/useTodayScopedSessions';
@@ -47,7 +47,9 @@ export function LearningSidebarCard() {
   if (isLoading || scopedLoading) {
     return (
       <div className="learning-sidebar-card">
-        <div className="learning-sidebar-card__loading">{t('sidebar.loading')}</div>
+        <div className="learning-sidebar-card__loading">
+          <Spinner size="sm" aria-label={t('sidebar.loading')} />
+        </div>
       </div>
     );
   }
@@ -96,13 +98,18 @@ export function LearningSidebarCard() {
           onClick={handleStartOrContinue}
           disabled={startSession.isPending}
         >
-          {startSession.isPending
-            ? t('sidebar.starting')
-            : canContinue
-              ? t('sidebar.continue')
-              : hasItemsReady
-                ? t('sidebar.startToday')
-                : t('sidebar.startLearning')}
+          {startSession.isPending ? (
+            <>
+              <Spinner announce={false} size="sm" />
+              <span className="sr-only">{t('sidebar.starting')}</span>
+            </>
+          ) : canContinue ? (
+            t('sidebar.continue')
+          ) : hasItemsReady ? (
+            t('sidebar.startToday')
+          ) : (
+            t('sidebar.startLearning')
+          )}
         </Button>
       )}
       {activeScopedSessions.length > 0 && (

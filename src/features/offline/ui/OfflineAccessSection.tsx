@@ -4,6 +4,7 @@ import { useOfflineAccount } from '../model/useOfflineAccount';
 import { useEnableOfflineAccess } from '../model/useEnableOfflineAccess';
 import { useClearCurrentAccountCache } from '../model/useClearOfflineCache';
 import { formatBytes } from '../lib/formatBytes';
+import { Spinner } from '@/shared/ui';
 import './OfflineAccessSection.css';
 
 export interface OfflineAccessSectionProps {
@@ -86,9 +87,14 @@ export function OfflineAccessSection({ readOnly = false }: OfflineAccessSectionP
             onClick={handleEnable}
             disabled={readOnly || enableMutation.isPending}
           >
-            {enableMutation.isPending
-              ? t('offline.actions.enabling')
-              : t('offline.actions.enable')}
+            {enableMutation.isPending ? (
+              <>
+                <Spinner announce={false} size="sm" />
+                <span className="sr-only">{t('offline.actions.enabling')}</span>
+              </>
+            ) : (
+              t('offline.actions.enable')
+            )}
           </button>
         )}
         {enabled && (
@@ -99,9 +105,14 @@ export function OfflineAccessSection({ readOnly = false }: OfflineAccessSectionP
               onClick={handleEnable}
               disabled={readOnly || enableMutation.isPending}
             >
-              {enableMutation.isPending
-                ? t('offline.actions.refreshing')
-                : t('offline.actions.refresh')}
+              {enableMutation.isPending ? (
+                <>
+                  <Spinner announce={false} size="sm" />
+                  <span className="sr-only">{t('offline.actions.refreshing')}</span>
+                </>
+              ) : (
+                t('offline.actions.refresh')
+              )}
             </button>
             <button
               type="button"
@@ -109,9 +120,14 @@ export function OfflineAccessSection({ readOnly = false }: OfflineAccessSectionP
               onClick={handleClear}
               disabled={readOnly || clearMutation.isPending}
             >
-              {clearMutation.isPending
-                ? t('offline.actions.clearing')
-                : t('offline.actions.clear')}
+              {clearMutation.isPending ? (
+                <>
+                  <Spinner announce={false} size="sm" />
+                  <span className="sr-only">{t('offline.actions.clearing')}</span>
+                </>
+              ) : (
+                t('offline.actions.clear')
+              )}
             </button>
           </>
         )}

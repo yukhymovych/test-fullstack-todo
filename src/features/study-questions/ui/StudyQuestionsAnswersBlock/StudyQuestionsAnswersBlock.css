@@ -29,26 +29,18 @@
   margin-bottom: 50px;
 }
 
+.study-qa-block__fetching {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 14px;
+}
+
 .study-qa-block__loader {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
   min-height: 124px;
   margin-bottom: 50px;
-  color: #d1d5db;
-}
-
-.study-qa-block__loader-spinner {
-  width: 18px;
-  height: 18px;
-  border: 2px solid #3a3f47;
-  border-top-color: #f3f4f6;
-  border-radius: 9999px;
-  animation: study-qa-block-spin 0.8s linear infinite;
-}
-
-.study-qa-block__loader-text {
-  margin: 0;
 }
 
 .study-qa-block__create > button {
@@ -110,12 +102,3 @@
   color: #ef4444;
 }
 
-@keyframes study-qa-block-spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}

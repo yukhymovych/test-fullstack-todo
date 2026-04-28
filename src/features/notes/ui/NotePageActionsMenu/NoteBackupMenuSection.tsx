@@ -1,10 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import {
-  DropdownMenuItem,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-} from '@/shared/ui';
+import { DropdownMenuItem, DropdownMenuResponsiveSub } from '@/shared/ui';
 import type { UsePageBackupExportResult } from '@/features/backup/model/usePageBackupExport';
 
 export interface NoteBackupMenuSectionProps {
@@ -32,26 +27,21 @@ export function NoteBackupMenuSection({
   const disabled = pageBackup.isExporting || isMenuBusy;
 
   return (
-    <DropdownMenuSub>
-      <DropdownMenuSubTrigger disabled={disabled}>
-        {t('menu.backup')}
-      </DropdownMenuSubTrigger>
-      <DropdownMenuSubContent>
+    <DropdownMenuResponsiveSub label={t('menu.backup')} disabled={disabled}>
+      <DropdownMenuItem
+        disabled={disabled}
+        onClick={() => void pageBackup.exportPage(noteId, noteTitle)}
+      >
+        {t('menu.backupPage')}
+      </DropdownMenuItem>
+      {hasChildren ? (
         <DropdownMenuItem
           disabled={disabled}
-          onClick={() => void pageBackup.exportPage(noteId, noteTitle)}
+          onClick={() => void pageBackup.exportSubtree(noteId, noteTitle)}
         >
-          {t('menu.backupPage')}
+          {t('menu.backupPageWithChildren')}
         </DropdownMenuItem>
-        {hasChildren ? (
-          <DropdownMenuItem
-            disabled={disabled}
-            onClick={() => void pageBackup.exportSubtree(noteId, noteTitle)}
-          >
-            {t('menu.backupPageWithChildren')}
-          </DropdownMenuItem>
-        ) : null}
-      </DropdownMenuSubContent>
-    </DropdownMenuSub>
+      ) : null}
+    </DropdownMenuResponsiveSub>
   );
 }

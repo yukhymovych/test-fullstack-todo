@@ -69,7 +69,7 @@ export function SearchModal({
           activeIndex={activeIndex}
           emptyPrompt={t('search.emptyPrompt')}
           minQueryHint={t('search.minQueryHint')}
-          loadingText={t('search.loading')}
+          loadingAriaLabel={t('search.loading')}
           noResultsText={t('search.noResults')}
           onHoverResult={onHoverResult}
           onSelectResult={onSelectResult}

@@ -1,4 +1,5 @@
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useNoteEditor } from '../features/notes/model/useNoteEditor';
 import { NoteEditorToolbar } from '../features/notes/ui/NoteEditorToolbar';
 import { NoteTitleInput } from '../features/notes/ui/NoteTitleInput';
@@ -8,10 +9,12 @@ import { useStudyItemStatus } from '../features/learning/model/useStudyItemStatu
 import { StudyQuestionsAnswersBlock } from '../features/study-questions/ui';
 import { usePageTitle } from '../shared/lib/usePageTitle';
 import { useAppMode } from '@/features/offline/model/AppModeProvider';
+import { Spinner } from '@/shared/ui';
 import './NoteEditorPage.css';
 
 export function NoteEditorPage() {
   const { id } = useParams<{ id: string }>();
+  const { t } = useTranslation('notes');
   const {
     note,
     isLoading,
@@ -41,7 +44,14 @@ export function NoteEditorPage() {
   usePageTitle(chromeTitle);
 
   if (isLoading || !id) {
-    return <div className="note-editor-page note-editor-page--loading">Loading data...</div>;
+    return (
+      <div className="note-editor-page note-editor-page--loading">
+        <span className="note-editor-page__loading-indicator">
+          <Spinner announce={false} />
+          <span className="note-editor-page__visually-hidden">{t('list.loading')}</span>
+        </span>
+      </div>
+    );
   }
 
   if (error || !note) {

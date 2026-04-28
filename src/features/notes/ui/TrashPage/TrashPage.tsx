@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { RotateCcw, Trash2 } from 'lucide-react';
-import { Button } from '@/shared/ui';
+import { Button, Spinner } from '@/shared/ui';
 import { useTranslation } from 'react-i18next';
 import { useTrashPage } from '../../model/useTrashPage';
 import { usePageTitle } from '@/shared/lib/usePageTitle';
@@ -46,7 +46,14 @@ export function TrashPage() {
   );
 
   if (isLoading) {
-    return <div className="trash-page trash-page--status">{t('trash.loading')}</div>;
+    return (
+      <div className="trash-page trash-page--loading-full">
+        <span className="inline-flex items-center">
+          <Spinner announce={false} />
+          <span className="sr-only">{t('trash.loading')}</span>
+        </span>
+      </div>
+    );
   }
 
   if (error) {
@@ -95,7 +102,9 @@ export function TrashPage() {
         {!selectedId ? (
           <div className="trash-page__placeholder">{t('trash.placeholder')}</div>
         ) : isSelectedNoteLoading || !selectedNote ? (
-          <div className="trash-page__placeholder">{t('trash.loadingPreview')}</div>
+          <div className="trash-page__placeholder trash-page__placeholder--busy">
+            <Spinner aria-label={t('trash.loadingPreview')} />
+          </div>
         ) : (
           <>
             <div className="trash-page__content-header">

@@ -13,7 +13,7 @@ import { LearningSidebarCard } from '@/features/learning/ui/LearningSidebarCard'
 import { SearchModal } from '@/features/search/ui/SearchModal';
 import { SearchTrigger } from '@/features/search/ui/SearchTrigger';
 import { useSearchModal } from '@/features/search/model/useSearchModal';
-import { Button } from '@/shared/ui';
+import { Button, Spinner } from '@/shared/ui';
 import { UserInfo } from '@/app/components/UserInfo';
 import { useAppMode } from '@/features/offline/model/AppModeProvider';
 import { notesRoutes } from '../../lib/routes';
@@ -99,7 +99,11 @@ export function SidebarNotesTree({ onNavigate }: SidebarNotesTreeProps) {
   );
 
   if (isLoading) {
-    return <div className="sidebar-loading">{t('sidebar.loading', { ns: 'notes' })}</div>;
+    return (
+      <div className="sidebar-loading">
+        <Spinner size="sm" aria-label={t('sidebar.loading', { ns: 'notes' })} />
+      </div>
+    );
   }
 
   if (error) {
@@ -140,9 +144,14 @@ export function SidebarNotesTree({ onNavigate }: SidebarNotesTreeProps) {
               onClick={handleCreateRoot}
               disabled={createNote.isPending}
             >
-              {createNote.isPending
-                ? t('sidebar.creating', { ns: 'notes' })
-                : t('sidebar.newPage', { ns: 'notes' })}
+              {createNote.isPending ? (
+                <>
+                  <Spinner announce={false} size="sm" />
+                  <span className="sr-only">{t('sidebar.creating', { ns: 'notes' })}</span>
+                </>
+              ) : (
+                t('sidebar.newPage', { ns: 'notes' })
+              )}
             </Button>
           </div>
         )}

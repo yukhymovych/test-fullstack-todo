@@ -1,10 +1,8 @@
 import {
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuResponsiveSub,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
 } from '@/shared/ui';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +19,7 @@ import { learningRoutes } from '@/features/learning/lib/routes';
 import type { NotePageActionsMenuProps } from './NotePageActionsMenu.types';
 import { NoteImportExportMenuSection } from './NoteImportExportMenuSection';
 import { NoteBackupMenuSection } from './NoteBackupMenuSection';
+import { Spinner } from '@/shared/ui';
 
 export function NotePageActionsMenu({
   noteId,
@@ -113,20 +112,17 @@ export function NotePageActionsMenu({
         </DropdownMenuItem>
       ) : (
         hasChildren ? (
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>{t('menu.setAsLearningPage')}</DropdownMenuSubTrigger>
-            <DropdownMenuSubContent>
-              <DropdownMenuItem onClick={handleSetAsLearning}>
-                {t('menu.setLearningThisPageOnly')}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleSetAsLearningScoped}>
-                {t('menu.setLearningThisPageAndDescendants')}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleSetAsLearningDescendantsOnly}>
-                {t('menu.setLearningDescendantsOnly')}
-              </DropdownMenuItem>
-            </DropdownMenuSubContent>
-          </DropdownMenuSub>
+          <DropdownMenuResponsiveSub label={t('menu.setAsLearningPage')}>
+            <DropdownMenuItem onClick={handleSetAsLearning}>
+              {t('menu.setLearningThisPageOnly')}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleSetAsLearningScoped}>
+              {t('menu.setLearningThisPageAndDescendants')}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleSetAsLearningDescendantsOnly}>
+              {t('menu.setLearningDescendantsOnly')}
+            </DropdownMenuItem>
+          </DropdownMenuResponsiveSub>
         ) : (
           <DropdownMenuItem onClick={handleSetAsLearning}>
             {t('menu.setAsLearningPage')}
@@ -134,23 +130,34 @@ export function NotePageActionsMenu({
         )
       )}
       {hasChildren && hasDescendantsInGlobal && (
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger>{t('menu.startScopedLearningSession')}</DropdownMenuSubTrigger>
-          <DropdownMenuSubContent>
-            <DropdownMenuItem
-              onClick={handleLearnAllChildren}
-              disabled={startScopedSession.isPending}
-            >
-              {startScopedSession.isPending ? t('menu.starting') : t('menu.deepDiveAllChildren')}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={handleLearnDueChildren}
-              disabled={startScopedSession.isPending}
-            >
-              {startScopedSession.isPending ? t('menu.starting') : t('menu.dueOnlyTodaysReview')}
-            </DropdownMenuItem>
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
+        <DropdownMenuResponsiveSub label={t('menu.startScopedLearningSession')}>
+          <DropdownMenuItem
+            onClick={handleLearnAllChildren}
+            disabled={startScopedSession.isPending}
+          >
+            {startScopedSession.isPending ? (
+              <>
+                <Spinner announce={false} size="sm" />
+                <span className="sr-only">{t('menu.starting')}</span>
+              </>
+            ) : (
+              t('menu.deepDiveAllChildren')
+            )}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={handleLearnDueChildren}
+            disabled={startScopedSession.isPending}
+          >
+            {startScopedSession.isPending ? (
+              <>
+                <Spinner announce={false} size="sm" />
+                <span className="sr-only">{t('menu.starting')}</span>
+              </>
+            ) : (
+              t('menu.dueOnlyTodaysReview')
+            )}
+          </DropdownMenuItem>
+        </DropdownMenuResponsiveSub>
       )}
       <NoteImportExportMenuSection importExport={importExport} />
       <NoteBackupMenuSection

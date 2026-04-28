@@ -11,6 +11,7 @@ import { LearningLayout } from './app/layout/LearningLayout';
 import { useAuth } from './app/contexts/useAuth';
 import { useTranslation } from 'react-i18next';
 import { useSyncUiLanguageToServer } from '@/features/settings/model/useSyncUiLanguageToServer';
+import { Spinner } from '@/shared/ui';
 import './App.css';
 
 function RootRedirect() {
@@ -20,7 +21,7 @@ function RootRedirect() {
   if (isLoading || (isAuthed && !isApiReady)) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <div className="text-muted-foreground text-sm">{t('status.loading')}</div>
+        <Spinner aria-label={t('status.loading')} />
       </div>
     );
   }

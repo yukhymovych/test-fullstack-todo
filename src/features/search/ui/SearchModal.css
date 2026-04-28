@@ -52,6 +52,13 @@
   font-size: 13px;
 }
 
+.search-modal__status--busy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 72px;
+}
+
 .search-result {
   width: 100%;
   display: flex;
