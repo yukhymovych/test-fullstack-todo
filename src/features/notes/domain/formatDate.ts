@@ -66,12 +66,9 @@ export function formatDueDate(iso: string, locale?: string): string {
   if (diffD <= 0) return capitalize(formatter.format(0, 'day'));
   if (diffD < 7) return capitalize(formatter.format(diffD, 'day'));
   if (diffD < 30) return capitalize(formatter.format(Math.floor(diffD / 7), 'week'));
+  if (diffD < 365) return capitalize(formatter.format(Math.floor(diffD / 30), 'month'));
 
-  return d.toLocaleDateString(locale, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
+  return capitalize(formatter.format(Math.floor(diffD / 365), 'year'));
 }
 
 /**

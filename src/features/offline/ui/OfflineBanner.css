@@ -34,3 +34,10 @@
   color: #6d4c41;
   font-weight: 500;
 }
+
+/* Clear NotesLayout fixed mobile menu (see --notes-layout-mobile-menu-clearance) */
+@media (max-width: 767px) {
+  .offline-banner {
+    padding-left: var(--notes-layout-mobile-menu-clearance, calc(8px + 36px + 12px));
+  }
+}

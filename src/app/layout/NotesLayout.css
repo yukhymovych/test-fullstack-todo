@@ -43,6 +43,11 @@
 }
 
 @media (max-width: 767px) {
+  /* Reserved for fixed menu (top/left 8px, 36×36) + gap; offline banner uses this for padding-left */
+  .notes-layout {
+    --notes-layout-mobile-menu-clearance: calc(8px + 36px + 12px);
+  }
+
   .notes-layout__menu-button {
     display: inline-flex;
   }
