@@ -2,10 +2,8 @@ import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DropdownMenuItem,
+  DropdownMenuResponsiveSub,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
 } from '@/shared/ui';
 import type { UseNoteImportExportResult } from '../../model/useNoteImportExport';
 
@@ -39,44 +37,42 @@ export function NoteImportExportMenuSection({
     <>
       <DropdownMenuSeparator />
       {importExport.canExport ? (
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger disabled={actionDisabled}>
-            {t('menu.export')}
-          </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent>
+        <DropdownMenuResponsiveSub
+          label={t('menu.export')}
+          disabled={actionDisabled}
+        >
+          <DropdownMenuItem
+            disabled={actionDisabled}
+            onClick={() => void importExport.handleExport('html')}
+          >
+            {t('menu.exportAsHtml')}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            disabled={actionDisabled}
+            onClick={() => void importExport.handleExport('txt')}
+          >
+            {t('menu.exportAsTxt')}
+          </DropdownMenuItem>
+          {importExport.canExportPdf ? (
             <DropdownMenuItem
               disabled={actionDisabled}
-              onClick={() => void importExport.handleExport('html')}
+              onClick={() => void importExport.handleExport('pdf')}
             >
-              {t('menu.exportAsHtml')}
+              {t('menu.exportAsPdf')}
             </DropdownMenuItem>
-            <DropdownMenuItem
-              disabled={actionDisabled}
-              onClick={() => void importExport.handleExport('txt')}
-            >
-              {t('menu.exportAsTxt')}
-            </DropdownMenuItem>
-            {importExport.canExportPdf ? (
-              <DropdownMenuItem
-                disabled={actionDisabled}
-                onClick={() => void importExport.handleExport('pdf')}
-              >
-                {t('menu.exportAsPdf')}
-              </DropdownMenuItem>
-            ) : null}
-            {shouldShowTreeExport
-              ? importExport.treeExportFormats.map((format) => (
-                  <DropdownMenuItem
-                    key={format}
-                    disabled={actionDisabled}
-                    onClick={() => void importExport.handleExportTree(format)}
-                  >
-                    {t('menu.treeAsFormat', { format: format.toUpperCase() })}
-                  </DropdownMenuItem>
-                ))
-              : null}
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
+          ) : null}
+          {shouldShowTreeExport
+            ? importExport.treeExportFormats.map((format) => (
+                <DropdownMenuItem
+                  key={format}
+                  disabled={actionDisabled}
+                  onClick={() => void importExport.handleExportTree(format)}
+                >
+                  {t('menu.treeAsFormat', { format: format.toUpperCase() })}
+                </DropdownMenuItem>
+              ))
+            : null}
+        </DropdownMenuResponsiveSub>
       ) : null}
       <DropdownMenuItem
         disabled={actionDisabled || !importExport.canImport}

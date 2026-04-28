@@ -26,6 +26,8 @@ export {
   DropdownMenuSubTrigger,
   DropdownMenuRadioGroup,
 } from './dropdown-menu';
+export { DropdownMenuResponsiveSub } from './DropdownMenuResponsiveSub';
+export type { DropdownMenuResponsiveSubProps } from './DropdownMenuResponsiveSub';
 export {
   Carousel,
   CarouselContent,
