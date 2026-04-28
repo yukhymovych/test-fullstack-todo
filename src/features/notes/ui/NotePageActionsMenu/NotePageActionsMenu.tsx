@@ -21,6 +21,7 @@ import { learningRoutes } from '@/features/learning/lib/routes';
 import type { NotePageActionsMenuProps } from './NotePageActionsMenu.types';
 import { NoteImportExportMenuSection } from './NoteImportExportMenuSection';
 import { NoteBackupMenuSection } from './NoteBackupMenuSection';
+import { Spinner } from '@/shared/ui';
 
 export function NotePageActionsMenu({
   noteId,
@@ -141,13 +142,27 @@ export function NotePageActionsMenu({
               onClick={handleLearnAllChildren}
               disabled={startScopedSession.isPending}
             >
-              {startScopedSession.isPending ? t('menu.starting') : t('menu.deepDiveAllChildren')}
+              {startScopedSession.isPending ? (
+                <>
+                  <Spinner announce={false} size="sm" />
+                  <span className="sr-only">{t('menu.starting')}</span>
+                </>
+              ) : (
+                t('menu.deepDiveAllChildren')
+              )}
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={handleLearnDueChildren}
               disabled={startScopedSession.isPending}
             >
-              {startScopedSession.isPending ? t('menu.starting') : t('menu.dueOnlyTodaysReview')}
+              {startScopedSession.isPending ? (
+                <>
+                  <Spinner announce={false} size="sm" />
+                  <span className="sr-only">{t('menu.starting')}</span>
+                </>
+              ) : (
+                t('menu.dueOnlyTodaysReview')
+              )}
             </DropdownMenuItem>
           </DropdownMenuSubContent>
         </DropdownMenuSub>

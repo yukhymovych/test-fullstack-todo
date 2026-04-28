@@ -10,10 +10,58 @@
   color: red;
 }
 
+.note-editor-page--loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.note-editor-page__visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.note-editor-page__loading-indicator {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
+}
+
+.note-editor-page__loading-indicator svg {
+  display: block;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  color: #a1a1aa;
+  stroke: currentColor;
+}
+
 @media (max-width: 767px) {
   .note-editor-page {
     padding: 14px;
   }
+
+  /* Clear fixed notes-layout menu button (≈8px + 36px + gap) */
+  .note-editor-page.note-editor-page--loading {
+    padding: 48px 14px 14px 56px;
+    justify-content: flex-start;
+  }
+
+  .note-editor-page.note-editor-page--error {
+    padding: 48px 14px 14px 52px;
+  }
+
   .bn-mantine .bn-side-menu {
     background-color: rgb(24, 24, 24);
     border-radius: 6px;

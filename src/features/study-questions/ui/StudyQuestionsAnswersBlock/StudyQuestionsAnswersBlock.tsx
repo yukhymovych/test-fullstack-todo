@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/shared/ui';
+import { Button, Spinner } from '@/shared/ui';
 import { RiDeleteBinLine, RiPencilLine } from 'react-icons/ri';
 import {
   useStudyQuestions,
@@ -120,17 +120,27 @@ export function StudyQuestionsAnswersBlock({
             onClick={generateForPage}
             disabled={isBusy}
           >
-            {isGenerating ? t('creating') : t('createWithAi')}
+            {isGenerating ? (
+              <>
+                <Spinner announce={false} size="sm" />
+                <span className="sr-only">{t('creating')}</span>
+              </>
+            ) : (
+              t('createWithAi')
+            )}
           </Button>
         ) : null}
       </div>
 
-      {isLoading ? <p className="study-qa-block__hint">{t('loading')}</p> : null}
+      {isLoading ? (
+        <div className="study-qa-block__fetching">
+          <Spinner size="sm" aria-label={t('loading')} />
+        </div>
+      ) : null}
 
       {!readOnly && isGenerating ? (
-        <div className="study-qa-block__loader" role="status" aria-live="polite">
-          <span className="study-qa-block__loader-spinner" aria-hidden="true" />
-          <p className="study-qa-block__loader-text">{t('creatingLoader')}</p>
+        <div className="study-qa-block__loader" aria-live="polite">
+          <Spinner aria-label={t('creatingLoader')} />
         </div>
       ) : null}
       {!readOnly && !isGenerating ? (

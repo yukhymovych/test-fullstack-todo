@@ -46,8 +46,10 @@
 }
 
 .learning-sidebar-card__loading {
-  color: #9ca3af;
-  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
 }
 
 .learning-sidebar-card__completed {

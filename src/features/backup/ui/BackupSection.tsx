@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/shared/ui';
+import { Button, Spinner } from '@/shared/ui';
 import { useBackup } from '../model/useBackup';
 import './BackupSection.css';
 
@@ -48,7 +48,14 @@ export function BackupSection({ readOnly = false }: BackupSectionProps) {
           onClick={handleExportClick}
           disabled={isBusy || readOnly}
         >
-          {isExporting ? t('backup.exportingButton') : t('backup.exportButton')}
+          {isExporting ? (
+            <>
+              <Spinner announce={false} size="sm" />
+              <span className="sr-only">{t('backup.exportingButton')}</span>
+            </>
+          ) : (
+            t('backup.exportButton')
+          )}
         </Button>
       </div>
 
@@ -59,7 +66,14 @@ export function BackupSection({ readOnly = false }: BackupSectionProps) {
           onClick={handleImportButtonClick}
           disabled={isBusy || readOnly}
         >
-          {isImporting ? t('backup.importingButton') : t('backup.importButton')}
+          {isImporting ? (
+            <>
+              <Spinner announce={false} size="sm" />
+              <span className="sr-only">{t('backup.importingButton')}</span>
+            </>
+          ) : (
+            t('backup.importButton')
+          )}
         </Button>
         <input
           ref={fileInputRef}

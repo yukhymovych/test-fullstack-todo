@@ -40,3 +40,5 @@ export {
   TooltipContent,
 } from './tooltip';
 export { Badge } from './badge';
+export { Spinner } from './Spinner';
+export type { SpinnerProps, SpinnerSize } from './Spinner';
