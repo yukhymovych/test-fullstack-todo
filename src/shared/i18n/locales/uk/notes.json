@@ -24,24 +24,7 @@
       "idle": "\u00a0"
     },
     "pageOptions": "Параметри сторінки",
-    "nextReview": "Наступне повторення: {{relative}} ({{date}})",
-    "whyToday": "Чому сьогодні?",
-    "whyTodayAria": "Чому повторення заплановане на сьогодні",
-    "lastReview": "Останнє повторення: {{value}}",
-    "stability": "Стабільність: {{value}} дн.",
-    "difficulty": "Складність: {{value}} / 10",
-    "lastGrade": "Остання оцінка: {{value}}",
-    "scheduledInterval": "Запланований інтервал: {{value}}",
-    "notAvailable": "Н/Д",
-    "today": "Сьогодні",
-    "daysAgo_one": "{{count}} день тому",
-    "daysAgo_few": "{{count}} дні тому",
-    "daysAgo_many": "{{count}} днів тому",
-    "daysAgo_other": "{{count}} дня тому",
-    "intervalDays_one": "{{count}} день",
-    "intervalDays_few": "{{count}} дні",
-    "intervalDays_many": "{{count}} днів",
-    "intervalDays_other": "{{count}} дня"
+    "nextReview": "Наступне повторення: {{relative}} ({{date}})"
   },
   "menu": {
     "addToFavorites": "Додати в обране",

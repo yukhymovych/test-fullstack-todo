@@ -47,5 +47,41 @@
     "undo": "Undo",
     "gradeUndone": "Grade undone",
     "undoFailed": "Undo failed. Grade was already finalized."
+  },
+  "stats": {
+    "title": "Learning statistics",
+    "openButton": "Learning statistics",
+    "totalReviews": "Reviews",
+    "totalLabel": "Total",
+    "againRate": "Again rate",
+    "againSub": "{{count}} again",
+    "stability": "Stability",
+    "difficulty": "Difficulty",
+    "current": "Current",
+    "stabilityUnit": "d",
+    "difficultyOutOf": "{{value}} / 10",
+    "chartTitle": "Stability over time",
+    "chartRange": "90 days",
+    "legendStability": "Stability",
+    "historyTitle": "Review history",
+    "columns": {
+      "date": "Date",
+      "grade": "Grade",
+      "interval": "Interval (days)",
+      "stability": "Stability",
+      "difficulty": "Difficulty"
+    },
+    "tooltip": {
+      "stability": "Stability",
+      "difficulty": "Difficulty",
+      "grade": "Grade"
+    },
+    "footer": "Stability is the estimated number of days the memory of this page is likely to last at the current difficulty, before it becomes hard to recall.",
+    "emptyHistory": "No reviews yet.",
+    "emptyChart": "Not enough data in this range.",
+    "loading": "Loading…",
+    "error": "Could not load statistics.",
+    "notAvailable": "—",
+    "intervalDays": "{{count}} d"
   }
 }
